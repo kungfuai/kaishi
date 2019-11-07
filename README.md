@@ -1,5 +1,5 @@
 # kaishi
-Tool kit to accelerate the first steps of the data science process
+Tool kit to accelerate the initial phases of exploratory data analysis.
 
 "kaishi" is the Chinese word for "begin", often used to mark the start a Kung Fu fight.
 
