@@ -1,5 +1,5 @@
 """Primary interface to the image tool kit."""
-from kaishi.lib.image.file import ImageFileGroup
+from kaishi.core.image.file import ImageFileGroup
 
 
 def analyze(dir_name):
