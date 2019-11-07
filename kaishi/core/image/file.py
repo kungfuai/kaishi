@@ -1,6 +1,6 @@
 import os
 import imghdr
-from kaishi.util.io import FileGroup
+from kaishi.util.file import FileGroup
 from kaishi.util.misc import trim_list_by_inds
 
 class ImageFileGroup(FileGroup):
