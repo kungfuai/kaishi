@@ -37,7 +37,7 @@ class FileGroup:
 
         return
 
-    def show_filters(self):
+    def show_available_filters(self):
         """Shows available member function filters."""
         for m in dir(self):
             if m.startswith('filter_'):

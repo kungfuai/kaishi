@@ -32,7 +32,7 @@ class ImageFileGroup(FileGroup):
                 badind.append(i)
 
         self.files, trimmed = trim_list_by_inds(self.files, badind) 
-        self.filtered['bad_extension'] = trimmed
+        self.filtered['unsupported_extension'] = trimmed
 
         return
 
