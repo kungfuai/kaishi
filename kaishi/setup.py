@@ -8,7 +8,7 @@ print(find_packages())
 setup(
     name = "kaishi",
     version = "0.0.1",
-    author = "Michael Wharton",
+    author = "KUNGFU.AI",
     author_email = "michael@kungfu.ai",
     description = ("Tool kit to accelerate the first steps of the data science process"),
     url = "https://github.com/kungfuai/receipt_ner",
