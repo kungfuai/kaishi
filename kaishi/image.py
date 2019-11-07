@@ -2,22 +2,26 @@
 from kaishi.core.image.file import ImageFileGroup
 
 
-def analyze(dir_name):
+def dataset():
+    """Blank image dataset object."""
+    return ImageFileGroup()
+
+def analyze_dir(dir_name):
+    """Analyze and validate a directory of images.
+
+    Returns an image file group object.
+    """
+
     # Load the file names that we will manipulate
-    images = ImageFileGroup()
-    images.from_dir(dir_name)
-    print('Files now:')
-    print(images.file_list)
-    print()
+    dataset = ImageFileGroup()
+    dataset.load_dir(dir_name)
 
-    images.filter_by_extension()
-    print('Files now:')
-    print(images.file_list)
-    print()
+    # Perform filter pipeline
+    dataset.filter_by_extension()
+    dataset.filter_by_image_header()
+    dataset.filter_duplicates()
 
-    images.filter_by_image_header()
-    print('Files now:')
-    print(images.file_list)
-    print()
+    # Print report
+    dataset.report()
 
-    return
+    return dataset
