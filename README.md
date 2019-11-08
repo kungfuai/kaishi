@@ -20,8 +20,10 @@ pip install ./kaishi
 # Quick Start
 To run the entire image analysis pipeline on the sample data directory, use the following commands in a python terminal:
 ```
-from kaishi.image import analyze_dir
-imdata = analyze_dir('sample_images')
+from kaishi.image import Dataset
+imdata = Dataset('sample_images')
+imdata.run_pipeline()
+imdata.report()
 ```
 If successful, a report like the below will be displayed:
 ```
@@ -42,13 +44,7 @@ Invalid files:
 ```
 In addition, the `imdata` object contains various objects and methods to interact with the data.
 
-# Fine control
-All parts of the above pipeline can be interacted with directly and independently. The `files` and `filtered` members of a dataset object keep lists of files based on applied filters.
+At any point in the pipeline, the `imdata.files` and `imdata.filtered` objects contain results.
 
-```
-from kaishi.image import dataset
-imdata = dataset()
-```
-From here you can use the `load_dir(dirname)` and `show_available_filters()` methods to get started. After running filters, you can intermittently run `imdata.report()` to see intermediate results.
-
-When complete, the `imdata.files` and `imdata.filtered` objects contain results.
+# A Note on Pipelines
+The `Dataset.pipeline.methods` and `Dataset.pipeline.args` are simply lists of functions and argument lists, respectively. You can edit this with your own custom objects simply by calling `dataset.pipeline.methods.append` and `Dataset.pipeline.args.append`, which will then be called when you run `Dataset.run_pipeline()`.
