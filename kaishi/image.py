@@ -12,7 +12,7 @@ class Dataset(ImageFileGroup):
             self.load_dir(source)
 
         # Define default pipeline
-        self.pipeline = [self.filter_by_file_extension,
+        self.pipeline = [self.filter_invalid_file_extensions,
                          self.filter_invalid_image_headers,
                          self.filter_duplicates]
         self.pipeline_args = [[], [], []]

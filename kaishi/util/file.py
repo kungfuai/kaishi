@@ -65,6 +65,10 @@ class FileGroup:
 
     def report(self):
         """Show a report of valid and invalid data."""
+        if self.files == [] and self.filtered == {}:
+            print('No data loaded to report on.')
+            return
+
         print('Valid files:')
         for f in self.files:
             print('\t%s' % f.basename)

@@ -21,7 +21,7 @@ class ImageFileGroup(FileGroup):
         else:
             return False
 
-    def filter_by_file_extension(self, valid_ext_list=VALID_EXT):
+    def filter_invalid_file_extensions(self, valid_ext_list=VALID_EXT):
         """Filter file list if non-image extensions exist."""
 
         # Trim any files without image extensions 
