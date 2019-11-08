@@ -21,14 +21,14 @@ class ImageFileGroup(FileGroup):
         else:
             return False
 
-    def filter_by_extension(self):
+    def filter_by_file_extension(self, valid_ext_list=VALID_EXT):
         """Filter file list if non-image extensions exist."""
 
         # Trim any files without image extensions 
         badind = []
-        for i, fn in enumerate(self.files):
-            _, ext = os.path.splitext(fn)
-            if len(ext) == 0 or ext not in self.VALID_EXT:
+        for i, f in enumerate(self.files):
+            _, ext = os.path.splitext(f.basename)
+            if len(ext) == 0 or ext not in valid_ext_list:
                 badind.append(i)
 
         self.files, trimmed = trim_list_by_inds(self.files, badind) 
@@ -36,12 +36,12 @@ class ImageFileGroup(FileGroup):
 
         return
 
-    def filter_by_image_header(self):
+    def filter_invalid_image_headers(self):
         """Filter file list if image files have invalid or nonexistent header."""
 
         badind = []
-        for i, fn in enumerate(self.files):
-            if not self.validate_image_header(fn):
+        for i, f in enumerate(self.files):
+            if not self.validate_image_header(f.abspath):
                 badind.append(i)
 
         self.files, trimmed = trim_list_by_inds(self.files, badind)

@@ -3,37 +3,23 @@ import os
 from kaishi.core.image.file import ImageFileGroup
 
 
-def dataset(source=None, validation=None):
-    """Try to initialize data set object."""
-    if source is None:
-        dataset_obj = ImageFileGroup()
-    elif os.path.isdir(source):
-        dataset_obj = ImageFileGroup()
-        dataset_obj.load_dir(source)
-    # elif os.path.isfile(source):
-    #    dataset_obj = ImageFile()
+class Dataset(ImageFileGroup):
+    """Primary object for image data sets."""
+    def __init__(self, source=None): 
 
-    # Additional thoughts: validation will be added to the dataset object and 
-    # will have the same methods/etc. But it will check for overlap, etc.
+        ImageFileGroup.__init__(self)
+        if source is not None:
+            self.load_dir(source)
 
-    return dataset_obj
+        # Define default pipeline
+        self.pipeline = [self.filter_by_file_extension,
+                         self.filter_invalid_image_headers,
+                         self.filter_duplicates]
+        self.pipeline_args = [[], [], []]
+                         
+        return
 
-def analyze_dir(dir_name):
-    """Analyze and validate a directory of images.
-
-    Returns an image file group object.
-    """
-
-    # Load the file names that we will manipulate
-    dataset = ImageFileGroup()
-    dataset.load_dir(dir_name)
-
-    # Perform filter pipeline
-    dataset.filter_by_extension()
-    dataset.filter_by_image_header()
-    dataset.filter_duplicates()
-
-    # Print report
-    dataset.report()
-
-    return dataset
+    def run_pipeline(self):
+        """Run the full pipeline as configured."""
+        for (pm, args) in zip(self.pipeline, self.pipeline_args):
+            pm(*args)

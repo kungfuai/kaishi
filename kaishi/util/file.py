@@ -3,8 +3,26 @@ import os
 from kaishi.util.misc import find_duplicate_inds, trim_list_by_inds, md5sum 
 
 
+class File:
+    """Class that contains details about a file."""
+    def __init__(self, filename):
+        """Initialize basic file details."""
+        self.dirname = os.path.dirname(filename)
+        _ , self.ext = os.path.splitext(filename)
+        self.basename = os.path.basename(filename)
+        self.abspath = os.path.abspath(filename)
+        self.hash = None  # Default to None, populate later
+        
+        return
+
+    def compute_hash(self):
+        """Compute the hash of the file."""
+        self.hash = md5sum(self.abspath)
+
+        return self.hash
+
 class FileGroup:
-    """Class for reading, writing, and performing general operations on files."""
+    """Class for readind and performing general operations on files."""
 
     def __init__(self):
         """Instantiate empty class."""
@@ -16,11 +34,11 @@ class FileGroup:
     def load_dir(self, dir_name):
         """Read file names in a directory while ignoring subdirectories."""
         self.dir_name = os.path.abspath(dir_name)
-        self.files = [self.dir_name + '/' + bn for bn in os.listdir(dir_name)]
+        self.files = [File(self.dir_name + '/' + bn) for bn in os.listdir(dir_name)]
 
         badind = []
-        for i, fn in enumerate(self.files):
-            if os.path.isdir(fn):
+        for i, f in enumerate(self.files):
+            if os.path.isdir(f.abspath):
                 badind.append(i)
 
         self.files, _ = trim_list_by_inds(self.files, badind)
@@ -29,7 +47,7 @@ class FileGroup:
 
     def filter_duplicates(self):
         """Filter duplicate files, detected via hashing."""
-        hashlist = [md5sum(f) for f in self.files]
+        hashlist = [f.hash if f.hash is not None else f.compute_hash() for f in self.files]
 
         duplicate_ind = find_duplicate_inds(hashlist)
         self.files, trimmed = trim_list_by_inds(self.files, duplicate_ind)
@@ -48,13 +66,13 @@ class FileGroup:
     def report(self):
         """Show a report of valid and invalid data."""
         print('Valid files:')
-        for fn in self.files:
-            print('\t%s' % os.path.basename(fn))
+        for f in self.files:
+            print('\t%s' % f.basename)
 
         print('Invalid files:')
         for k in self.filtered.keys():
             print('\t%s:' % k)
-            for fn in self.filtered[k]:
-                print('\t\t%s' % os.path.basename(fn))
+            for f in self.filtered[k]:
+                print('\t\t%s' % f.basename)
 
         return
