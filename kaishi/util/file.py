@@ -53,7 +53,7 @@ class FileGroup:
         self.files, trimmed = trim_list_by_inds(self.files, duplicate_ind)
         self.filtered['duplicates'] = trimmed
 
-        return
+        return trimmed
 
     def show_available_filters(self):
         """Shows available member function filters."""

@@ -34,7 +34,7 @@ class ImageFileGroup(FileGroup):
         self.files, trimmed = trim_list_by_inds(self.files, badind) 
         self.filtered['unsupported_extension'] = trimmed
 
-        return
+        return trimmed
 
     def filter_invalid_image_headers(self):
         """Filter file list if image files have invalid or nonexistent header."""
@@ -47,4 +47,4 @@ class ImageFileGroup(FileGroup):
         self.files, trimmed = trim_list_by_inds(self.files, badind)
         self.filtered['invalid_header'] = trimmed
 
-        return
+        return trimmed
