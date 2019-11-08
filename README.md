@@ -4,6 +4,12 @@ Tool kit to accelerate the initial phases of exploratory data analysis.
 # Requirements
 Python 3
 
+# Contributing
+Some general guidelines to keep in mind when contributing
+* Rely on convention as opposed to providing extensive configuration
+* Don't invent features that _might_ be needed. If you've seen an issue more than once in the past or are presented with it in the future, feel free to add functionality.
+* Try to follow a [factory approach](https://en.wikipedia.org/wiki/Software_factory) where possible
+
 # Installation
 To install:
 ```
