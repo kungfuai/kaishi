@@ -1,10 +1,19 @@
 """Primary interface to the image tool kit."""
+import os
 from kaishi.core.image.file import ImageFileGroup
 
 
-def dataset():
-    """Blank image dataset object."""
-    return ImageFileGroup()
+def dataset(source=None):
+    """Try to initialize data set object."""
+    if source is None:
+        dataset_obj = ImageFileGroup()
+    elif os.path.isdir(source):
+        dataset_obj = ImageFileGroup()
+        dataset_obj.load_dir(source)
+    # elif os.path.isfile(source):
+    #    dataset_obj = ImageFile()
+
+    return dataset_obj
 
 def analyze_dir(dir_name):
     """Analyze and validate a directory of images.

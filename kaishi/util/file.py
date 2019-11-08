@@ -8,7 +8,7 @@ class FileGroup:
 
     def __init__(self):
         """Instantiate empty class."""
-        self.file = []
+        self.files = []
         self.filtered = dict()
 
         return
