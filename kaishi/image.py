@@ -3,7 +3,7 @@ import os
 from kaishi.core.image.file import ImageFileGroup
 
 
-def dataset(source=None):
+def dataset(source=None, validation=None):
     """Try to initialize data set object."""
     if source is None:
         dataset_obj = ImageFileGroup()
@@ -12,6 +12,9 @@ def dataset(source=None):
         dataset_obj.load_dir(source)
     # elif os.path.isfile(source):
     #    dataset_obj = ImageFile()
+
+    # Additional thoughts: validation will be added to the dataset object and 
+    # will have the same methods/etc. But it will check for overlap, etc.
 
     return dataset_obj
 
