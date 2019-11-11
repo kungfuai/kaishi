@@ -1,13 +1,64 @@
 import os
 import imghdr
-from kaishi.util.file import FileGroup
+from PIL import Image
+import imagehash
+from kaishi.util.file import File, FileGroup
 from kaishi.util.misc import trim_list_by_inds
+from kaishi.util.misc import find_near_duplicates_by_value
+
+
+class ImageFile(File):
+    """Class extension from 'File' for image-specific attributes and methods."""
+    THUMBNAIL_SIZE = (64, 64)
+
+    def __init__(self, filename):
+        """Add members to supplement File class."""
+        File.__init__(self, filename)
+
+        self.image = None
+        self.perceptual_hash = None
+
+        return
+
+    def verify_loaded(self):
+        """Verify image is loaded, and try to load."""
+        if self.image is None:
+            try:
+                self.image = Image.open(self.abspath).resize(self.THUMBNAIL_SIZE)
+            except OSError:  # Not an image file:
+                self.image = None
+
+        return
+
+    def compute_perceptual_hash(self):
+        """Calculate perceptual hash (close in value to similar images."""
+        self.verify_loaded()
+        if self.image is None:  # Couldn't load the image
+            return None
+
+        self.perceptual_hash = imagehash.average_hash(self.image)
+
+        return self.perceptual_hash
 
 class ImageFileGroup(FileGroup):
     """Class to operate on an image file group."""
     # Valid extensions for opencv images
     VALID_EXT = ['.bmp', '.dib', '.jpeg', '.jpg', '.jpe', '.jp2', '.png', '.pbm',
                  '.pgm', '.ppm', '.sr', '.ras', '.tiff', '.tif']
+
+    def load_dir(self, dir_name):
+        """Read file names in a directory while ignoring subdirectories."""
+        self.dir_name = os.path.abspath(dir_name)
+        self.files = [ImageFile(self.dir_name + '/' + bn) for bn in os.listdir(dir_name)]
+
+        badind = []
+        for i, f in enumerate(self.files):
+            if os.path.isdir(f.abspath):
+                badind.append(i)
+
+        self.files, _ = trim_list_by_inds(self.files, badind)
+
+        return
 
     def validate_image_header(self, filename):
         """Validate that an image has a valid header.
@@ -20,6 +71,16 @@ class ImageFileGroup(FileGroup):
             return True
         else:
             return False
+
+    def filter_near_duplicates(self, threshold):
+        """Filter near duplicate files, detected via perceptual hashing ('imagehash' library)."""
+        hashlist = [f.perceptual_hash if f.perceptual_hash is not None else f.compute_perceptual_hash() for f in self.files]
+
+        duplicate_ind = find_near_duplicates_by_value(hashlist, threshold)
+        self.files, trimmed = trim_list_by_inds(self.files, duplicate_ind)
+        self.filtered['near_duplicates'] = trimmed
+
+        return trimmed
 
     def filter_invalid_file_extensions(self, valid_ext_list=VALID_EXT):
         """Filter file list if non-image extensions exist."""

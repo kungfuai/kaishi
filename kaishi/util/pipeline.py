@@ -12,9 +12,11 @@ class Pipeline:
 
         return
 
-    def run(self):
+    def run(self, verbose=False):
         """Run the full pipeline as configured."""
         for (pm, args) in zip(self.methods, self.args):
+            if verbose:
+                print('Running ' + pm.__name__)
             pm(*args)
 
         return
