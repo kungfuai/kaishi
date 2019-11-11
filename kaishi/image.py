@@ -6,7 +6,7 @@ from kaishi.util.pipeline import Pipeline
 
 class Dataset(ImageFileGroup):
     """Primary object for image data sets."""
-    PERCEPTUAL_HASH_THRESHOLD = 8  # Empirically determined, can be overridden in DEFUALT_PIPELINE_ARGS
+    PERCEPTUAL_HASH_THRESHOLD = 3  # Empirically determined, can be overridden in DEFUALT_PIPELINE_ARGS
 
     def __init__(self, source=None): 
         """Initialize with the default pipeline defined."""
