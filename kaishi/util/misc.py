@@ -1,7 +1,23 @@
 """Miscellaneous helper functions."""
 import hashlib
 import numpy as np
+import os
 
+def load_files_by_walk(dir_name_raw, FileInitializer):
+    """Read file names in a directory while ignoring subdirectories."""
+    dir_name = os.path.abspath(dir_name_raw)
+    dir_children = []
+    files = []
+    for root, dirs, filenames in os.walk(dir_name):
+        relative_path = None  # Assume we're in the 'dir_name' directory before checking
+        if len(os.path.abspath(root)) > len(dir_name):
+            relative_path = os.path.abspath(root)[len(dir_name) + 1:]
+            if relative_path not in dir_children:
+                dir_children.append(relative_path)
+        for filename in filenames:
+            files.append(FileInitializer(dir_name, relative_path, filename))
+
+    return dir_name, dir_children, files
 
 def trim_list_by_inds(list_to_trim, indices):
     """Trim a list given an unordered list of indices."""

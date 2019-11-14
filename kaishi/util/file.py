@@ -1,16 +1,22 @@
 """Class definition for reading/writing files of various types."""
 import os
-from kaishi.util.misc import find_duplicate_inds, trim_list_by_inds, md5sum 
+from kaishi.util.misc import find_duplicate_inds
+from kaishi.util.misc import trim_list_by_inds
+from kaishi.util.misc import md5sum
+from kaishi.util.misc import load_files_by_walk
 
 
 class File:
     """Class that contains details about a file."""
-    def __init__(self, filename):
+    def __init__(self, basedir, relpath, filename):
         """Initialize basic file details."""
-        self.dirname = os.path.dirname(filename)
+        self.relative_path = relpath
         _ , self.ext = os.path.splitext(filename)
-        self.basename = os.path.basename(filename)
-        self.abspath = os.path.abspath(filename)
+        self.basename = filename
+        if relpath is not None:
+            self.abspath = os.path.join(basedir, relpath, filename)
+        else:
+            self.abspath = os.path.join(basedir, filename)
         self.hash = None  # Default to None, populate later
         
         return
@@ -33,15 +39,7 @@ class FileGroup:
 
     def load_dir(self, dir_name):
         """Read file names in a directory while ignoring subdirectories."""
-        self.dir_name = os.path.abspath(dir_name)
-        self.files = [File(self.dir_name + '/' + bn) for bn in os.listdir(dir_name)]
-
-        badind = []
-        for i, f in enumerate(self.files):
-            if os.path.isdir(f.abspath):
-                badind.append(i)
-
-        self.files, _ = trim_list_by_inds(self.files, badind)
+        self.dir_name, self.dir_children, self.files = load_files_by_walk(dir_name, File)
 
         return
 
