@@ -43,6 +43,6 @@ def add_poisson_noise(image, param=1.0, rescale=True):
 
     return Image.fromarray(noisy_image.astype(np.uint8))
 
-#def _train_generator(self, batch_size=16):
-#    """Generator for training the data labeler. Operates on a kaishi.image.Dataset object."""
-#    self.files
+def _train_generator(self, batch_size=16):
+    """Generator for training the data labeler. Operates on a kaishi.image.Dataset object."""
+    self.files

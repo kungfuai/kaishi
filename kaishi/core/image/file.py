@@ -4,7 +4,7 @@ from PIL import Image
 import imagehash
 from kaishi.util.file import File, FileGroup
 from kaishi.util.misc import trim_list_by_inds
-from kaishi.util.misc import find_near_duplicates_by_value
+from kaishi.util.misc import find_similar_by_value
 from kaishi.util.misc import load_files_by_walk
 
 
@@ -16,6 +16,7 @@ class ImageFile(File):
         """Add members to supplement File class."""
         File.__init__(self, basedir, relpath, filename)
 
+        self.children['similar'] = []
         self.image = None
         self.thumbnail = None
         self.perceptual_hash = None
@@ -33,13 +34,13 @@ class ImageFile(File):
 
         return
 
-    def compute_perceptual_hash(self):
+    def compute_perceptual_hash(self, hashfunc=imagehash.average_hash):
         """Calculate perceptual hash (close in value to similar images."""
         self.verify_loaded()
         if self.image is None:  # Couldn't load the image
             return None
 
-        self.perceptual_hash = imagehash.average_hash(self.thumbnail)
+        self.perceptual_hash = hashfunc(self.thumbnail)
 
         return self.perceptual_hash
 
@@ -67,13 +68,15 @@ class ImageFileGroup(FileGroup):
         else:
             return False
 
-    def filter_near_duplicates(self, threshold):
+    def filter_similar(self, threshold):
         """Filter near duplicate files, detected via perceptual hashing ('imagehash' library)."""
         hashlist = [f.perceptual_hash if f.perceptual_hash is not None else f.compute_perceptual_hash() for f in self.files]
 
-        duplicate_ind = find_near_duplicates_by_value(hashlist, threshold)
+        duplicate_ind, parent_ind = find_similar_by_value(hashlist, threshold)
+        for di, pi in zip(duplicate_ind, parent_ind):
+            self.files[pi].children['similar'].append(self.files[di])
         self.files, trimmed = trim_list_by_inds(self.files, duplicate_ind)
-        self.filtered['near_duplicates'] = trimmed
+        self.filtered['similar'] = trimmed
 
         return trimmed
 
