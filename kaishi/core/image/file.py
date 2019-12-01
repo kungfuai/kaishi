@@ -1,16 +1,22 @@
 import os
+import numpy as np
 import imghdr
 from PIL import Image
 import imagehash
+from tqdm import tqdm
 from kaishi.util.file import File, FileGroup
 from kaishi.util.misc import trim_list_by_inds
 from kaishi.util.misc import find_similar_by_value
 from kaishi.util.misc import load_files_by_walk
+from sklearn.feature_extraction.image import extract_patches_2d
 
 
 class ImageFile(File):
     """Class extension from 'File' for image-specific attributes and methods."""
     THUMBNAIL_SIZE = (64, 64)
+    MAX_DIM_FOR_SMALL = 256  # Max dimension for small sample
+    PATCH_SIZE = (64, 64)  # Patch size for compression artifact detection
+    RESAMPLE_METHOD = Image.NEAREST  # Resampling method for resizing images
 
     def __init__(self, basedir, relpath, filename):
         """Add members to supplement File class."""
@@ -18,25 +24,39 @@ class ImageFile(File):
 
         self.children['similar'] = []
         self.image = None
+        self.small_image = None
         self.thumbnail = None
+        self.patch = None
         self.perceptual_hash = None
 
         return
 
-    def verify_loaded(self):
-        """Verify image is loaded, and try to load."""
+    def verify_loaded(self, thumbnail=False, small_image=False, patch=False, all_formats=False):
+        """Verify image and derivatives are loaded (only loading when necessary)."""
         if self.image is None:
             try:
                 self.image = Image.open(self.abspath)
-                self.thumbnail = self.image.resize(self.THUMBNAIL_SIZE)
-            except OSError:  # Not an image file:
+                if (thumbnail or all_formats) and self.thumbnail is not None:
+                    self.thumbnail = self.image.resize(self.THUMBNAIL_SIZE)
+                if (small_image or all_formats) and self.small_image is not None:
+                    scale_factor = np.min(self.image.size) / float(self.MAX_DIM_FOR_SMALL)
+                    small_size = (np.round(self.image.size[0] / scale_factor).astype('int64'),
+                                  np.round(self.image.size[1] / scale_factor).astype('int64'))
+                    left = (small_size[0] - self.MAX_DIM_FOR_SMALL) // 2
+                    right = left + self.MAX_DIM_FOR_SMALL
+                    upper = (small_size[1] - self.MAX_DIM_FOR_SMALL) // 2
+                    lower = upper + self.MAX_DIM_FOR_SMALL
+                    self.small_image = self.image.resize(small_size, resample=self.RESAMPLE_METHOD).crop([left, upper, right, lower])
+                if (patch or all_formats) and self.patch is not None:
+                    self.patch = Image.fromarray(extract_patches_2d(np.array(self.image), self.PATCH_SIZE, max_patches=1, random_state=0)[0])
+            except OSError:  # Not an image file
                 self.image = None
 
         return
 
     def compute_perceptual_hash(self, hashfunc=imagehash.average_hash):
         """Calculate perceptual hash (close in value to similar images."""
-        self.verify_loaded()
+        self.verify_loaded(thumbnail=True)
         if self.image is None:  # Couldn't load the image
             return None
 
@@ -50,9 +70,27 @@ class ImageFileGroup(FileGroup):
     VALID_EXT = ['.bmp', '.dib', '.jpeg', '.jpg', '.jpe', '.jp2', '.png', '.pbm',
                  '.pgm', '.ppm', '.sr', '.ras', '.tiff', '.tif']
 
+    def __init__(self):
+        """Initialize new image file group."""
+        FileGroup.__init__(self)
+
+        return
+
+    # Externally defined methods
+    from kaishi.core.image.generator import train_generator
+
     def load_dir(self, dir_name):
         """Read file names in a directory while ignoring subdirectories."""
         self.dir_name, self.dir_children, self.files = load_files_by_walk(dir_name, ImageFile)
+
+        return
+
+    def load_all(self, thumbnail=False, small_image=False, patch=False, all_formats=False):
+        """Load all images and specific image derivatives."""
+        if not thumbnail and not small_image and not patch:
+            all_formats = True  # If no option provided, load everything
+        for f in tqdm(self.files):
+            f.verify_loaded(thumbnail=thumbnail, small_image=small_image, patch=patch, all_formats=all_formats)
 
         return
 

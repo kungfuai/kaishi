@@ -1,5 +1,7 @@
 from io import BytesIO
+import itertools
 import numpy as np
+import random
 from PIL import Image
 
 
@@ -21,7 +23,7 @@ def add_stretching(image, w_percent_additional, h_percent_additional):
     newsize = (image.size[0] * int(1.0 + w_percent_additional / 100),
                image.size[1] * int(1.0 + h_percent_additional / 100))
 
-    return image.resize(newsize)
+    return image.resize(newsize, resample=Image.BILINEAR)
 
 def add_poisson_noise(image, param=1.0, rescale=True):
     """Add Poisson noise to image, where (poisson noise * param) is the final noise function.
@@ -43,6 +45,62 @@ def add_poisson_noise(image, param=1.0, rescale=True):
 
     return Image.fromarray(noisy_image.astype(np.uint8))
 
-def _train_generator(self, batch_size=16):
-    """Generator for training the data labeler. Operates on a kaishi.image.Dataset object."""
-    self.files
+def train_generator(self, batch_size=32):
+    """Generator for training the data labeler. Operates on a kaishi.image.Dataset object.
+    
+    LABELS: [DOCUMENT, ROTATED_RIGHT, ROTATED_LEFT, UPSIDE_DOWN, STRETCHING]
+    Additional labels to implement with a different network: compressed, noisy
+    """
+    indexes = [i for i in range(len(self.files))]
+    random.seed(0)
+    random.shuffle(indexes)
+    bi = 0  # Index within batch
+    for imind in itertools.cycle(indexes):
+        if 'validate' in self.files[imind].relative_path:  # Don't use validation data
+            continue
+        self.files[imind].verify_loaded(small_image=True)
+        if self.files[imind].image is None:
+            continue
+        im = self.files[imind].small_image.convert('RGB')  # Always work in grayscale
+
+        if bi == 0:  # Initialize the batch if needed
+            batch = [None] * batch_size
+            labels = np.zeros((batch_size, 5))
+
+        # Perturb the image randomly and label
+        if 'document' in self.files[imind].relative_path:  # Document label
+            labels[bi, 0] = 1
+        rot_param = np.random.random()  # Rotation (<0.25 does nothing)
+        if 0.25 < rot_param <= 0.5:
+            im = add_rotation(im, ccw_rotation_degrees=90)
+            labels[bi, 2] = 1
+        elif 0.5 < rot_param <= 0.75:
+            im = add_rotation(im, ccw_rotation_degrees=180)
+            labels[bi, 3] = 1
+        elif rot_param > 0.75:
+            im = add_rotation(im, ccw_rotation_degrees=270)
+            labels[bi, 1] = 1
+        stretch_param = np.random.random()  # Stretching
+        if 0.25 < stretch_param <= 0.75:
+            if 0.25 < stretch_param <= 0.5:
+                h_stretch = 100
+                v_stretch = 0
+            elif 0.5 < stretch_param <= 0.75:
+                h_stretch = 0
+                v_stretch = 100
+            im = add_stretching(im, h_stretch, v_stretch)
+            sz_baseline = np.min(im.size)  # Crop back to size if it's stretched
+            left = (im.size[0] - sz_baseline) // 2
+            right = left + sz_baseline
+            upper = (im.size[1] - sz_baseline) // 2
+            lower = upper + sz_baseline
+            im = im.crop([left, upper, right, lower])
+            labels[bi, 4] = 1
+
+        batch[bi] = np.array(im)
+        
+        if bi == batch_size - 1:
+            bi = 0
+            yield np.stack(batch), labels
+        else:
+            bi += 1
