@@ -1,4 +1,5 @@
 import os
+import copy
 import numpy as np
 import imghdr
 from PIL import Image
@@ -31,24 +32,24 @@ class ImageFile(File):
 
         return
 
-    def verify_loaded(self, thumbnail=False, small_image=False, patch=False, all_formats=False):
+    def verify_loaded(self):
         """Verify image and derivatives are loaded (only loading when necessary)."""
         if self.image is None:
             try:
                 self.image = Image.open(self.abspath)
-                if (thumbnail or all_formats) and self.thumbnail is not None:
-                    self.thumbnail = self.image.resize(self.THUMBNAIL_SIZE)
-                if (small_image or all_formats) and self.small_image is not None:
-                    scale_factor = np.min(self.image.size) / float(self.MAX_DIM_FOR_SMALL)
-                    small_size = (np.round(self.image.size[0] / scale_factor).astype('int64'),
-                                  np.round(self.image.size[1] / scale_factor).astype('int64'))
-                    left = (small_size[0] - self.MAX_DIM_FOR_SMALL) // 2
-                    right = left + self.MAX_DIM_FOR_SMALL
-                    upper = (small_size[1] - self.MAX_DIM_FOR_SMALL) // 2
-                    lower = upper + self.MAX_DIM_FOR_SMALL
-                    self.small_image = self.image.resize(small_size, resample=self.RESAMPLE_METHOD).crop([left, upper, right, lower])
-                if (patch or all_formats) and self.patch is not None:
-                    self.patch = Image.fromarray(extract_patches_2d(np.array(self.image), self.PATCH_SIZE, max_patches=1, random_state=0)[0])
+                self.image.load()  # Necessary b/c of https://github.com/python-pillow/Pillow/issues/1144
+
+                # Compute image derived products
+                self.thumbnail = self.image.resize(self.THUMBNAIL_SIZE)  # Generate thumbnail
+                scale_factor = np.min(self.image.size) / float(self.MAX_DIM_FOR_SMALL)  # Scale down to a small version
+                small_size = (np.round(self.image.size[0] / scale_factor).astype('int64'),
+                              np.round(self.image.size[1] / scale_factor).astype('int64'))
+                left = (small_size[0] - self.MAX_DIM_FOR_SMALL) // 2
+                right = left + self.MAX_DIM_FOR_SMALL
+                upper = (small_size[1] - self.MAX_DIM_FOR_SMALL) // 2
+                lower = upper + self.MAX_DIM_FOR_SMALL
+                self.small_image = self.image.resize(small_size, resample=self.RESAMPLE_METHOD).crop([left, upper, right, lower])
+                self.patch = Image.fromarray(extract_patches_2d(np.array(self.image), self.PATCH_SIZE, max_patches=1, random_state=0)[0])  # Extract patch
             except OSError:  # Not an image file
                 self.image = None
 
@@ -78,6 +79,7 @@ class ImageFileGroup(FileGroup):
 
     # Externally defined methods
     from kaishi.core.image.generator import train_generator
+    from kaishi.core.image.generator import generate_validation_data
 
     def load_dir(self, dir_name):
         """Read file names in a directory while ignoring subdirectories."""
@@ -85,12 +87,10 @@ class ImageFileGroup(FileGroup):
 
         return
 
-    def load_all(self, thumbnail=False, small_image=False, patch=False, all_formats=False):
+    def load_all(self):
         """Load all images and specific image derivatives."""
-        if not thumbnail and not small_image and not patch:
-            all_formats = True  # If no option provided, load everything
         for f in tqdm(self.files):
-            f.verify_loaded(thumbnail=thumbnail, small_image=small_image, patch=patch, all_formats=all_formats)
+            f.verify_loaded()
 
         return
 
