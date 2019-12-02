@@ -14,7 +14,7 @@ Some general guidelines to keep in mind when contributing
 To install:
 ```
 pip install -r requirements.txt
-pip install ./kaishi
+python setup.py install
 ```
 
 # Quick Start
