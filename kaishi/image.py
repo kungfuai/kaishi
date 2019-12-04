@@ -18,16 +18,9 @@ class Dataset(ImageFileGroup):
         DEFAULT_PIPELINE_METHODS = [self.filter_invalid_file_extensions,
                                     self.filter_invalid_image_headers,
                                     self.filter_duplicates,
-                                    self.collapse_children]
-        DEFAULT_PIPELINE_ARGS = [[], [], [], []]
-        """
-        DEFAULT_PIPELINE_METHODS = [self.filter_invalid_file_extensions,
-                                    self.filter_invalid_image_headers,
-                                    self.filter_duplicates,
                                     self.filter_similar,
                                     self.collapse_children]
         DEFAULT_PIPELINE_ARGS = [[], [], [], [self.PERCEPTUAL_HASH_THRESHOLD], []]
-        """
         self.pipeline = Pipeline(DEFAULT_PIPELINE_METHODS, DEFAULT_PIPELINE_ARGS)
                          
         return
