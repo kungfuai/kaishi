@@ -8,14 +8,12 @@ import torch.nn as nn
 class Model:
     def __init__(self, n_classes=6, type='vgg16_bn'):
         """Initialize generic computer vision model class."""
+
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         if type == 'vgg16_bn':
             self.model = self.vgg16_bn(n_classes)
             weights_filename = pkg_resources.resource_filename('kaishi', 'weights/image_macro_issues_vgg16.pth')
-            gpu_flag = torch.cuda.is_available()
-            if gpu_flag:
-                state_dict = torch.load(weights_filename, map_location=torch.device('cuda'))
-            else:
-                state_dict = torch.load(weights_filename, map_location=torch.device('cpu'))
+            state_dict = torch.load(weights_filename, map_location=self.device)
             self.model.load_state_dict(state_dict)
 
         return
