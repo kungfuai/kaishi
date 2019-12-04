@@ -14,7 +14,7 @@ Some general guidelines to keep in mind when contributing
 To install:
 ```
 pip install -r requirements.txt
-python setup.py install
+pip install .
 ```
 
 # Quick Start
@@ -25,23 +25,7 @@ imdata = Dataset('sample_images')
 imdata.run_pipeline()
 imdata.report()
 ```
-If successful, a report like the below will be displayed:
-```
-Valid files:
-	real_same1.jpg
-Invalid files:
-	unsupported_extension:
-		file.gif
-		file1
-		fil2
-		file3
-	invalid_header:
-		file.bmp
-		file.jpg
-		file.jpeg
-	duplicates:
-		real_same2.jpg
-```
+
 In addition, the `imdata` object contains various objects and methods to interact with the data.
 
 At any point in the pipeline, the `imdata.files` and `imdata.filtered` objects contain results.
