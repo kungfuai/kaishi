@@ -15,7 +15,7 @@ from sklearn.feature_extraction.image import extract_patches_2d
 class ImageFile(File):
     """Class extension from 'File' for image-specific attributes and methods."""
     THUMBNAIL_SIZE = (64, 64)
-    MAX_DIM_FOR_SMALL = 256  # Max dimension for small sample
+    MAX_DIM_FOR_SMALL = 224  # Max dimension for small sample
     PATCH_SIZE = (64, 64)  # Patch size for compression artifact detection
     RESAMPLE_METHOD = Image.NEAREST  # Resampling method for resizing images
 

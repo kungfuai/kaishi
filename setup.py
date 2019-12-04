@@ -13,4 +13,6 @@ setup(
     description = ("Tool kit to accelerate the first steps of the data science process"),
     url = "https://github.com/kungfuai/receipt_ner",
     packages=find_packages(),
+    include_package_data=True,
+    zip_safe=False
 )

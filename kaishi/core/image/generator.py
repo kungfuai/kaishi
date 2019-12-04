@@ -7,7 +7,7 @@ from PIL import Image
 
 def add_jpeg_compression(image, quality_level=30):
     """Apply random (unless specified) JPEG compression to an image.
-    
+
     Quality level is a number < 100."""
     buf = BytesIO()
     image.save(buf, 'JPEG', q=int(quality_level))
@@ -48,23 +48,28 @@ def add_poisson_noise(image, param=1.0, rescale=True):
 def augment_and_label(imobj):
     """Augment an image with common issues and return the modified image + label vector.
 
-    LABELS: [DOCUMENT, ROTATED_RIGHT, ROTATED_LEFT, UPSIDE_DOWN, STRETCHING]
+    LABELS: [DOCUMENT, RECTIFIED, ROTATED_RIGHT, ROTATED_LEFT, UPSIDE_DOWN, STRETCHING]
     """
-    label = np.zeros((5,))
+    label = np.zeros((6,))
     im = imobj.small_image.convert('RGB')
 
     if 'document' in imobj.relative_path:  # Document label
         label[0] = 1
+
+    if np.random.random() < 0.5:  # Remove colors sometimes, no matter the class
+        im = im.convert('L').convert('RGB')
     rot_param = np.random.random()  # Rotation (<0.25 does nothing)
-    if 0.25 < rot_param <= 0.5:
+    if rot_param <= 0.25:
+        label[1] = 1
+    elif 0.25 < rot_param <= 0.5:
         im = add_rotation(im, ccw_rotation_degrees=90)
-        label[2] = 1
+        label[3] = 1
     elif 0.5 < rot_param <= 0.75:
         im = add_rotation(im, ccw_rotation_degrees=180)
-        label[3] = 1
+        label[4] = 1
     elif rot_param > 0.75:
         im = add_rotation(im, ccw_rotation_degrees=270)
-        label[1] = 1
+        label[2] = 1
     stretch_param = np.random.random()  # Stretching
     if 0.25 < stretch_param <= 0.75:
         if 0.25 < stretch_param <= 0.5:
@@ -80,14 +85,14 @@ def augment_and_label(imobj):
         upper = (im.size[1] - sz_baseline) // 2
         lower = upper + sz_baseline
         im = im.crop([left, upper, right, lower])
-        label[4] = 1
+        label[5] = 1
 
     return im, label
 
 def train_generator(self, batch_size=32):
     """Generator for training the data labeler. Operates on a kaishi.image.Dataset object.
-    
-    LABELS: [DOCUMENT, ROTATED_RIGHT, ROTATED_LEFT, UPSIDE_DOWN, STRETCHING]
+
+    LABELS: [DOCUMENT, RECTIFIED, ROTATED_RIGHT, ROTATED_LEFT, UPSIDE_DOWN, STRETCHING]
     Additional labels to implement with a different network: compressed, noisy
     """
     indexes = [i for i in range(len(self.files))]
@@ -99,17 +104,19 @@ def train_generator(self, batch_size=32):
     for imind in itertools.cycle(indexes):
         if 'validate' in self.files[imind].relative_path:  # Don't use validation data
             continue
+        if 'high_res' in self.files[imind].relative_path:  # Use only PASCAL photos
+            continue
         self.files[imind].verify_loaded()
         if self.files[imind].image is None:
             continue
 
         if bi == 0:  # Initialize the batch if needed
             batch = [None] * batch_size
-            labels = np.zeros((batch_size, 5))
+            labels = np.zeros((batch_size, 6))
 
         # Perturb the image randomly and label
         batch[bi], labels[bi, :] = augment_and_label(self.files[imind])
-        
+
         if bi == batch_size - 1:
             bi = 0
             yield np.swapaxes(np.stack(batch), 1, 3), labels
@@ -119,20 +126,22 @@ def train_generator(self, batch_size=32):
 def generate_validation_data(self, n_examples=400):
     """Generate a reproducibly random validation data set.
 
-    LABELS: [DOCUMENT, ROTATED_RIGHT, ROTATED_LEFT, UPSIDE_DOWN, STRETCHING]
+    LABELS: [DOCUMENT, RECTIFIED, ROTATED_RIGHT, ROTATED_LEFT, UPSIDE_DOWN, STRETCHING]
     """
     indexes = [i for i in range(len(self.files))]
     random.seed(42)
     np.random.seed(42)
     random.shuffle(indexes)
     X = [None] * n_examples
-    y = np.zeros((n_examples, 5))
+    y = np.zeros((n_examples, 6))
     i = 0
 
     for imind in itertools.cycle(indexes):
         if i == n_examples:
             break
         if 'validate' not in self.files[imind].relative_path:  # Use only validation data
+            continue
+        if 'high_res' in self.files[imind].relative_path:  # Disregard high res images
             continue
         self.files[imind].verify_loaded()
         if self.files[imind].image is None:
