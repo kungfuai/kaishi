@@ -12,12 +12,13 @@ from kaishi.util.misc import load_files_by_walk
 from sklearn.feature_extraction.image import extract_patches_2d
 
 
+THUMBNAIL_SIZE = (64, 64)
+MAX_DIM_FOR_SMALL = 224  # Max dimension for small sample
+PATCH_SIZE = (64, 64)  # Patch size for compression artifact detection
+RESAMPLE_METHOD = Image.NEAREST  # Resampling method for resizing images
+
 class ImageFile(File):
     """Class extension from 'File' for image-specific attributes and methods."""
-    THUMBNAIL_SIZE = (64, 64)
-    MAX_DIM_FOR_SMALL = 224  # Max dimension for small sample
-    PATCH_SIZE = (64, 64)  # Patch size for compression artifact detection
-    RESAMPLE_METHOD = Image.NEAREST  # Resampling method for resizing images
 
     def __init__(self, basedir, relpath, filename):
         """Add members to supplement File class."""
@@ -40,16 +41,16 @@ class ImageFile(File):
                 self.image.load()  # Necessary b/c of https://github.com/python-pillow/Pillow/issues/1144
 
                 # Compute image derived products
-                self.thumbnail = self.image.resize(self.THUMBNAIL_SIZE)  # Generate thumbnail
-                scale_factor = np.min(self.image.size) / float(self.MAX_DIM_FOR_SMALL)  # Scale down to a small version
+                self.thumbnail = self.image.resize(THUMBNAIL_SIZE)  # Generate thumbnail
+                scale_factor = np.min(self.image.size) / float(MAX_DIM_FOR_SMALL)  # Scale down to a small version
                 small_size = (np.round(self.image.size[0] / scale_factor).astype('int64'),
                               np.round(self.image.size[1] / scale_factor).astype('int64'))
-                left = (small_size[0] - self.MAX_DIM_FOR_SMALL) // 2
-                right = left + self.MAX_DIM_FOR_SMALL
-                upper = (small_size[1] - self.MAX_DIM_FOR_SMALL) // 2
-                lower = upper + self.MAX_DIM_FOR_SMALL
-                self.small_image = self.image.resize(small_size, resample=self.RESAMPLE_METHOD).crop([left, upper, right, lower])
-                self.patch = Image.fromarray(extract_patches_2d(np.array(self.image), self.PATCH_SIZE, max_patches=1, random_state=0)[0])  # Extract patch
+                left = (small_size[0] - MAX_DIM_FOR_SMALL) // 2
+                right = left + MAX_DIM_FOR_SMALL
+                upper = (small_size[1] - MAX_DIM_FOR_SMALL) // 2
+                lower = upper + MAX_DIM_FOR_SMALL
+                self.small_image = self.image.resize(small_size, resample=RESAMPLE_METHOD).crop([left, upper, right, lower])
+                self.patch = Image.fromarray(extract_patches_2d(np.array(self.image), PATCH_SIZE, max_patches=1, random_state=0)[0])  # Extract patch
             except OSError:  # Not an image file
                 self.image = None
 
@@ -57,7 +58,7 @@ class ImageFile(File):
 
     def compute_perceptual_hash(self, hashfunc=imagehash.average_hash):
         """Calculate perceptual hash (close in value to similar images."""
-        self.verify_loaded(thumbnail=True)
+        self.verify_loaded()
         if self.image is None:  # Couldn't load the image
             return None
 
@@ -96,15 +97,45 @@ class ImageFileGroup(FileGroup):
 
     def validate_image_header(self, filename):
         """Validate that an image has a valid header.
-        
+
         Returns True if valid, False if invalid.
         """
-        
+
         status = imghdr.what(filename)
         if status is not None:
             return True
         else:
             return False
+
+    def build_tensor(self, channels_first=True, image_type='small_image'):
+        """Build a single tensor from the entire image corpus.
+
+        'image_type' is one of 'thumbnail', 'small_image', or 'patch'
+        """
+        if image_type == 'small_image':  # Get size of the tensor
+            sz = (len(self.files), MAX_DIM_FOR_SMALL, MAX_DIM_FOR_SMALL, 3)
+        elif image_type == 'thumbnail':
+            sz = (len(self.files), THUMNAIL_SIZE[0], THUMBNAIL_SIZE[1], 3)
+        elif image_type == 'patch':
+            sz = (len(self.files), PATCH_SIZE[0], PATCH_SIZE[1], 3)
+        im_tensor = np.zeros(sz)
+
+        for i, f in enumerate(self.files):
+            try:
+                f.verify_loaded()
+                if image_type == 'small_image':
+                    im_tensor[i] = np.array(f.small_image.convert('RGB'))
+                elif image_type == 'thumbnail':
+                    im_tensor[i] = np.array(f.thumbnail.convert('RGB'))
+                elif image_type == 'patch':
+                    im_tensor[i] = np.array(f.patch.convert('RGB'))
+            except AttributeError:
+                continue
+
+        if channels_first:
+            im_tensor = np.swapaxes(im_tensor, 1, 3)
+
+        return im_tensor
 
     def filter_similar(self, threshold):
         """Filter near duplicate files, detected via perceptual hashing ('imagehash' library)."""
