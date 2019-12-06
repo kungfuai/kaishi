@@ -1,15 +1,17 @@
 from torchvision import models
 from torchvision import transforms
+from tqdm import tqdm
 import pkg_resources
 import torch
 import torch.nn as nn
+import numpy as np
 
 
 class Model:
     def __init__(self, n_classes=6, type='vgg16_bn'):
         """Initialize generic computer vision model class."""
-
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.pred_batch_size = 16
         if type == 'vgg16_bn':
             self.model = self.vgg16_bn(n_classes)
             weights_filename = pkg_resources.resource_filename('kaishi', 'weights/image_macro_issues_vgg16.pth')
@@ -31,3 +33,20 @@ class Model:
                                             nn.Sigmoid())
 
         return model
+
+    def predict(self, numpy_array):
+        """Automatically batch and predict a numpy array of samples."""
+        pred = []
+        for i in tqdm(range(len(numpy_array) // self.pred_batch_size)):
+            start = i * self.pred_batch_size
+            end = (i + 1) * self.pred_batch_size
+            in_tensor = torch.from_numpy(numpy_array[start:end]).to(torch.float32)
+            pred.append(self.model(in_tensor).detach().numpy())
+            del in_tensor
+
+        if end < len(numpy_array):
+            in_tensor = torch.from_numpy(numpy_array[end:]).to(torch.float32)
+            pred.append(self.model(in_tensor).detach().numpy())
+            del in_tensor
+
+        return np.concatenate(pred, axis=0)
