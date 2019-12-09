@@ -4,6 +4,7 @@ from kaishi.util.misc import find_duplicate_inds
 from kaishi.util.misc import trim_list_by_inds
 from kaishi.util.misc import md5sum
 from kaishi.util.misc import load_files_by_walk
+import multiprocessing
 
 
 class File:
@@ -19,7 +20,7 @@ class File:
         else:
             self.abspath = os.path.join(basedir, filename)
         self.hash = None  # Default to None, populate later
-        
+
         return
 
     def __repr__(self):
@@ -44,8 +45,19 @@ class FileGroup:
         """Instantiate empty class."""
         self.files = []
         self.filtered = dict()
+        self.pool = multiprocessing.Pool(multiprocessing.cpu_count())
 
         return
+
+    def __getstate__(self):
+        """Required to have a shared pool instance."""
+        self_dict = self.__dict__.copy()
+        del self_dict['pool']
+        return self_dict
+
+    def __setstate__(self, state):
+        """Required to have a shared pool instance."""
+        self.__dict__.update(state)
 
     def load_dir(self, dir_name):
         """Read file names in a directory while ignoring subdirectories."""
