@@ -88,10 +88,15 @@ class ImageFileGroup(FileGroup):
 
         return
 
+    def load_instance(self, im_obj):
+        """Load a single image instance."""
+        im_obj.verify_loaded()
+
+        return
+
     def load_all(self):
-        """Load all images and specific image derivatives."""
-        for f in tqdm(self.files):
-            f.verify_loaded()
+        """Load all with a map function."""
+        self.pool.map(self.load_instance, self.files)
 
         return
 
