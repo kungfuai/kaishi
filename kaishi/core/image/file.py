@@ -125,7 +125,7 @@ class ImageFileGroup(FileGroup):
             sz = (len(self.files), PATCH_SIZE[0], PATCH_SIZE[1], 3)
         im_tensor = np.zeros(sz)
 
-        for i, f in enumerate(self.files):
+        for i, f in tqdm(enumerate(self.files)):
             try:
                 f.verify_loaded()
                 if image_type == 'small_image':
