@@ -40,13 +40,13 @@ class Model:
         for i in tqdm(range(len(numpy_array) // self.pred_batch_size)):
             start = i * self.pred_batch_size
             end = (i + 1) * self.pred_batch_size
-            in_tensor = torch.from_numpy(numpy_array[start:end]).to(torch.float32)
-            pred.append(self.model(in_tensor).detach().numpy())
+            in_tensor = torch.from_numpy(numpy_array[start:end]).to(torch.float32).to(self.device)
+            pred.append(self.model(in_tensor).detach().cpu().numpy())
             del in_tensor
 
         if end < len(numpy_array):
-            in_tensor = torch.from_numpy(numpy_array[end:]).to(torch.float32)
-            pred.append(self.model(in_tensor).detach().numpy())
+            in_tensor = torch.from_numpy(numpy_array[end:]).to(torch.float32).to(self.device)
+            pred.append(self.model(in_tensor).detach().cpu().numpy())
             del in_tensor
 
         return np.concatenate(pred, axis=0)
