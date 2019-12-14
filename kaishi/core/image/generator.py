@@ -56,7 +56,7 @@ def augment_and_label(imobj):
     if 'document' in imobj.relative_path:  # Document label
         label[0] = 1
 
-    if np.random.random() < 0.5:  # Remove colors sometimes, no matter the class
+    if np.random.random() < 0.5:  # Remove colors sometimes, no matter the source
         im = im.convert('L').convert('RGB')
     rot_param = np.random.random()  # Rotation (<0.25 does nothing)
     if rot_param <= 0.25:
@@ -89,11 +89,14 @@ def augment_and_label(imobj):
 
     return im, label
 
-def train_generator(self, batch_size=32):
+def train_generator(self, batch_size=32, string_to_match=None):
     """Generator for training the data labeler. Operates on a kaishi.image.Dataset object.
 
     LABELS: [DOCUMENT, RECTIFIED, ROTATED_RIGHT, ROTATED_LEFT, UPSIDE_DOWN, STRETCHING]
     Additional labels to implement with a different network: compressed, noisy
+
+    'batch_size' - size of batches to create
+    'string_to_match' - ignores data without this string in the relative path (make 'None' to use all data)
     """
     indexes = [i for i in range(len(self.files))]
     random.seed(42)
@@ -105,6 +108,8 @@ def train_generator(self, batch_size=32):
         if 'validate' in self.files[imind].relative_path:  # Don't use validation data
             continue
         if 'high_res' in self.files[imind].relative_path:  # Use only PASCAL photos
+            continue
+        if string_to_match is not None and string_to_match not in self.files[imind].relative_path:
             continue
         self.files[imind].verify_loaded()
         if self.files[imind].image is None:
@@ -119,11 +124,12 @@ def train_generator(self, batch_size=32):
 
         if bi == batch_size - 1:
             bi = 0
-            yield np.swapaxes(np.stack(batch), 1, 3), labels
+            batch = np.stack(batch)
+            yield np.swapaxes(batch, 1, 3), labels
         else:
             bi += 1
 
-def generate_validation_data(self, n_examples=400):
+def generate_validation_data(self, n_examples=400, string_to_match=None):
     """Generate a reproducibly random validation data set.
 
     LABELS: [DOCUMENT, RECTIFIED, ROTATED_RIGHT, ROTATED_LEFT, UPSIDE_DOWN, STRETCHING]
@@ -143,6 +149,8 @@ def generate_validation_data(self, n_examples=400):
             continue
         if 'high_res' in self.files[imind].relative_path:  # Disregard high res images
             continue
+        if string_to_match is not None and string_to_match not in self.files[imind].relative_path:
+            continue
         self.files[imind].verify_loaded()
         if self.files[imind].image is None:
             continue
@@ -151,4 +159,5 @@ def generate_validation_data(self, n_examples=400):
         X[i], y[i, :] = augment_and_label(self.files[imind])
         i += 1
 
-    return np.swapaxes(np.stack(X), 1, 3), y
+    X = np.stack(X)
+    return np.swapaxes(X, 1, 3), y

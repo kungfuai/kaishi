@@ -50,6 +50,7 @@ class ImageFile(File):
                 upper = (small_size[1] - MAX_DIM_FOR_SMALL) // 2
                 lower = upper + MAX_DIM_FOR_SMALL
                 self.small_image = self.image.resize(small_size, resample=RESAMPLE_METHOD).crop([left, upper, right, lower])
+                #self.small_image = self.image.resize((MAX_DIM_FOR_SMALL, MAX_DIM_FOR_SMALL), resample=RESAMPLE_METHOD)
                 self.patch = Image.fromarray(extract_patches_2d(np.array(self.image), PATCH_SIZE, max_patches=1, random_state=0)[0])  # Extract patch
             except OSError:  # Not an image file
                 self.image = None
@@ -157,14 +158,14 @@ class ImageFileGroup(FileGroup):
     def filter_invalid_file_extensions(self, valid_ext_list=VALID_EXT):
         """Filter file list if non-image extensions exist."""
 
-        # Trim any files without image extensions 
+        # Trim any files without image extensions
         badind = []
         for i, f in enumerate(self.files):
             _, ext = os.path.splitext(f.basename)
             if len(ext) == 0 or ext not in valid_ext_list:
                 badind.append(i)
 
-        self.files, trimmed = trim_list_by_inds(self.files, badind) 
+        self.files, trimmed = trim_list_by_inds(self.files, badind)
         self.filtered['unsupported_extension'] = trimmed
 
         return trimmed
