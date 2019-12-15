@@ -13,6 +13,7 @@ class File:
         """Initialize basic file details."""
         self.relative_path = relpath
         self.children = {'duplicates': []}
+        self.labels = []
         _ , self.ext = os.path.splitext(filename)
         self.basename = filename
         if relpath is not None:
@@ -37,6 +38,22 @@ class File:
         self.hash = md5sum(self.abspath)
 
         return self.hash
+
+    def add_label(self, label):
+        """Add a label to a file object."""
+        if label not in self.labels:
+            self.labels.append(label)
+        self.labels.sort()
+
+        return
+
+    def remove_label(self, label):
+        """Remove a label from a file object."""
+        try:
+            self.labels.remove(label)
+        except ValueError:
+            return
+        return
 
 class FileGroup:
     """Class for readind and performing general operations on files."""
