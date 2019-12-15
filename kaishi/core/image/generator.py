@@ -90,7 +90,7 @@ def augment_and_label(imobj):
 
     return im, label
 
-def _train_generator(self, batch_size=32, string_to_match=None):
+def train_generator(self, batch_size=32, string_to_match=None):
     """Generator for training the data labeler. Operates on a kaishi.image.Dataset object.
 
     LABELS: [DOCUMENT, RECTIFIED, ROTATED_RIGHT, ROTATED_LEFT, UPSIDE_DOWN, STRETCHING]
@@ -130,7 +130,7 @@ def _train_generator(self, batch_size=32, string_to_match=None):
         else:
             bi += 1
 
-def _generate_validation_data(self, n_examples=400, string_to_match=None):
+def generate_validation_data(self, n_examples=400, string_to_match=None):
     """Generate a reproducibly random validation data set.
 
     LABELS: [DOCUMENT, RECTIFIED, ROTATED_RIGHT, ROTATED_LEFT, UPSIDE_DOWN, STRETCHING]
@@ -161,4 +161,5 @@ def _generate_validation_data(self, n_examples=400, string_to_match=None):
         i += 1
 
     X = np.stack(X)
+
     return swap_channel_dimension(X), y
