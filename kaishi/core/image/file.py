@@ -6,10 +6,8 @@ from PIL import Image
 import imagehash
 from tqdm import tqdm
 from kaishi.util.file import File, FileGroup
-from kaishi.util.misc import trim_list_by_inds
-from kaishi.util.misc import find_similar_by_value
 from kaishi.util.misc import load_files_by_walk
-from kaishi.core.image.util import swap_channel_dimesnion
+from kaishi.core.image.util import swap_channel_dimension
 from sklearn.feature_extraction.image import extract_patches_2d
 
 
@@ -17,6 +15,8 @@ THUMBNAIL_SIZE = (64, 64)
 MAX_DIM_FOR_SMALL = 224  # Max dimension for small sample
 PATCH_SIZE = (64, 64)  # Patch size for compression artifact detection
 RESAMPLE_METHOD = Image.NEAREST  # Resampling method for resizing images
+VALID_EXT = ['.bmp', '.dib', '.jpeg', '.jpg', '.jpe', '.jp2', '.png', '.pbm',  # Valid image extensions
+             '.pgm', '.ppm', '.sr', '.ras', '.tiff', '.tif']
 
 class ImageFile(File):
     """Class extension from 'File' for image-specific attributes and methods."""
@@ -71,22 +71,24 @@ class ImageFile(File):
 class ImageFileGroup(FileGroup):
     """Class to operate on an image file group."""
     # Valid extensions for opencv images
-    VALID_EXT = ['.bmp', '.dib', '.jpeg', '.jpg', '.jpe', '.jp2', '.png', '.pbm',
-                 '.pgm', '.ppm', '.sr', '.ras', '.tiff', '.tif']
 
     def __init__(self):
         """Initialize new image file group."""
         FileGroup.__init__(self)
         self.THUMBNAIL_SIZE = THUMBNAIL_SIZE
         self.MAX_DIM_FOR_SMALL = MAX_DIM_FOR_SMALL
-        slef.PATCH_SIZE = PATCH_SIZE
+        self.PATCH_SIZE = PATCH_SIZE
+        self.VALID_EXT = VALID_EXT
 
         return
 
     # Externally defined methods
-    from kaishi.core.image.generator import _train_generator as train_generator
-    from kaishi.core.image.generator import _generate_validation_data as generate_validation_data
-    from kaishi.core.image.util import _get_batch_dimensions as get_batch_dimensions
+    from kaishi.core.image.generator import train_generator
+    from kaishi.core.image.generator import generate_validation_data
+    from kaishi.core.image.util import get_batch_dimensions
+    from kaishi.core.image.filters import filter_similar
+    from kaishi.core.image.filters import filter_invalid_file_extensions
+    from kaishi.core.image.filters import filter_invalid_image_headers
 
     def load_dir(self, dir_name):
         """Read file names in a directory while ignoring subdirectories."""
@@ -157,43 +159,3 @@ class ImageFileGroup(FileGroup):
                 im_tensor = swap_channel_dimension(im_tensor)
 
             return im_tensor  # Don't return file objects as it's the same as 'self.files'
-
-    def filter_similar(self, threshold):
-        """Filter near duplicate files, detected via perceptual hashing ('imagehash' library)."""
-        hashlist = [f.perceptual_hash if f.perceptual_hash is not None else f.compute_perceptual_hash() for f in self.files]
-
-        duplicate_ind, parent_ind = find_similar_by_value(hashlist, threshold)
-        for di, pi in zip(duplicate_ind, parent_ind):
-            self.files[pi].children['similar'].append(self.files[di])
-        self.files, trimmed = trim_list_by_inds(self.files, duplicate_ind)
-        self.filtered['similar'] = trimmed
-
-        return trimmed
-
-    def filter_invalid_file_extensions(self, valid_ext_list=VALID_EXT):
-        """Filter file list if non-image extensions exist."""
-
-        # Trim any files without image extensions
-        badind = []
-        for i, f in enumerate(self.files):
-            _, ext = os.path.splitext(f.basename)
-            if len(ext) == 0 or ext not in valid_ext_list:
-                badind.append(i)
-
-        self.files, trimmed = trim_list_by_inds(self.files, badind)
-        self.filtered['unsupported_extension'] = trimmed
-
-        return trimmed
-
-    def filter_invalid_image_headers(self):
-        """Filter file list if image files have invalid or nonexistent header."""
-
-        badind = []
-        for i, f in enumerate(self.files):
-            if not self.validate_image_header(f.abspath):
-                badind.append(i)
-
-        self.files, trimmed = trim_list_by_inds(self.files, badind)
-        self.filtered['invalid_header'] = trimmed
-
-        return trimmed
