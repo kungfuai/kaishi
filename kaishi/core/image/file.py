@@ -9,6 +9,7 @@ from kaishi.util.file import File, FileGroup
 from kaishi.util.misc import trim_list_by_inds
 from kaishi.util.misc import find_similar_by_value
 from kaishi.util.misc import load_files_by_walk
+from kaishi.core.image.util import swap_channel_dimesnion
 from sklearn.feature_extraction.image import extract_patches_2d
 
 
@@ -76,12 +77,16 @@ class ImageFileGroup(FileGroup):
     def __init__(self):
         """Initialize new image file group."""
         FileGroup.__init__(self)
+        self.THUMBNAIL_SIZE = THUMBNAIL_SIZE
+        self.MAX_DIM_FOR_SMALL = MAX_DIM_FOR_SMALL
+        slef.PATCH_SIZE = PATCH_SIZE
 
         return
 
     # Externally defined methods
-    from kaishi.core.image.generator import train_generator
-    from kaishi.core.image.generator import generate_validation_data
+    from kaishi.core.image.generator import _train_generator as train_generator
+    from kaishi.core.image.generator import _generate_validation_data as generate_validation_data
+    from kaishi.core.image.util import _get_batch_dimensions as get_batch_dimensions
 
     def load_dir(self, dir_name):
         """Read file names in a directory while ignoring subdirectories."""
@@ -96,7 +101,7 @@ class ImageFileGroup(FileGroup):
         return
 
     def load_all(self):
-        """Load all with a map function."""
+        """Load all with a multiprocessing map."""
         self.pool.map(self.load_instance, self.files)
 
         return
@@ -113,35 +118,45 @@ class ImageFileGroup(FileGroup):
         else:
             return False
 
-    def build_tensor(self, channels_first=True, image_type='small_image'):
-        """Build a single tensor from the entire image corpus.
+    def build_numpy_batches(self, channels_first=True, batch_size=None, image_type='small_image'):
+        """Build a tensor from the entire image corpus (or generate batches if specified).
 
+        If a batch size is specified, this acts as a generator of batches and returns a list of file objects to manipulate.
+
+        'channels_first' - 'True' if channels are the first dimension (standard for PyTorch)
         'image_type' is one of 'thumbnail', 'small_image', or 'patch'
         """
-        if image_type == 'small_image':  # Get size of the tensor
-            sz = (len(self.files), MAX_DIM_FOR_SMALL, MAX_DIM_FOR_SMALL, 3)
-        elif image_type == 'thumbnail':
-            sz = (len(self.files), THUMNAIL_SIZE[0], THUMBNAIL_SIZE[1], 3)
-        elif image_type == 'patch':
-            sz = (len(self.files), PATCH_SIZE[0], PATCH_SIZE[1], 3)
+        l = batch_size if batch_size is not None else len(self.files)
+        sz = self.get_batch_dimensions(l, channels_first, image_type)
         im_tensor = np.zeros(sz)
 
-        for i, f in tqdm(enumerate(self.files)):
+        bi = 0
+        batch_file_objects = []
+        for f in self.files:
             try:
                 f.verify_loaded()
                 if image_type == 'small_image':
-                    im_tensor[i] = np.array(f.small_image.convert('RGB'))
+                    im_tensor[bi] = np.array(f.small_image.convert('RGB'))
                 elif image_type == 'thumbnail':
-                    im_tensor[i] = np.array(f.thumbnail.convert('RGB'))
+                    im_tensor[bi] = np.array(f.thumbnail.convert('RGB'))
                 elif image_type == 'patch':
-                    im_tensor[i] = np.array(f.patch.convert('RGB'))
+                    im_tensor[bi] = np.array(f.patch.convert('RGB'))
             except AttributeError:
                 continue
+            bi += 1
+            if batch_size is not None:
+                batch_file_objects.append(f)
+                if bi == batch_size:
+                    if channels_first:
+                        imtensor = swap_channel_dimension(im_tensor)
+                    yield im_tensor, batch_file_objects
+                    bi = 0  # Reset the batch
 
-        if channels_first:
-            im_tensor = np.swapaxes(im_tensor, 1, 3)
+        if batch_size is None:
+            if channels_first:
+                im_tensor = swap_channel_dimension(im_tensor)
 
-        return im_tensor
+            return im_tensor  # Don't return file objects as it's the same as 'self.files'
 
     def filter_similar(self, threshold):
         """Filter near duplicate files, detected via perceptual hashing ('imagehash' library)."""
