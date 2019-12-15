@@ -3,6 +3,7 @@ import itertools
 import numpy as np
 import random
 from PIL import Image
+from kaishi.core.image.util import swap_channel_dimension
 
 
 def add_jpeg_compression(image, quality_level=30):
@@ -89,7 +90,7 @@ def augment_and_label(imobj):
 
     return im, label
 
-def train_generator(self, batch_size=32, string_to_match=None):
+def _train_generator(self, batch_size=32, string_to_match=None):
     """Generator for training the data labeler. Operates on a kaishi.image.Dataset object.
 
     LABELS: [DOCUMENT, RECTIFIED, ROTATED_RIGHT, ROTATED_LEFT, UPSIDE_DOWN, STRETCHING]
@@ -125,11 +126,11 @@ def train_generator(self, batch_size=32, string_to_match=None):
         if bi == batch_size - 1:
             bi = 0
             batch = np.stack(batch)
-            yield np.swapaxes(batch, 1, 3), labels
+            yield swap_channel_dimension(batch), labels
         else:
             bi += 1
 
-def generate_validation_data(self, n_examples=400, string_to_match=None):
+def _generate_validation_data(self, n_examples=400, string_to_match=None):
     """Generate a reproducibly random validation data set.
 
     LABELS: [DOCUMENT, RECTIFIED, ROTATED_RIGHT, ROTATED_LEFT, UPSIDE_DOWN, STRETCHING]
@@ -160,4 +161,4 @@ def generate_validation_data(self, n_examples=400, string_to_match=None):
         i += 1
 
     X = np.stack(X)
-    return np.swapaxes(X, 1, 3), y
+    return swap_channel_dimension(X), y
