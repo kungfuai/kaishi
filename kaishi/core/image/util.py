@@ -18,7 +18,7 @@ def swap_channel_dimension(tensor):
         else:
             return np.swapaxes(np.swapaxes(tensor, 1, 2), 2, 3)
 
-def _get_batch_dimensions(self, batch_size, channels_first=True, image_type='small_image'):
+def get_batch_dimensions(self, batch_size, channels_first=True, image_type='small_image'):
     """Get dimensions of the batch tensor. Note that the 'batch_size' argument can be the full data set."""
     if image_type == 'small_image':  # Get size of the tensor
         sz = (batch_size, self.MAX_DIM_FOR_SMALL, self.MAX_DIM_FOR_SMALL, 3)
