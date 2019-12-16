@@ -8,6 +8,7 @@ from tqdm import tqdm
 from kaishi.util.file import File, FileGroup
 from kaishi.util.misc import load_files_by_walk
 from kaishi.core.image.util import swap_channel_dimension
+from kaishi.core.image.model import Model
 from sklearn.feature_extraction.image import extract_patches_2d
 
 
@@ -70,8 +71,6 @@ class ImageFile(File):
 
 class ImageFileGroup(FileGroup):
     """Class to operate on an image file group."""
-    # Valid extensions for opencv images
-
     def __init__(self):
         """Initialize new image file group."""
         FileGroup.__init__(self)
@@ -79,6 +78,7 @@ class ImageFileGroup(FileGroup):
         self.MAX_DIM_FOR_SMALL = MAX_DIM_FOR_SMALL
         self.PATCH_SIZE = PATCH_SIZE
         self.VALID_EXT = VALID_EXT
+        self.model = None  # Only load model if needed
 
         return
 
@@ -129,7 +129,7 @@ class ImageFileGroup(FileGroup):
         'image_type' is one of 'thumbnail', 'small_image', or 'patch'
         """
         l = batch_size if batch_size is not None else len(self.files)
-        sz = self.get_batch_dimensions(l, channels_first, image_type)
+        sz = self.get_batch_dimensions(l, channels_first=False, image_type=image_type)  # Start with PIL-style channel layout
         im_tensor = np.zeros(sz)
 
         bi = 0
@@ -150,12 +150,42 @@ class ImageFileGroup(FileGroup):
                 batch_file_objects.append(f)
                 if bi == batch_size:
                     if channels_first:
-                        imtensor = swap_channel_dimension(im_tensor)
-                    yield im_tensor, batch_file_objects
+                        yield swap_channel_dimension(im_tensor), batch_file_objects
+                    else:
+                        yield im_tensor, batch_file_objects
                     bi = 0  # Reset the batch
+                    batch_file_objects = []
 
         if batch_size is None:
             if channels_first:
-                im_tensor = swap_channel_dimension(im_tensor)
+                return swap_channel_dimension(im_tensor)
+            else:
+                return im_tensor  # Don't return file objects as it's the same as 'self.files'
+        elif batch_size is not None and len(batch_file_objects) > 0:
+            if channels_first:
+                yield swap_channel_dimension(im_tensor), batch_file_objects
+            else:
+                yield im_tensor, batch_file_objects
 
-            return im_tensor  # Don't return file objects as it's the same as 'self.files'
+    def predict_and_label(self):
+        """Use pre-trained ConvNet to predict image labels (e.g. stretched, rotated, etc.)."""
+        if self.model is None:
+            self.model = Model()
+        for batch, fobjs in self.build_numpy_batches(batch_size=self.model.batch_size):
+            pred = self.model.predict(batch)
+            for i in range(len(fobjs)):
+                if pred[i, 0] > 0.5:
+                    fobjs[i].add_label('DOCUMENT')
+                rot = np.argmax(pred[i, 1:5])
+                if rot == 0:
+                    fobjs[i].add_label('RECTIFIED')
+                elif rot == 1:
+                    fobjs[i].add_label('ROTATED_RIGHT')
+                elif rot == 2:
+                    fobjs[i].add_label('ROTATED_LEFT')
+                else:
+                    fobjs[i].add_label('UPSIDE_DOWN')
+                if pred[i, 5] > 0.5:
+                    fobjs[i].add_label('STRETCHED')
+
+        return

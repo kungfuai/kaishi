@@ -35,18 +35,7 @@ class Model:
         return model
 
     def predict(self, numpy_array):
-        """Automatically batch and predict a numpy array of samples."""
-        pred = []
-        for i in tqdm(range(len(numpy_array) // self.batch_size)):
-            start = i * self.batch_size
-            end = (i + 1) * self.batch_size
-            in_tensor = torch.from_numpy(numpy_array[start:end]).to(torch.float32).to(self.device)
-            pred.append(self.model(in_tensor).detach().cpu().numpy())
-            del in_tensor
+        """Make predictions from a numpy array."""
+        in_tensor = torch.from_numpy(numpy_array).to(torch.float32).to(self.device)
 
-        if end < len(numpy_array):
-            in_tensor = torch.from_numpy(numpy_array[end:]).to(torch.float32).to(self.device)
-            pred.append(self.model(in_tensor).detach().cpu().numpy())
-            del in_tensor
-
-        return np.concatenate(pred, axis=0)
+        return self.model(in_tensor).detach().cpu().numpy()

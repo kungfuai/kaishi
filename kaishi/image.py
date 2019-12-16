@@ -2,6 +2,8 @@
 import os
 from kaishi.core.image.file import ImageFileGroup
 from kaishi.util.pipeline import Pipeline
+import warnings
+import torch
 
 
 class Dataset(ImageFileGroup):
@@ -14,6 +16,9 @@ class Dataset(ImageFileGroup):
         if source is not None:
             self.load_dir(source)
 
+        #
+        if torch.cuda.is_available() is False:
+            warnings.warn('No GPU detected, ConvNet prediction tasks will be very slow')
         # Define default pipeline
         """
         DEFAULT_PIPELINE_METHODS = [self.filter_invalid_file_extensions,

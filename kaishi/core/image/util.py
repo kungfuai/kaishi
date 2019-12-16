@@ -7,7 +7,7 @@ def swap_channel_dimension(tensor):
     If 'tensor' has 4 elements, it's assumed to be the shape vector. Otherwise, it's
     assumed that it's the actual tensor. Returns the edited shape vector or tensor.
     """
-    if tensor.size == 4:  # Shape vector
+    if np.size(tensor) == 4:  # Shape vector
         if tensor[-1] == 3 or tensor[-1] == 1:
             return np.array([tensor[0], tensor[3], tensor[1], tensor[2]])
         else:
