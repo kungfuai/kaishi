@@ -96,18 +96,12 @@ class ImageFileGroup(FileGroup):
 
         return
 
-    def load_instance(self, im_obj):
-        """Load a single image instance."""
-        im_obj.verify_loaded()
-
-        return
-
     def load_all(self):
-        """Load all with a multiprocessing map."""
-        self.pool.map(self.load_instance, self.files)
+        """Load all files."""
+        for f in self.files:
+            f.verify_loaded()
 
         return
-
 
     def build_numpy_batches(self, channels_first=True, batch_size=None, image_type='small_image'):
         """Build a tensor from the entire image corpus (or generate batches if specified).
@@ -177,5 +171,23 @@ class ImageFileGroup(FileGroup):
                 if pred[i, 5] > 0.5:
                     fobjs[i].add_label('STRETCHED')
         self.labeled = True
+
+        return
+
+    def save(self, out_dir):
+        """Save image data set in the same structure as the original data set, save for the filtered elements."""
+        out_dir = os.path.abspath(out_dir)
+        if not os.path.exists(out_dir):  # Ensure output directory exists
+            os.makedirs(out_dir)
+        for f in self.files:  # Determine file paths and save
+            if f.image is None:
+                continue
+            if f.relative_path is not None:
+                file_dir = os.path.join(out_dir, f.relative_path)
+                if not os.path.exists(file_dir):
+                    os.makedirs(file_dir)
+            else:
+                file_dir = out_dir
+            f.image.save(os.path.join(file_dir, f.basename))
 
         return
