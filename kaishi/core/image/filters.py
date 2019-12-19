@@ -1,6 +1,7 @@
 import os
 from kaishi.util.misc import trim_list_by_inds
 from kaishi.util.misc import find_similar_by_value
+from kaishi.core.image.util import validate_image_header
 
 
 def filter_similar(self, threshold):
@@ -35,7 +36,7 @@ def filter_invalid_image_headers(self):
 
     badind = []
     for i, f in enumerate(self.files):
-        if not self.validate_image_header(f.abspath):
+        if not validate_image_header(f.abspath):
             badind.append(i)
 
     self.files, trimmed = trim_list_by_inds(self.files, badind)
