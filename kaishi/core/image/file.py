@@ -8,6 +8,7 @@ from tqdm import tqdm
 from kaishi.util.file import File, FileGroup
 from kaishi.util.misc import load_files_by_walk
 from kaishi.core.image.util import swap_channel_dimension
+from kaishi.core.image.util import normalize_image
 from kaishi.core.image.model import Model
 from sklearn.feature_extraction.image import extract_patches_2d
 
@@ -138,11 +139,11 @@ class ImageFileGroup(FileGroup):
             try:
                 f.verify_loaded()
                 if image_type == 'small_image':
-                    im_tensor[bi] = np.array(f.small_image.convert('RGB'))
+                    im_tensor[bi] = np.array(normalize_image(f.small_image.convert('RGB')))
                 elif image_type == 'thumbnail':
-                    im_tensor[bi] = np.array(f.thumbnail.convert('RGB'))
+                    im_tensor[bi] = np.array(normalize_image(f.thumbnail.convert('RGB')))
                 elif image_type == 'patch':
-                    im_tensor[bi] = np.array(f.patch.convert('RGB'))
+                    im_tensor[bi] = np.array(normalize_image(f.patch.convert('RGB')))
             except AttributeError:
                 continue
             bi += 1
