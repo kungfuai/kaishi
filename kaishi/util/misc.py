@@ -36,7 +36,7 @@ def find_duplicate_inds(list_with_duplicates):
     foundind = []
     badind = []
     parentind = []
-    
+
     for i, item in enumerate(list_with_duplicates):
         try:
             parentind.append(foundind[found.index(item)])

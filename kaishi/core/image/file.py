@@ -1,7 +1,6 @@
 import os
 import copy
 import numpy as np
-import imghdr
 from PIL import Image
 import imagehash
 from tqdm import tqdm
@@ -10,6 +9,7 @@ from kaishi.util.misc import load_files_by_walk
 from kaishi.core.image.util import swap_channel_dimension
 from kaishi.core.image.util import normalize_image
 from kaishi.core.image.model import Model
+from kaishi.core.image import ops
 from sklearn.feature_extraction.image import extract_patches_2d
 
 
@@ -26,7 +26,6 @@ class ImageFile(File):
     def __init__(self, basedir, relpath, filename):
         """Add members to supplement File class."""
         File.__init__(self, basedir, relpath, filename)
-
         self.children['similar'] = []
         self.image = None
         self.small_image = None
@@ -42,21 +41,20 @@ class ImageFile(File):
             try:
                 self.image = Image.open(self.abspath)
                 self.image.load()  # Necessary b/c of https://github.com/python-pillow/Pillow/issues/1144
-
-                # Compute image derived products
-                self.thumbnail = self.image.resize(THUMBNAIL_SIZE)  # Generate thumbnail
-                scale_factor = np.min(self.image.size) / float(MAX_DIM_FOR_SMALL)  # Scale down to a small version
-                small_size = (np.round(self.image.size[0] / scale_factor).astype('int64'),
-                              np.round(self.image.size[1] / scale_factor).astype('int64'))
-                left = (small_size[0] - MAX_DIM_FOR_SMALL) // 2
-                right = left + MAX_DIM_FOR_SMALL
-                upper = (small_size[1] - MAX_DIM_FOR_SMALL) // 2
-                lower = upper + MAX_DIM_FOR_SMALL
-                self.small_image = self.image.resize(small_size, resample=RESAMPLE_METHOD).crop([left, upper, right, lower])
-                #self.small_image = self.image.resize((MAX_DIM_FOR_SMALL, MAX_DIM_FOR_SMALL), resample=RESAMPLE_METHOD)
-                self.patch = Image.fromarray(extract_patches_2d(np.array(self.image), PATCH_SIZE, max_patches=1, random_state=0)[0])  # Extract patch
+                self.thumbnail = self.image.resize(THUMBNAIL_SIZE)
+                self.small_image = ops.make_small(self.image, max_dim=MAX_DIM_FOR_SMALL, resample_method=RESAMPLE_METHOD)
+                self.patch = ops.extract_patch(self.image, PATCH_SIZE)
             except OSError:  # Not an image file
                 self.image = None
+
+        return
+
+    def rotate(self, ccw_rotation_degrees):
+        """Rotate all instances of image by 'ccw_rotation_degrees'."""
+        self.image = self.image.rotate(ccw_rotation_degrees, expand=True)
+        self.thumbnail = self.thumbnail.rotate(ccw_rotation_degrees, expand=True)
+        self.small_image = self.small_image.rotate(ccw_rotation_degrees, expand=True)
+        self.patch = self.patch.rotate(ccw_rotation_degrees, expand=True)
 
         return
 
@@ -80,6 +78,7 @@ class ImageFileGroup(FileGroup):
         self.PATCH_SIZE = PATCH_SIZE
         self.VALID_EXT = VALID_EXT
         self.model = None  # Only load model if needed
+        self.labeled = False
 
         return
 
@@ -90,6 +89,7 @@ class ImageFileGroup(FileGroup):
     from kaishi.core.image.filters import filter_similar
     from kaishi.core.image.filters import filter_invalid_file_extensions
     from kaishi.core.image.filters import filter_invalid_image_headers
+    from kaishi.core.image.transforms import transform_fix_rotation
 
     def load_dir(self, dir_name):
         """Read file names in a directory while ignoring subdirectories."""
@@ -97,29 +97,12 @@ class ImageFileGroup(FileGroup):
 
         return
 
-    def load_instance(self, im_obj):
-        """Load a single image instance."""
-        im_obj.verify_loaded()
-
-        return
-
     def load_all(self):
-        """Load all with a multiprocessing map."""
-        self.pool.map(self.load_instance, self.files)
+        """Load all files."""
+        for f in self.files:
+            f.verify_loaded()
 
         return
-
-    def validate_image_header(self, filename):
-        """Validate that an image has a valid header.
-
-        Returns True if valid, False if invalid.
-        """
-
-        status = imghdr.what(filename)
-        if status is not None:
-            return True
-        else:
-            return False
 
     def build_numpy_batches(self, channels_first=True, batch_size=None, image_type='small_image'):
         """Build a tensor from the entire image corpus (or generate batches if specified).
@@ -188,5 +171,24 @@ class ImageFileGroup(FileGroup):
                     fobjs[i].add_label('UPSIDE_DOWN')
                 if pred[i, 5] > 0.5:
                     fobjs[i].add_label('STRETCHED')
+        self.labeled = True
+
+        return
+
+    def save(self, out_dir):
+        """Save image data set in the same structure as the original data set, save for the filtered elements."""
+        out_dir = os.path.abspath(out_dir)
+        if not os.path.exists(out_dir):  # Ensure output directory exists
+            os.makedirs(out_dir)
+        for f in self.files:  # Determine file paths and save
+            if f.image is None:
+                continue
+            if f.relative_path is not None:
+                file_dir = os.path.join(out_dir, f.relative_path)
+                if not os.path.exists(file_dir):
+                    os.makedirs(file_dir)
+            else:
+                file_dir = out_dir
+            f.image.save(os.path.join(file_dir, f.basename))
 
         return

@@ -1,4 +1,5 @@
 import numpy as np
+import imghdr
 
 
 def swap_channel_dimension(tensor):
@@ -17,6 +18,18 @@ def swap_channel_dimension(tensor):
             return np.swapaxes(np.swapaxes(tensor, 2, 3), 1, 2)
         else:
             return np.swapaxes(np.swapaxes(tensor, 1, 2), 2, 3)
+
+def validate_image_header(filename):
+    """Validate that an image has a valid header.
+
+    Returns True if valid, False if invalid.
+    """
+
+    status = imghdr.what(filename)
+    if status is not None:
+        return True
+    else:
+        return False
 
 def get_batch_dimensions(self, batch_size, channels_first=True, image_type='small_image'):
     """Get dimensions of the batch tensor. Note that the 'batch_size' argument can be the full data set."""
