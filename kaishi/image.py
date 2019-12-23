@@ -14,25 +14,20 @@ class Dataset(ImageFileGroup):
         """Initialize with the default pipeline defined."""
         ImageFileGroup.__init__(self)
         if source is not None:
-            self.load_dir(source)
+            if os.path.exists(source):
+                self.load_dir(source)
+            else:
+                warnings.warn('Directory not found, initializing empty Dataset')
 
-        #
+        # Make sure GPU is available, warn if not
         if torch.cuda.is_available() is False:
             warnings.warn('No GPU detected, ConvNet prediction tasks will be very slow')
+
         # Define default pipeline
-        """
         DEFAULT_PIPELINE_METHODS = [self.filter_invalid_file_extensions,
                                     self.filter_invalid_image_headers,
-                                    self.filter_duplicates,
-                                    self.filter_similar,
                                     self.collapse_children]
-        """
-        DEFAULT_PIPELINE_METHODS = [self.filter_invalid_file_extensions,
-                                    self.filter_invalid_image_headers,
-                                    self.filter_duplicates,
-                                    self.collapse_children]
-        #DEFAULT_PIPELINE_ARGS = [[], [], [], [self.PERCEPTUAL_HASH_THRESHOLD], []]
-        DEFAULT_PIPELINE_ARGS = [[], [], [], []]
+        DEFAULT_PIPELINE_ARGS = [[], [], []]
         self.pipeline = Pipeline(DEFAULT_PIPELINE_METHODS, DEFAULT_PIPELINE_ARGS)
 
         return
