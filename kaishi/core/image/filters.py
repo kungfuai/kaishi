@@ -4,9 +4,11 @@ from kaishi.util.misc import find_similar_by_value
 from kaishi.core.image.util import validate_image_header
 
 
-def filter_similar(self, threshold):
+def filter_similar(self, threshold=None):
     """Filter near duplicate files, detected via perceptual hashing ('imagehash' library)."""
     hashlist = [f.perceptual_hash if f.perceptual_hash is not None else f.compute_perceptual_hash() for f in self.files]
+    if threshold is None:
+        threshold = self.PERCEPTUAL_HASH_THRESHOLD
 
     duplicate_ind, parent_ind = find_similar_by_value(hashlist, threshold)
     for di, pi in zip(duplicate_ind, parent_ind):
