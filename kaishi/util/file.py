@@ -82,12 +82,19 @@ class FileGroup:
         self.filtered['duplicates'] = trimmed
 
         return trimmed
+    filter_duplicates.default_args = []
 
-    def show_available_filters(self):
-        """Shows available member function filters."""
+    def pipeline_components(self):
+        """Shows available pipeline components."""
+        pnum = 0
         for m in dir(self):
             if m.startswith('filter_'):
-                print(m)
+                pnum += 1
+                print(repr(pnum) + ': ' + repr(m))
+        for m in dir(self):
+            if m.startswith('transform_'):
+                pnum += 1
+                print(repr(pnum) + ': ' + repr(m))
 
         return
 
