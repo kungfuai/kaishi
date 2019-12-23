@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image
 import imagehash
 from tqdm import tqdm
+import multiprocessing
 from kaishi.util.file import File, FileGroup
 from kaishi.util.misc import load_files_by_walk
 from kaishi.core.image.util import swap_channel_dimension
@@ -96,10 +97,15 @@ class ImageFileGroup(FileGroup):
 
         return
 
+    def load_instance(self, obj):
+        """Method to load an image object."""
+        obj.verify_loaded()
+        return
+
     def load_all(self):
         """Load all files."""
-        for f in self.files:
-            f.verify_loaded()
+        pool = multiprocessing.Pool(multiprocessing.cpu_count())
+        pool.map(self.load_instance, self.files)
 
         return
 
