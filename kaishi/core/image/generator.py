@@ -49,9 +49,6 @@ def augment_and_label(imobj):
 def train_generator(self, batch_size=32, string_to_match=None):
     """Generator for training the data labeler. Operates on a kaishi.image.Dataset object.
 
-    LABELS: [DOCUMENT, RECTIFIED, ROTATED_RIGHT, ROTATED_LEFT, UPSIDE_DOWN, STRETCHING]
-    Additional labels to implement with a different network: compressed, noisy
-
     'batch_size' - size of batches to create
     'string_to_match' - ignores data without this string in the relative path (make 'None' to use all data)
     """
@@ -64,7 +61,7 @@ def train_generator(self, batch_size=32, string_to_match=None):
     for imind in itertools.cycle(indexes):
         if 'validate' in self.files[imind].relative_path:  # Don't use validation data
             continue
-        if 'high_res' in self.files[imind].relative_path:  # Use only PASCAL photos
+        if 'high_res' in self.files[imind].relative_path:  # Use only low res photos
             continue
         if string_to_match is not None and string_to_match not in self.files[imind].relative_path:
             continue
@@ -87,10 +84,7 @@ def train_generator(self, batch_size=32, string_to_match=None):
             bi += 1
 
 def generate_validation_data(self, n_examples=400, string_to_match=None):
-    """Generate a reproducibly random validation data set.
-
-    LABELS: [DOCUMENT, RECTIFIED, ROTATED_RIGHT, ROTATED_LEFT, UPSIDE_DOWN, STRETCHING]
-    """
+    """Generate a reproducibly random validation data set."""
     indexes = [i for i in range(len(self.files))]
     random.seed(42)
     np.random.seed(42)
