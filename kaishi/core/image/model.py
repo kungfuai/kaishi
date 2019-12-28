@@ -8,20 +8,23 @@ import numpy as np
 
 
 class Model:
-    def __init__(self, n_classes=6, type='vgg16_bn'):
+    def __init__(self, n_classes=6, type='resnet18'):
         """Initialize generic computer vision model class."""
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.batch_size = 16
         if type == 'vgg16_bn':
             self.model = self.vgg16_bn(n_classes)
             weights_filename = pkg_resources.resource_filename('kaishi', 'weights/image_macro_issues_vgg16.pth')
-            state_dict = torch.load(weights_filename, map_location=self.device)
-            self.model.load_state_dict(state_dict)
+        elif type == 'resnet18':
+            self.model = self.resnet18(n_classes)
+            weights_filename = pkg_resources.resource_filename('kaishi', 'weights/image_macro_issues_resnet18.pth')
+        state_dict = torch.load(weights_filename, map_location=self.device)
+        self.model.load_state_dict(state_dict)
 
         return
 
     def vgg16_bn(self, n_classes):
-        """Basic VGG16 model in PyTorch with specified number of output classes."""
+        """Basic VGG16 model with specified number of output classes."""
         model = models.vgg16_bn(pretrained=False)  # PyTorch VGG16
 
         # Terminate with a custom number of classes
@@ -31,6 +34,14 @@ class Model:
                                             nn.Dropout(0.15),
                                             nn.Linear(256, n_classes),
                                             nn.Sigmoid())
+
+        return model
+
+    def resnet18(self, n_classes):
+        """Basic ResNet18 model with specified number of output classes."""
+        model = torch.hub.load('pytorch/vision:v0.4.2', 'resnet18', pretrained=False)
+        model.fc = nn.Sequential(nn.Linear(512, n_classes),
+                                 nn.Sigmoid())
 
         return model
 
