@@ -102,10 +102,14 @@ class ImageFileGroup(FileGroup):
         obj.verify_loaded()
         return
 
-    def load_all(self):
-        """Load all files."""
-        pool = multiprocessing.Pool(multiprocessing.cpu_count())
-        pool.map(self.load_instance, self.files)
+    def load_all(self, pool=False):
+        """Load all files. If 'pool' is True, a multiprocessing pool will be created for faster loading."""
+        if pool:
+            pool = multiprocessing.Pool(multiprocessing.cpu_count())
+            pool.map(self.load_instance, self.files)
+        else:
+            for f in self.files:
+                self.load_instance(f)
 
         return
 
