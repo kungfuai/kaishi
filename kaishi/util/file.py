@@ -5,6 +5,7 @@ from kaishi.util.misc import trim_list_by_inds
 from kaishi.util.misc import md5sum
 from kaishi.util.misc import load_files_by_walk
 import multiprocessing
+from prettytable import PrettyTable
 
 
 class File:
@@ -128,13 +129,18 @@ class FileGroup:
             return
 
         print('Valid files:')
+        x = PrettyTable()
+        x.field_names = ['File Name', 'Children', 'Labels']
         for f in self.files:
-            print('\t' + repr(f) + '\t' + repr(f.children))
+            x.add_row([repr(f), repr(f.children), repr(f.labels)])
+        print(x)
 
-        print('Invalid files:')
+        print('Filtered files:')
+        x = PrettyTable()
+        x.field_names = ['File Name', 'Filter Reason']
         for k in self.filtered.keys():
-            print('\t%s:' % k)
             for f in self.filtered[k]:
-                print('\t\t' + repr(f))
+                x.add_row([repr(f), k])
+        print(x)
 
         return
