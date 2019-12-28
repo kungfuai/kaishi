@@ -33,9 +33,9 @@ class Dataset(ImageFileGroup):
 
         return
 
-    def run_pipeline(self, verbose=False):
+    def run_pipeline(self, pool=False, verbose=False):
         """Run the pipeline as configured."""
-        self.load_all()
+        self.load_all(pool=pool)
         self.pipeline.run(verbose)
         if verbose:
             print('Pipeline completed')
