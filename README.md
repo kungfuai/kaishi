@@ -28,6 +28,16 @@ imdata.run_pipeline()
 imdata.report()
 ```
 
+There's also a labeler and rotation fix method that can be used, although it's not part of the default pipeline. To run:
+
+```
+imdata.predict_and_label()  # Run without fixing the rotation
+imdata.report()
+# or
+imdata.transform_fix_rotation()  # Detect rotation and fix it
+imdata.report()
+```
+
 In addition, the `imdata` object contains various objects and methods to interact with the data.
 
 At any point in the pipeline, the `imdata.files` and `imdata.filtered` objects contain results.
@@ -39,7 +49,6 @@ from kaishi.core.image.nn import Model
 model = Model().model
 predictions = model(stuff_you_want_to_predict)
 ```
-This will soon be baked into the pipeline.
 
 # A Note on Pipelines
 `Dataset.pipeline.methods` and `Dataset.pipeline.args` are simply lists of functions and argument lists, respectively. You can edit this with your own custom objects simply by calling `dataset.pipeline.methods.append` and `Dataset.pipeline.args.append`, which will then be called when you run `Dataset.run_pipeline()`.
