@@ -20,3 +20,13 @@ class Pipeline:
             pm(*args)
 
         return
+
+"""
+class PipelineComponent:
+    def __init__(self, func, args=[]):
+        self.func = func
+        self.args = args
+        return
+
+    def __call__(self, dataset_object):
+"""
