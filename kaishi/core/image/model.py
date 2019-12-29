@@ -18,6 +18,9 @@ class Model:
         elif type == 'resnet18':
             self.model = self.resnet18(n_classes)
             weights_filename = pkg_resources.resource_filename('kaishi', 'weights/image_macro_issues_resnet18.pth')
+        elif type == 'resnet50':
+            self.model = self.resnet50(n_classes)
+            weights_filename = pkg_resources.resource_filename('kaishi', 'weights/image_macro_issues_resnet50.pth')
         state_dict = torch.load(weights_filename, map_location=self.device)
         self.model.load_state_dict(state_dict)
 
@@ -42,6 +45,14 @@ class Model:
         model = torch.hub.load('pytorch/vision:v0.4.2', 'resnet18', pretrained=False)
         model.fc = nn.Sequential(nn.Linear(512, n_classes),
                                  nn.Sigmoid())
+
+        return model
+
+    def resnet50(self, n_classes):
+        """Basic ResNet50 with specified number of output classes."""
+        model = torch.hub.load('pytorch/vision:v0.4.2', 'resnet50', pretrained=False)
+        model.fc = torch.nn.Sequential(torch.nn.Linear(in_features=2048, out_features=n_classes),
+                                       torch.nn.Sigmoid())
 
         return model
 
