@@ -23,20 +23,14 @@ class Dataset(ImageFileGroup):
         if torch.cuda.is_available() is False:
             warnings.warn('No GPU detected, ConvNet prediction tasks will be very slow')
 
-        # Define default pipeline
-        DEFAULT_PIPELINE_METHODS = [self.filter_invalid_file_extensions,
-                                    self.filter_invalid_image_headers,
-                                    self.filter_duplicates,
-                                    self.collapse_children]
-        DEFAULT_PIPELINE_ARGS = [[], [], [], []]
-        self.pipeline = Pipeline(DEFAULT_PIPELINE_METHODS, DEFAULT_PIPELINE_ARGS)
+        #self.pipeline = Pipeline(DEFAULT_PIPELINE_METHODS, DEFAULT_PIPELINE_ARGS)
 
         return
 
-    def run_pipeline(self, pool=False, verbose=False):
+    def run(self, pool=False, verbose=False):
         """Run the pipeline as configured."""
         self.load_all(pool=pool)
-        self.pipeline.run(verbose)
+        self.pipeline(verbose)
         if verbose:
             print('Pipeline completed')
 

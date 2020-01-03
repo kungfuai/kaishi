@@ -3,6 +3,7 @@ import hashlib
 import numpy as np
 import os
 
+
 def load_files_by_walk(dir_name_raw, FileInitializer):
     """Read file names in a directory while ignoring subdirectories."""
     dir_name = os.path.abspath(dir_name_raw)
@@ -74,3 +75,32 @@ def md5sum(filename):
         hasher.update(buf)
 
         return hasher.hexdigest()
+
+class CollapseChildren():
+    """Restructure potentially multi-layer file tree into a single parent/child layer."""
+    def __init__(self, dataset):
+        self.dataset = dataset
+
+        return
+
+    def __call__(self):
+        def recursive_collapse_children(parent, top_level_children, top_level_call=True, top_level_key=None):
+            for k in parent.children.keys():
+                if top_level_call:
+                    top_level_key = k
+                if len(parent.children[k]) == 0:
+                    continue
+                else:
+                    for child in parent.children[k]:
+                        recursive_collapse_children(child, top_level_children, False, top_level_key)
+                        if not top_level_call:
+                            top_level_children[top_level_key].append(child)
+            if not top_level_call:
+                for k in parent.children.keys():
+                    parent.children[k] = []
+            return
+
+        for f in self.dataset.files:  # Recursively collapse tree for all files in this group
+            recursive_collapse_children(f, f.children)
+
+        return

@@ -2,31 +2,45 @@
 
 class Pipeline:
     """Base class for a generic pipeline object."""
-    def __init__(self, methods=None, args=None):
-        if methods is not None and args is not None:
-            self.methods = methods
-            self.args = args
-        else:
-            self.methods = []
-            self.args = []
+    def __init__(self):
+        self.components = []
 
         return
 
-    def run(self, verbose=False):
+    def __call__(self, dataset, verbose=False):
         """Run the full pipeline as configured."""
-        for (pm, args) in zip(self.methods, self.args):
+        for component in self.components:
             if verbose:
-                print('Running ' + pm.__name__)
-            pm(*args)
+                print('Running ' + component.__class__.__name__)
+            component()
 
         return
 
-"""
-class PipelineComponent:
-    def __init__(self, func, args=[]):
-        self.func = func
-        self.args = args
+    def __repr__(self):
+        """Print pipeline overview."""
+        if len(self.components) == 0:
+            return 'Empty Kaishi pipeline'
+        else:
+            ret_str = 'Kaishi pipeline: '
+            for i, component in enumerate(self.components):
+                if component.__class__.__name__ == 'CollapseChildren':
+                    ret_str += 'CollapseChildren (required)'
+                else:
+                    ret_str += component.__class__.__name__ + ' -> '
+
+            return ret_str
+
+    def __str__(self):
+        return self.__repr__()
+
+    def add_component(self, component):
+        """Add a method to be called as a pipeline step, where the only argument to each will be the dataset object."""
+        self.components.append(component)
+
         return
 
-    def __call__(self, dataset_object):
-"""
+    def reset(self):
+        """Reset the pipeline by removing all components."""
+        self.components = []
+
+        return

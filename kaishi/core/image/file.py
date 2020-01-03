@@ -8,7 +8,6 @@ import multiprocessing
 from kaishi.util.file import File, FileGroup
 from kaishi.util.misc import load_files_by_walk
 from kaishi.core.image.util import swap_channel_dimension
-from kaishi.core.image.model import Model
 from kaishi.core.image import ops
 from sklearn.feature_extraction.image import extract_patches_2d
 
@@ -82,14 +81,15 @@ class ImageFileGroup(FileGroup):
 
         return
 
-    # Externally defined methods
+    # Externally defined classes and methods
     from kaishi.core.image.generator import train_generator
     from kaishi.core.image.generator import generate_validation_data
     from kaishi.core.image.util import get_batch_dimensions
-    from kaishi.core.image.filters import filter_similar
-    from kaishi.core.image.filters import filter_invalid_file_extensions
-    from kaishi.core.image.filters import filter_invalid_image_headers
-    from kaishi.core.image.transforms import transform_fix_rotation
+    from kaishi.core.image.filters import FilterSimilar
+    from kaishi.core.image.filters import FilterInvalidFileExtensions
+    from kaishi.core.image.filters import FilterInvalidImageHeaders
+    from kaishi.core.image.labelers import LabelerMacro
+    from kaishi.core.image.transforms import TransformFixRotation
 
     def load_dir(self, dir_name):
         """Read file names in a directory while ignoring subdirectories."""
@@ -102,7 +102,7 @@ class ImageFileGroup(FileGroup):
         obj.verify_loaded()
         return
 
-    def load_all(self, pool=False):
+    def load_all(self, pool=True):
         """Load all files. If 'pool' is True, a multiprocessing pool will be created for faster loading."""
         if pool:
             pool = multiprocessing.Pool(multiprocessing.cpu_count())
@@ -159,30 +159,6 @@ class ImageFileGroup(FileGroup):
                 yield swap_channel_dimension(im_tensor), batch_file_objects
             else:
                 yield im_tensor, batch_file_objects
-
-    def predict_and_label(self):
-        """Use pre-trained ConvNet to predict image labels (e.g. stretched, rotated, etc.)."""
-        if self.model is None:
-            self.model = Model()
-        for batch, fobjs in self.build_numpy_batches(batch_size=self.model.batch_size):
-            pred = self.model.predict(batch)
-            for i in range(len(fobjs)):
-                if pred[i, 0] > 0.5:
-                    fobjs[i].add_label('DOCUMENT')
-                rot = np.argmax(pred[i, 1:5])
-                if rot == 0:
-                    fobjs[i].add_label('RECTIFIED')
-                elif rot == 1:
-                    fobjs[i].add_label('ROTATED_RIGHT')
-                elif rot == 2:
-                    fobjs[i].add_label('ROTATED_LEFT')
-                else:
-                    fobjs[i].add_label('UPSIDE_DOWN')
-                if pred[i, 5] > 0.5:
-                    fobjs[i].add_label('STRETCHED')
-        self.labeled = True
-
-        return
 
     def save(self, out_dir):
         """Save image data set in the same structure as the original data set, save for the filtered elements."""
