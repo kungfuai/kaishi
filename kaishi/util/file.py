@@ -10,12 +10,13 @@ import numpy as np
 
 class File:
     """Class that contains details about a file."""
+
     def __init__(self, basedir, relpath, filename):
         """Initialize basic file details."""
         self.relative_path = relpath
-        self.children = {'duplicates': []}
+        self.children = {"duplicates": []}
         self.labels = []
-        _ , self.ext = os.path.splitext(filename)
+        _, self.ext = os.path.splitext(filename)
         self.basename = filename
         if relpath is not None:
             self.abspath = os.path.join(basedir, relpath, filename)
@@ -46,15 +47,13 @@ class File:
             self.labels.append(label)
         self.labels.sort()
 
-        return
-
     def remove_label(self, label):
         """Remove a label from a file object."""
         try:
             self.labels.remove(label)
         except ValueError:
             return
-        return
+
 
 class FileGroup:
     """Class for readind and performing general operations on files."""
@@ -65,29 +64,27 @@ class FileGroup:
         self.filtered = dict()
         self.pipeline = Pipeline()
 
-        return
-
     # Externally defined classes and methods
     from kaishi.util.misc import CollapseChildren
     from kaishi.util.filters import FilterDuplicates
 
     def load_dir(self, dir_name):
         """Read file names in a directory while ignoring subdirectories."""
-        self.dir_name, self.dir_children, self.files = load_files_by_walk(dir_name, File)
-
-        return
+        self.dir_name, self.dir_children, self.files = load_files_by_walk(
+            dir_name, File
+        )
 
     def pipeline_options(self):
         """Returns available pipeline options."""
         options = []
         for method in dir(self):
-            if method.startswith('Filter'):
+            if method.startswith("Filter"):
                 options.append(getattr(self, method))
         for method in dir(self):
-            if method.startswith('Labeler'):
+            if method.startswith("Labeler"):
                 options.append(getattr(self, method))
         for method in dir(self):
-            if method.startswith('Transform'):
+            if method.startswith("Transform"):
                 options.append(getattr(self, method))
 
         return options
@@ -96,48 +93,55 @@ class FileGroup:
         """Configures the data processing pipeline."""
         options = self.pipeline_options()
         if choice_inds is None:  # Prompt for choices if not provided
-            print('Pipeline options: ')
+            print("Pipeline options: ")
             for i, option in enumerate(options):
-                print(repr(i) + ': ' + option.__name__)
-            print('')
+                print(repr(i) + ": " + option.__name__)
+            print("")
 
-            choice_string = input('To configure, enter a comma separated list of integers: ')
+            choice_string = input(
+                "To configure, enter a comma separated list of integers: "
+            )
             choice_inds = None
             while choice_inds is None:  # Keep trying until a valid string is entered
                 try:
-                    choice_inds = np.array(choice_string.split(',')).astype('int')
-                    if np.any(choice_inds < 0) or np.max(choice_inds) > len(options) - 1:
+                    choice_inds = np.array(choice_string.split(",")).astype("int")
+                    if (
+                        np.any(choice_inds < 0)
+                        or np.max(choice_inds) > len(options) - 1
+                    ):
                         choice_inds = None
                 except ValueError:
                     choice_inds = None
                 if choice_inds is None:
-                    choice_string = input('Error parsing string, please re-enter a list of the above options: ')
+                    choice_string = input(
+                        "Error parsing string, please re-enter a list of the above options: "
+                    )
         self.pipeline.reset()
-        for choice_ind in choice_inds:  # Use the configuration specified to construct pipeline
+        for (
+            choice_ind
+        ) in choice_inds:  # Use the configuration specified to construct pipeline
             self.pipeline.add_component(options[choice_ind](self))
-        self.pipeline.add_component(self.CollapseChildren(self))  # Always must end with this component
-
-        return
+        self.pipeline.add_component(
+            self.CollapseChildren(self)
+        )  # Always must end with this component
 
     def report(self):
         """Show a report of valid and invalid data."""
         if self.files == [] and self.filtered == {}:
-            print('No data loaded to report on.')
+            print("No data loaded to report on.")
             return
 
-        print('Current file list:')
+        print("Current file list:")
         x = PrettyTable()
-        x.field_names = ['File Name', 'Children', 'Labels']
+        x.field_names = ["File Name", "Children", "Labels"]
         for f in self.files:
             x.add_row([repr(f), repr(f.children), repr(f.labels)])
         print(x)
 
-        print('Filtered files:')
+        print("Filtered files:")
         x = PrettyTable()
-        x.field_names = ['File Name', 'Filter Reason']
+        x.field_names = ["File Name", "Filter Reason"]
         for k in self.filtered.keys():
             for f in self.filtered[k]:
                 x.add_row([repr(f), k])
         print(x)
-
-        return

@@ -16,8 +16,23 @@ THUMBNAIL_SIZE = (64, 64)
 MAX_DIM_FOR_SMALL = 224  # Max dimension for small sample
 PATCH_SIZE = (64, 64)  # Patch size for compression artifact detection
 RESAMPLE_METHOD = Image.NEAREST  # Resampling method for resizing images
-VALID_EXT = ['.bmp', '.dib', '.jpeg', '.jpg', '.jpe', '.jp2', '.png', '.pbm',  # Valid image extensions
-             '.pgm', '.ppm', '.sr', '.ras', '.tiff', '.tif']
+VALID_EXT = [
+    ".bmp",
+    ".dib",
+    ".jpeg",
+    ".jpg",
+    ".jpe",
+    ".jp2",
+    ".png",
+    ".pbm",  # Valid image extensions
+    ".pgm",
+    ".ppm",
+    ".sr",
+    ".ras",
+    ".tiff",
+    ".tif",
+]
+
 
 class ImageFile(File):
     """Class extension from 'File' for image-specific attributes and methods."""
@@ -25,14 +40,12 @@ class ImageFile(File):
     def __init__(self, basedir, relpath, filename):
         """Add members to supplement File class."""
         File.__init__(self, basedir, relpath, filename)
-        self.children['similar'] = []
+        self.children["similar"] = []
         self.image = None
         self.small_image = None
         self.thumbnail = None
         self.patch = None
         self.perceptual_hash = None
-
-        return
 
     def verify_loaded(self):
         """Verify image and derivatives are loaded (only loading when necessary)."""
@@ -41,12 +54,14 @@ class ImageFile(File):
                 self.image = Image.open(self.abspath)
                 self.image.load()  # Necessary b/c of https://github.com/python-pillow/Pillow/issues/1144
                 self.thumbnail = self.image.resize(THUMBNAIL_SIZE)
-                self.small_image = ops.make_small(self.image, max_dim=MAX_DIM_FOR_SMALL, resample_method=RESAMPLE_METHOD)
+                self.small_image = ops.make_small(
+                    self.image,
+                    max_dim=MAX_DIM_FOR_SMALL,
+                    resample_method=RESAMPLE_METHOD,
+                )
                 self.patch = ops.extract_patch(self.image, PATCH_SIZE)
             except OSError:  # Not an image file
                 self.image = None
-
-        return
 
     def rotate(self, ccw_rotation_degrees):
         """Rotate all instances of image by 'ccw_rotation_degrees'."""
@@ -54,8 +69,6 @@ class ImageFile(File):
         self.thumbnail = self.thumbnail.rotate(ccw_rotation_degrees, expand=True)
         self.small_image = self.small_image.rotate(ccw_rotation_degrees, expand=True)
         self.patch = self.patch.rotate(ccw_rotation_degrees, expand=True)
-
-        return
 
     def compute_perceptual_hash(self, hashfunc=imagehash.average_hash):
         """Calculate perceptual hash (close in value to similar images."""
@@ -67,8 +80,10 @@ class ImageFile(File):
 
         return self.perceptual_hash
 
+
 class ImageFileGroup(FileGroup):
     """Class to operate on an image file group."""
+
     def __init__(self):
         """Initialize new image file group."""
         FileGroup.__init__(self)
@@ -78,8 +93,6 @@ class ImageFileGroup(FileGroup):
         self.VALID_EXT = VALID_EXT
         self.model = None  # Only load model if needed
         self.labeled = False
-
-        return
 
     # Externally defined classes and methods
     from kaishi.core.image.generator import train_generator
@@ -93,14 +106,13 @@ class ImageFileGroup(FileGroup):
 
     def load_dir(self, dir_name):
         """Read file names in a directory while ignoring subdirectories."""
-        self.dir_name, self.dir_children, self.files = load_files_by_walk(dir_name, ImageFile)
-
-        return
+        self.dir_name, self.dir_children, self.files = load_files_by_walk(
+            dir_name, ImageFile
+        )
 
     def load_instance(self, obj):
         """Method to load an image object."""
         obj.verify_loaded()
-        return
 
     def load_all(self, pool=True):
         """Load all files. If 'pool' is True, a multiprocessing pool will be created for faster loading."""
@@ -111,9 +123,9 @@ class ImageFileGroup(FileGroup):
             for f in self.files:
                 self.load_instance(f)
 
-        return
-
-    def build_numpy_batches(self, channels_first=True, batch_size=None, image_type='small_image'):
+    def build_numpy_batches(
+        self, channels_first=True, batch_size=None, image_type="small_image"
+    ):
         """Build a tensor from the entire image corpus (or generate batches if specified).
 
         If a batch size is specified, this acts as a generator of batches and returns a list of file objects to manipulate.
@@ -122,7 +134,9 @@ class ImageFileGroup(FileGroup):
         'image_type' is one of 'thumbnail', 'small_image', or 'patch'
         """
         l = batch_size if batch_size is not None else len(self.files)
-        sz = self.get_batch_dimensions(l, channels_first=False, image_type=image_type)  # Start with PIL-style channel layout
+        sz = self.get_batch_dimensions(
+            l, channels_first=False, image_type=image_type
+        )  # Start with PIL-style channel layout
         im_tensor = np.zeros(sz)
 
         bi = 0
@@ -130,12 +144,12 @@ class ImageFileGroup(FileGroup):
         for f in self.files:
             try:
                 f.verify_loaded()
-                if image_type == 'small_image':
-                    im_tensor[bi] = np.array(f.small_image.convert('RGB'))
-                elif image_type == 'thumbnail':
-                    im_tensor[bi] = np.array(f.thumbnail.convert('RGB'))
-                elif image_type == 'patch':
-                    im_tensor[bi] = np.array(f.patch.convert('RGB'))
+                if image_type == "small_image":
+                    im_tensor[bi] = np.array(f.small_image.convert("RGB"))
+                elif image_type == "thumbnail":
+                    im_tensor[bi] = np.array(f.thumbnail.convert("RGB"))
+                elif image_type == "patch":
+                    im_tensor[bi] = np.array(f.patch.convert("RGB"))
             except AttributeError:
                 continue
             bi += 1
@@ -175,5 +189,3 @@ class ImageFileGroup(FileGroup):
             else:
                 file_dir = out_dir
             f.image.save(os.path.join(file_dir, f.basename))
-
-        return
