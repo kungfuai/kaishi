@@ -17,7 +17,7 @@ class TransformFixRotation:
         for f in self.dataset.files:
             if Labels.RECTIFIED in f.labels:
                 continue
-            elif Labels.RECTIFIED in f.labels:
+            elif Labels.ROTATED_RIGHT in f.labels:
                 f.rotate(90)
                 f.remove_label(Labels.ROTATED_RIGHT)
             elif Labels.ROTATED_LEFT in f.labels:
