@@ -1,5 +1,6 @@
 """Class definition for reading/writing files of various types."""
 import os
+from kaishi.util.labels import Labels
 from kaishi.util.misc import md5sum
 from kaishi.util.misc import load_files_by_walk
 from kaishi.util.pipeline import Pipeline
@@ -45,7 +46,11 @@ class File:
         """Add a label to a file object."""
         if label not in self.labels:
             self.labels.append(label)
-        self.labels.sort()
+
+        # Ensure the list is always sorted
+        string_list = [label.name for label in self.labels]
+        sort_ind = sorted(range(len(string_list)), key=lambda k: string_list[k])
+        self.labels = [self.labels[i] for i in sort_ind]
 
     def remove_label(self, label):
         """Remove a label from a file object."""
@@ -135,7 +140,9 @@ class FileGroup:
         x = PrettyTable()
         x.field_names = ["File Name", "Children", "Labels"]
         for f in self.files:
-            x.add_row([repr(f), repr(f.children), repr(f.labels)])
+            x.add_row(
+                [repr(f), repr(f.children), repr([label.name for label in f.labels])]
+            )
         print(x)
 
         print("Filtered files:")

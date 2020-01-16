@@ -1,3 +1,4 @@
+from kaishi.util.labels import Labels
 from kaishi.core.image.labelers import LabelerMacro
 
 
@@ -14,15 +15,15 @@ class TransformFixRotation:
             self.dataset.labeled = True
 
         for f in self.dataset.files:
-            if "RECTIFIED" in f.labels:
+            if Labels.RECTIFIED in f.labels:
                 continue
-            elif "ROTATED_RIGHT" in f.labels:
+            elif Labels.RECTIFIED in f.labels:
                 f.rotate(90)
-                f.remove_label("ROTATED_RIGHT")
-            elif "ROTATED_LEFT" in f.labels:
+                f.remove_label(Labels.ROTATED_RIGHT)
+            elif Labels.ROTATED_LEFT in f.labels:
                 f.rotate(270)
-                f.remove_label("ROTATED_LEFT")
-            elif "UPSIDE_DOWN" in f.labels:
+                f.remove_label(Labels.ROTATED_LEFT)
+            elif Labels.UPSIDE_DOWN in f.labels:
                 f.rotate(180)
-                f.remove_label("UPSIDE_DOWN")
-            f.add_label("RECTIFIED")
+                f.remove_label(Labels.UPSIDE_DOWN)
+            f.add_label(Labels.RECTIFIED)
