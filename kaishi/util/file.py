@@ -1,21 +1,23 @@
 """Class definition for reading/writing files of various types."""
 import os
-from kaishi.util.misc import find_duplicate_inds
-from kaishi.util.misc import trim_list_by_inds
+from kaishi.util.labels import Labels
 from kaishi.util.misc import md5sum
 from kaishi.util.misc import load_files_by_walk
+from kaishi.util.pipeline import Pipeline
 import multiprocessing
 from prettytable import PrettyTable
+import numpy as np
 
 
 class File:
     """Class that contains details about a file."""
+
     def __init__(self, basedir, relpath, filename):
         """Initialize basic file details."""
         self.relative_path = relpath
-        self.children = {'duplicates': []}
+        self.children = {"duplicates": []}
         self.labels = []
-        _ , self.ext = os.path.splitext(filename)
+        _, self.ext = os.path.splitext(filename)
         self.basename = filename
         if relpath is not None:
             self.abspath = os.path.join(basedir, relpath, filename)
@@ -44,9 +46,11 @@ class File:
         """Add a label to a file object."""
         if label not in self.labels:
             self.labels.append(label)
-        self.labels.sort()
 
-        return
+        # Ensure the list is always sorted
+        string_list = [label.name for label in self.labels]
+        sort_ind = sorted(range(len(string_list)), key=lambda k: string_list[k])
+        self.labels = [self.labels[i] for i in sort_ind]
 
     def remove_label(self, label):
         """Remove a label from a file object."""
@@ -54,7 +58,7 @@ class File:
             self.labels.remove(label)
         except ValueError:
             return
-        return
+
 
 class FileGroup:
     """Class for readind and performing general operations on files."""
@@ -63,84 +67,88 @@ class FileGroup:
         """Instantiate empty class."""
         self.files = []
         self.filtered = dict()
+        self.pipeline = Pipeline()
 
-        return
+    # Externally defined classes and methods
+    from kaishi.util.misc import CollapseChildren
+    from kaishi.util.filters import FilterDuplicates
 
     def load_dir(self, dir_name):
         """Read file names in a directory while ignoring subdirectories."""
-        self.dir_name, self.dir_children, self.files = load_files_by_walk(dir_name, File)
+        self.dir_name, self.dir_children, self.files = load_files_by_walk(
+            dir_name, File
+        )
 
-        return
+    def pipeline_options(self):
+        """Returns available pipeline options."""
+        options = []
+        for method in dir(self):
+            if method.startswith("Filter"):
+                options.append(getattr(self, method))
+        for method in dir(self):
+            if method.startswith("Labeler"):
+                options.append(getattr(self, method))
+        for method in dir(self):
+            if method.startswith("Transform"):
+                options.append(getattr(self, method))
 
-    def filter_duplicates(self):
-        """Filter duplicate files, detected via hashing."""
-        hashlist = [f.hash if f.hash is not None else f.compute_hash() for f in self.files]
+        return options
 
-        duplicate_ind, parent_ind = find_duplicate_inds(hashlist)
-        for di, pi in zip(duplicate_ind, parent_ind):
-            self.files[pi].children['duplicates'].append(self.files[di])
-        self.files, trimmed = trim_list_by_inds(self.files, duplicate_ind)
-        self.filtered['duplicates'] = trimmed
+    def configure(self, choice_inds=None):
+        """Configures the data processing pipeline."""
+        options = self.pipeline_options()
+        if choice_inds is None:  # Prompt for choices if not provided
+            print("Pipeline options: ")
+            for i, option in enumerate(options):
+                print(repr(i) + ": " + option.__name__)
+            print("")
 
-        return trimmed
-    filter_duplicates.default_args = []
-
-    def pipeline_components(self):
-        """Shows available pipeline components."""
-        pnum = 0
-        for m in dir(self):
-            if m.startswith('filter_'):
-                pnum += 1
-                print(repr(pnum) + ': ' + repr(m))
-        for m in dir(self):
-            if m.startswith('transform_'):
-                pnum += 1
-                print(repr(pnum) + ': ' + repr(m))
-
-        return
-
-    def collapse_children(self):
-        """Restructure potentially multi-layer file tree into a single parent/child layer."""
-        def recursive_collapse_children(parent, top_level_children, top_level_call=True, top_level_key=None):
-            for k in parent.children.keys():
-                if top_level_call:
-                    top_level_key = k
-                if len(parent.children[k]) == 0:
-                    continue
-                else:
-                    for child in parent.children[k]:
-                        recursive_collapse_children(child, top_level_children, False, top_level_key)
-                        if not top_level_call:
-                            top_level_children[top_level_key].append(child)
-            if not top_level_call:
-                for k in parent.children.keys():
-                    parent.children[k] = []
-            return
-
-        for f in self.files:  # Recursively collapse tree for all files in this group
-            recursive_collapse_children(f, f.children)
-
-        return
+            choice_string = input(
+                "To configure, enter a comma separated list of integers: "
+            )
+            choice_inds = None
+            while choice_inds is None:  # Keep trying until a valid string is entered
+                try:
+                    choice_inds = np.array(choice_string.split(",")).astype("int")
+                    if (
+                        np.any(choice_inds < 0)
+                        or np.max(choice_inds) > len(options) - 1
+                    ):
+                        choice_inds = None
+                except ValueError:
+                    choice_inds = None
+                if choice_inds is None:
+                    choice_string = input(
+                        "Error parsing string, please re-enter a list of the above options: "
+                    )
+        self.pipeline.reset()
+        for (
+            choice_ind
+        ) in choice_inds:  # Use the configuration specified to construct pipeline
+            self.pipeline.add_component(options[choice_ind](self))
+        self.pipeline.add_component(
+            self.CollapseChildren(self)
+        )  # Always must end with this component
 
     def report(self):
         """Show a report of valid and invalid data."""
         if self.files == [] and self.filtered == {}:
-            print('No data loaded to report on.')
+            print("No data loaded to report on.")
             return
 
-        print('Valid files:')
+        print("Current file list:")
         x = PrettyTable()
-        x.field_names = ['File Name', 'Children', 'Labels']
+        x.field_names = ["File Name", "Children", "Labels"]
         for f in self.files:
-            x.add_row([repr(f), repr(f.children), repr(f.labels)])
+            x.add_row(
+                [repr(f), repr(f.children), repr([label.name for label in f.labels])]
+            )
         print(x)
 
-        print('Filtered files:')
+        print("Filtered files:")
         x = PrettyTable()
-        x.field_names = ['File Name', 'Filter Reason']
+        x.field_names = ["File Name", "Filter Reason"]
         for k in self.filtered.keys():
             for f in self.filtered[k]:
                 x.add_row([repr(f), k])
         print(x)
-
-        return
