@@ -9,7 +9,11 @@ from kaishi.util.pipeline import Pipeline
 
 class TabularDataInspector:
     def __init__(
-        self, source: str, source_type: str = "directory", recursive: bool = False
+        self,
+        source: str,
+        source_type: str = "directory",
+        recursive: bool = False,
+        use_predefined_pipeline: bool = False,
     ):
         """
         Construct an inspector for tabular data. It can be
@@ -33,8 +37,9 @@ class TabularDataInspector:
         self.recursive = recursive
         self.files = []
         self.pipeline = Pipeline()
-        self.pipeline.add_step(self._load)
-        self.pipeline.add_step(self._print)
+        if use_predefined_pipeline:
+            self.pipeline.add_component(self.load)
+            self.pipeline.add_component(self.print)
 
     def _has_csv_file_ext(self, f):
         f = f.lower()
@@ -49,7 +54,7 @@ class TabularDataInspector:
             or f.endswith(".jsonl.gz")
         )
 
-    def _load(self):
+    def load(self):
         print("[tabular load]")
         dfs = []
         if self.source_type == "directory":
@@ -60,6 +65,8 @@ class TabularDataInspector:
                 elif self._has_json_file_ext(f):
                     self.files.append(f)
                     dfs.append(pd.read_json(f))
+        else:
+            raise ValueError("source_type {} not supported.".format(self.source_type))
         self.dfs = dfs
 
         # TODO: decide whether and which dataframes to concat.
@@ -82,7 +89,7 @@ class TabularDataInspector:
                 )
             )
 
-    def _print(self):
+    def print(self):
         for i, s in enumerate(self.df_summaries):
             print(f"\nDataframe {i}. Shape = {s['shape']}")
             print(f"source: {s['filepath']}")
@@ -92,6 +99,33 @@ class TabularDataInspector:
                 print(f"\n---  Column {col}")
                 print(s["describe"][col])
                 print(f"Fraction of missing values: {s['fraction_missing'][col]}.")
+
+    def concatenate_all(self):
+        # concat all tables.
+        self.df_concatenated = pd.concat(self.dfs).reset_index(drop=True)
+
+    @property
+    def is_concatenated(self):
+        return hasattr(self, "df_concatenated")
+
+    def dedup(self, columns=None, concatenate=False):
+        if concatenate:
+            if not self.is_concatenated:
+                self.concatenate_all()
+            self.df_concatenated.drop_duplicates(inplace=True)
+        else:
+            for df in self.dfs:
+                df.drop_duplicates(inplace=True)
+
+    def save(self, out_dir, max_rows_per_file=1e6):
+        if self.is_concatenated:
+            self.df_concatenated.to_csv(path.join(out_dir, "all.csv"), index=False)
+        else:
+            for df, filepath in zip(self.dfs, self.files):
+                filename = path.basename(file)
+                if not filename.lower().endswith(".csv"):
+                    filename += ".csv"
+                df.to_csv(path.join(out_dir, filename))
 
     def run_pipeline(self, verbose=False):
         # It is using the same method name as in `image.Dataset`.
