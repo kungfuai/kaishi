@@ -1,7 +1,7 @@
 """Data exploration utilities for tabular data (csv files, database tables).
 """
 from glob import glob
-from os import path
+from os import path, makedirs
 import pandas as pd
 
 from kaishi.util.pipeline import Pipeline
@@ -40,6 +40,12 @@ class TabularDataInspector:
         if use_predefined_pipeline:
             self.pipeline.add_component(self.load)
             self.pipeline.add_component(self.print)
+            self.pipeline.add_component(self.dedup)
+
+            def save_files():
+                self.save("tabular_data_output")
+
+            self.pipeline.add_component(save_files)
 
     def _has_csv_file_ext(self, f):
         f = f.lower()
@@ -118,17 +124,19 @@ class TabularDataInspector:
                 df.drop_duplicates(inplace=True)
 
     def save(self, out_dir, max_rows_per_file=1e6):
+        if not path.exists(out_dir):
+            makedirs(out_dir)
         if self.is_concatenated:
             self.df_concatenated.to_csv(path.join(out_dir, "all.csv"), index=False)
         else:
             for df, filepath in zip(self.dfs, self.files):
-                filename = path.basename(file)
+                filename = path.basename(filepath)
                 if not filename.lower().endswith(".csv"):
                     filename += ".csv"
                 df.to_csv(path.join(out_dir, filename))
 
     def run_pipeline(self, verbose=False):
         # It is using the same method name as in `image.Dataset`.
-        self.pipeline.run()
+        self.pipeline(self)
         if verbose:
             print("Pipeline completed")

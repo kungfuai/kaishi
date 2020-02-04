@@ -7,5 +7,5 @@ from kaishi.tabular import TabularDataInspector
 
 
 if __name__ == "__main__":
-    ins = TabularDataInspector("sample_data/simple_csv")
-    ins.run_pipeline()
+    ins = TabularDataInspector("sample_data/simple_csv", use_predefined_pipeline=True)
+    ins.run_pipeline(verbose=True)
