@@ -40,7 +40,7 @@ class TabularDataInspector:
         if use_predefined_pipeline:
             self.pipeline.add_component(self.load)
             self.pipeline.add_component(lambda: print(self))
-            self.pipeline.add_component(self.dedup)
+            self.pipeline.add_component(self.FilterDuplicates)
 
             def save_files():
                 self.save("tabular_data_output")
@@ -118,7 +118,8 @@ class TabularDataInspector:
     def is_concatenated(self):
         return hasattr(self, "df_concatenated")
 
-    def dedup(self, columns=None, concatenate=False):
+    # The method name is discoverable by `utils.file.FileGroup.pipeline_options`.
+    def FilterDuplicates(self, columns=None, concatenate=False):
         if concatenate:
             if not self.is_concatenated:
                 self.concatenate_all()
