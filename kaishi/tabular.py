@@ -39,8 +39,8 @@ class TabularDataInspector:
         self.pipeline = Pipeline()
         if use_predefined_pipeline:
             self.pipeline.add_component(self.load)
-            self.pipeline.add_component(self.print)
-            self.pipeline.add_component(self.dedup)
+            self.pipeline.add_component(lambda: print(self))
+            self.pipeline.add_component(self.FilterDuplicates)
 
             def save_files():
                 self.save("tabular_data_output")
@@ -95,16 +95,20 @@ class TabularDataInspector:
                 )
             )
 
-    def print(self):
+    def __str__(self):
+        lines = []
         for i, s in enumerate(self.df_summaries):
-            print(f"\nDataframe {i}. Shape = {s['shape']}")
-            print(f"source: {s['filepath']}")
-            print("====================================")
-            print(f"{len(s['columns'])} columns:", s["columns"])
+            lines.append(f"\nDataframe {i}. Shape = {s['shape']}")
+            lines.append(f"source: {s['filepath']}")
+            lines.append("====================================")
+            lines.append(f"{len(s['columns'])} columns: {s['columns']}")
             for col in s["columns"]:
-                print(f"\n---  Column {col}")
-                print(s["describe"][col])
-                print(f"Fraction of missing values: {s['fraction_missing'][col]}.")
+                lines.append(f"\n---  Column {col}")
+                lines.append(str(s["describe"][col]))
+                lines.append(
+                    f"Fraction of missing values: {s['fraction_missing'][col]}."
+                )
+        return "\n".join(lines)
 
     def concatenate_all(self):
         # concat all tables.
@@ -114,7 +118,8 @@ class TabularDataInspector:
     def is_concatenated(self):
         return hasattr(self, "df_concatenated")
 
-    def dedup(self, columns=None, concatenate=False):
+    # The method name is discoverable by `utils.file.FileGroup.pipeline_options`.
+    def FilterDuplicates(self, columns=None, concatenate=False):
         if concatenate:
             if not self.is_concatenated:
                 self.concatenate_all()
