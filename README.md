@@ -1,6 +1,13 @@
 # kaishi
 Tool kit to accelerate the initial phases of exploratory data analysis.
 
+
+![](https://github.com/kungfuai/kaishi/workflows/build/badge.svg)
+[![License](https://img.shields.io/github/license/kungfuai/kaishi)](https://github.com/kungfuai/kaishi/blob/master/LICENSE)
+<!--[![PyPI Latest Release](https://img.shields.io/pypi/v/pandas.svg)](https://pypi.org/project/kaishi/)
+ -->
+
+
 # Requirements
 Python 3
 
