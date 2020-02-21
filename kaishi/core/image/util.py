@@ -19,6 +19,7 @@ def swap_channel_dimension(tensor):
         else:
             return np.swapaxes(np.swapaxes(tensor, 1, 2), 2, 3)
 
+
 def validate_image_header(filename):
     """Validate that an image has a valid header.
 
@@ -31,17 +32,19 @@ def validate_image_header(filename):
     else:
         return False
 
-def get_batch_dimensions(self, batch_size, channels_first=True, image_type='small_image'):
+
+def get_batch_dimensions(
+    self, batch_size, channels_first=True, image_type="small_image"
+):
     """Get dimensions of the batch tensor. Note that the 'batch_size' argument can be the full data set."""
-    if image_type == 'small_image':  # Get size of the tensor
+    if image_type == "small_image":  # Get size of the tensor
         sz = (batch_size, self.MAX_DIM_FOR_SMALL, self.MAX_DIM_FOR_SMALL, 3)
-    elif image_type == 'thumbnail':
+    elif image_type == "thumbnail":
         sz = (batch_size, self.THUMNAIL_SIZE[0], self.THUMBNAIL_SIZE[1], 3)
-    elif image_type == 'patch':
+    elif image_type == "patch":
         sz = (batch_size, self.PATCH_SIZE[0], self.PATCH_SIZE[1], 3)
 
     if channels_first:
         return swap_channel_dimension(sz)
     else:
         return sz
-

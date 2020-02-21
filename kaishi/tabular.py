@@ -53,7 +53,12 @@ class TabularDataInspector:
 
     def _has_json_file_ext(self, f):
         f = f.lower()
-        return f.endswith(".json") or f.endswith(".jsonl") or f.endswith(".json.gz") or f.endswith(".jsonl.gz")
+        return (
+            f.endswith(".json")
+            or f.endswith(".jsonl")
+            or f.endswith(".json.gz")
+            or f.endswith(".jsonl.gz")
+        )
 
     def load(self):
         print("[tabular load]")
@@ -100,7 +105,9 @@ class TabularDataInspector:
             for col in s["columns"]:
                 lines.append(f"\n---  Column {col}")
                 lines.append(str(s["describe"][col]))
-                lines.append(f"Fraction of missing values: {s['fraction_missing'][col]}.")
+                lines.append(
+                    f"Fraction of missing values: {s['fraction_missing'][col]}."
+                )
         return "\n".join(lines)
 
     def concatenate_all(self):
