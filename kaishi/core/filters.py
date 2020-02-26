@@ -1,5 +1,5 @@
-from kaishi.util.misc import find_duplicate_inds
-from kaishi.util.misc import trim_list_by_inds
+from kaishi.core.misc import find_duplicate_inds
+from kaishi.core.misc import trim_list_by_inds
 
 
 class FilterDuplicates:

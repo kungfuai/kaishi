@@ -1,14 +1,17 @@
 """Primary interface to the image tool kit."""
 import os
-from kaishi.core.image.file import ImageFileGroup
-from kaishi.util.pipeline import Pipeline
+from kaishi.image.file import ImageFileGroup
+from kaishi.core.pipeline import Pipeline
 import warnings
 import torch
 
 
 class Dataset(ImageFileGroup):
     """Primary object for image data sets."""
-    PERCEPTUAL_HASH_THRESHOLD = 3  # Empirically determined, can be overridden in DEFUALT_PIPELINE_ARGS
+
+    PERCEPTUAL_HASH_THRESHOLD = (
+        3  # Empirically determined, can be overridden in DEFUALT_PIPELINE_ARGS
+    )
 
     def __init__(self, source=None):
         """Initialize with the default pipeline defined."""
@@ -17,13 +20,13 @@ class Dataset(ImageFileGroup):
             if os.path.exists(source):
                 self.load_dir(source)
             else:
-                warnings.warn('Directory not found, initializing empty Dataset')
+                warnings.warn("Directory not found, initializing empty Dataset")
 
         # Make sure GPU is available, warn if not
         if torch.cuda.is_available() is False:
-            warnings.warn('No GPU detected, ConvNet prediction tasks will be very slow')
+            warnings.warn("No GPU detected, ConvNet prediction tasks will be very slow")
 
-        #self.pipeline = Pipeline(DEFAULT_PIPELINE_METHODS, DEFAULT_PIPELINE_ARGS)
+        # self.pipeline = Pipeline(DEFAULT_PIPELINE_METHODS, DEFAULT_PIPELINE_ARGS)
 
         return
 
@@ -32,6 +35,6 @@ class Dataset(ImageFileGroup):
         self.load_all(pool=pool)
         self.pipeline(self, verbose=verbose)
         if verbose:
-            print('Pipeline completed')
+            print("Pipeline completed")
 
         return

@@ -1,10 +1,9 @@
 """Class definition for reading/writing files of various types."""
 import os
-from kaishi.util.labels import Labels
-from kaishi.util.misc import md5sum
-from kaishi.util.misc import load_files_by_walk
-from kaishi.util.pipeline import Pipeline
-import multiprocessing
+from kaishi.core.labels import Labels
+from kaishi.core.misc import md5sum
+from kaishi.core.misc import load_files_by_walk
+from kaishi.core.pipeline import Pipeline
 from prettytable import PrettyTable
 import numpy as np
 
@@ -70,8 +69,8 @@ class FileGroup:
         self.pipeline = Pipeline()
 
     # Externally defined classes and methods
-    from kaishi.util.misc import CollapseChildren
-    from kaishi.util.filters import FilterDuplicates
+    from kaishi.core.misc import CollapseChildren
+    from kaishi.core.filters import FilterDuplicates
 
     def load_dir(self, dir_name):
         """Read file names in a directory while ignoring subdirectories."""

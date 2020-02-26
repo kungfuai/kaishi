@@ -1,7 +1,7 @@
 import os
-from kaishi.util.misc import trim_list_by_inds
-from kaishi.util.misc import find_similar_by_value
-from kaishi.core.image.util import validate_image_header
+from kaishi.core.misc import trim_list_by_inds
+from kaishi.core.misc import find_similar_by_value
+from kaishi.image.util import validate_image_header
 
 
 class FilterSimilar:

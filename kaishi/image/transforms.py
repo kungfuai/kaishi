@@ -1,5 +1,5 @@
-from kaishi.util.labels import Labels
-from kaishi.core.image.labelers import LabelerMacro
+from kaishi.core.labels import Labels
+from kaishi.image.labelers import LabelerMacro
 
 
 class TransformFixRotation:

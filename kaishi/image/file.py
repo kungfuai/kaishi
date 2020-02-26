@@ -5,10 +5,10 @@ from PIL import Image
 import imagehash
 from tqdm import tqdm
 import multiprocessing
-from kaishi.util.file import File, FileGroup
-from kaishi.util.misc import load_files_by_walk
-from kaishi.core.image.util import swap_channel_dimension
-from kaishi.core.image import ops
+from kaishi.core.file import File, FileGroup
+from kaishi.core.misc import load_files_by_walk
+from kaishi.image.util import swap_channel_dimension
+from kaishi.image import ops
 from sklearn.feature_extraction.image import extract_patches_2d
 
 
@@ -95,14 +95,14 @@ class ImageFileGroup(FileGroup):
         self.labeled = False
 
     # Externally defined classes and methods
-    from kaishi.core.image.generator import train_generator
-    from kaishi.core.image.generator import generate_validation_data
-    from kaishi.core.image.util import get_batch_dimensions
-    from kaishi.core.image.filters import FilterSimilar
-    from kaishi.core.image.filters import FilterInvalidFileExtensions
-    from kaishi.core.image.filters import FilterInvalidImageHeaders
-    from kaishi.core.image.labelers import LabelerMacro
-    from kaishi.core.image.transforms import TransformFixRotation
+    from kaishi.image.generator import train_generator
+    from kaishi.image.generator import generate_validation_data
+    from kaishi.image.util import get_batch_dimensions
+    from kaishi.image.filters import FilterSimilar
+    from kaishi.image.filters import FilterInvalidFileExtensions
+    from kaishi.image.filters import FilterInvalidImageHeaders
+    from kaishi.image.labelers import LabelerMacro
+    from kaishi.image.transforms import TransformFixRotation
 
     def load_dir(self, dir_name):
         """Read file names in a directory while ignoring subdirectories."""

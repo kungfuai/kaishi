@@ -1,6 +1,6 @@
 import numpy as np
-from kaishi.util.labels import Labels
-from kaishi.core.image.model import Model
+from kaishi.core.labels import Labels
+from kaishi.image.model import Model
 
 
 class LabelerMacro:
