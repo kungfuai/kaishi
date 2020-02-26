@@ -97,7 +97,7 @@ class CollapseChildren:
         def recursive_collapse_children(
             parent, top_level_children, top_level_call=True, top_level_key=None
         ):
-            for k in parent.children.keys():
+            for k in parent.children:
                 if top_level_call:
                     top_level_key = k
                 if len(parent.children[k]) == 0:
@@ -110,7 +110,7 @@ class CollapseChildren:
                         if not top_level_call:
                             top_level_children[top_level_key].append(child)
             if not top_level_call:
-                for k in parent.children.keys():
+                for k in parent.children:
                     parent.children[k] = []
 
         for (

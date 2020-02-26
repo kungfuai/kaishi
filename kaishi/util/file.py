@@ -148,7 +148,7 @@ class FileGroup:
         print("Filtered files:")
         x = PrettyTable()
         x.field_names = ["File Name", "Filter Reason"]
-        for k in self.filtered.keys():
+        for k in self.filtered:
             for f in self.filtered[k]:
                 x.add_row([repr(f), k])
         print(x)
