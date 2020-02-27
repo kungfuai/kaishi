@@ -3,7 +3,7 @@ from kaishi.core.misc import find_duplicate_inds
 from kaishi.core.misc import trim_list_by_inds
 
 
-class FilterDuplicates:
+class FilterDuplicateFiles:
     """Filter duplicate files, detected via hashing."""
 
     def __init__(self, dataset):

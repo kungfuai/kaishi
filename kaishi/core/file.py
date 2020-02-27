@@ -60,7 +60,7 @@ class FileGroup:
 
     # Externally defined classes and methods
     from kaishi.core.misc import CollapseChildren
-    from kaishi.core.filters import FilterDuplicates
+    from kaishi.core.filters import FilterDuplicateFiles
 
     def __init__(self, recursive: bool):
         """Instantiate empty class."""
@@ -129,7 +129,7 @@ class FileGroup:
             self.CollapseChildren(self)
         )  # Always must end with this component
 
-    def report(self):
+    def file_report(self):
         """Show a report of valid and invalid data."""
         if self.files == [] and self.filtered == {}:
             print("No data loaded to report on.")

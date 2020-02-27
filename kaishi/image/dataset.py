@@ -5,7 +5,7 @@ from kaishi.image.file import ImageFileGroup
 import torch
 
 
-class Dataset(ImageFileGroup):
+class ImageDataset(ImageFileGroup):
     """Primary object for image data sets."""
 
     PERCEPTUAL_HASH_THRESHOLD = (
@@ -31,3 +31,7 @@ class Dataset(ImageFileGroup):
         self.pipeline(self, verbose=verbose)
         if verbose:
             print("Pipeline completed")
+
+    def report(self):
+        """Run a descriptive report."""
+        self.file_report()
