@@ -1,3 +1,4 @@
+"""Filters for image datasets."""
 import os
 from kaishi.core.misc import trim_list_by_inds
 from kaishi.core.misc import find_similar_by_value
@@ -10,7 +11,7 @@ class FilterSimilar:
     def __init__(self, dataset):
         self.dataset = dataset
 
-    def __call__(self, threshold=None):
+    def __call__(self, threshold: bool = None):
         hashlist = [
             f.perceptual_hash
             if f.perceptual_hash is not None
@@ -37,14 +38,12 @@ class FilterInvalidFileExtensions:
     def __init__(self, dataset):
         self.dataset = dataset
 
-        return
-
     def __call__(self):
         # Trim any files without image extensions
         badind = []
-        for i, f in enumerate(self.dataset.files):
-            _, ext = os.path.splitext(f.basename)
-            if len(ext) == 0 or ext not in self.dataset.VALID_EXT:
+        for i, fobj in enumerate(self.dataset.files):
+            _, ext = os.path.splitext(fobj.basename)
+            if len(ext) == 0 or ext not in self.dataset.valid_ext:
                 badind.append(i)
 
         self.dataset.files, trimmed = trim_list_by_inds(self.dataset.files, badind)
@@ -61,8 +60,8 @@ class FilterInvalidImageHeaders:
 
     def __call__(self):
         badind = []
-        for i, f in enumerate(self.dataset.files):
-            if not validate_image_header(f.abspath):
+        for i, fobj in enumerate(self.dataset.files):
+            if not validate_image_header(fobj.abspath):
                 badind.append(i)
 
         self.dataset.files, trimmed = trim_list_by_inds(self.dataset.files, badind)

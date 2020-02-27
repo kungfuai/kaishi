@@ -1,3 +1,4 @@
+"""Core filters for multiple dataset types."""
 from kaishi.core.misc import find_duplicate_inds
 from kaishi.core.misc import trim_list_by_inds
 
@@ -7,8 +8,6 @@ class FilterDuplicates:
 
     def __init__(self, dataset):
         self.dataset = dataset
-
-        return
 
     def __call__(self):
         hashlist = [

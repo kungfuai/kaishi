@@ -1,8 +1,7 @@
 """Primary interface to the image tool kit."""
 import os
-from kaishi.image.file import ImageFileGroup
-from kaishi.core.pipeline import Pipeline
 import warnings
+from kaishi.image.file import ImageFileGroup
 import torch
 
 
@@ -13,7 +12,7 @@ class Dataset(ImageFileGroup):
         3  # Empirically determined, can be overridden in DEFUALT_PIPELINE_ARGS
     )
 
-    def __init__(self, source=None):
+    def __init__(self, source: str = None):
         """Initialize with the default pipeline defined."""
         ImageFileGroup.__init__(self)
         if source is not None:
@@ -26,15 +25,9 @@ class Dataset(ImageFileGroup):
         if torch.cuda.is_available() is False:
             warnings.warn("No GPU detected, ConvNet prediction tasks will be very slow")
 
-        # self.pipeline = Pipeline(DEFAULT_PIPELINE_METHODS, DEFAULT_PIPELINE_ARGS)
-
-        return
-
-    def run(self, pool=False, verbose=False):
+    def run(self, pool: bool = False, verbose: bool = False):
         """Run the pipeline as configured."""
         self.load_all(pool=pool)
         self.pipeline(self, verbose=verbose)
         if verbose:
             print("Pipeline completed")
-
-        return

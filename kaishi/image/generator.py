@@ -1,7 +1,7 @@
+"""Data generator for image datasets."""
 import itertools
-import numpy as np
 import random
-from PIL import Image
+import numpy as np
 from kaishi.image.util import swap_channel_dimension
 from kaishi.image import ops
 
@@ -49,13 +49,14 @@ def augment_and_label(imobj):
     return im, label
 
 
-def train_generator(self, batch_size=32, string_to_match=None):
+def train_generator(self, batch_size: int = 32, string_to_match: str = None):
     """Generator for training the data labeler. Operates on a kaishi.image.Dataset object.
 
     'batch_size' - size of batches to create
-    'string_to_match' - ignores data without this string in the relative path (make 'None' to use all data)
+    'string_to_match' - ignores data without this string in the relative path (make
+                        'None' to use all data)
     """
-    indexes = [i for i in range(len(self.files))]
+    indexes = list(range(len(self.files)))
     random.seed(42)
     np.random.seed(42)
     random.shuffle(indexes)
@@ -90,9 +91,9 @@ def train_generator(self, batch_size=32, string_to_match=None):
             bi += 1
 
 
-def generate_validation_data(self, n_examples=400, string_to_match=None):
+def generate_validation_data(self, n_examples: int = 400, string_to_match: str = None):
     """Generate a reproducibly random validation data set."""
-    indexes = [i for i in range(len(self.files))]
+    indexes = list(range(len(self.files)))
     random.seed(42)
     np.random.seed(42)
     random.shuffle(indexes)

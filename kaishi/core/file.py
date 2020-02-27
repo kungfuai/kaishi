@@ -1,6 +1,5 @@
 """Class definition for reading/writing files of various types."""
 import os
-from kaishi.core.labels import Labels
 from kaishi.core.misc import md5sum
 from kaishi.core.misc import load_files_by_walk
 from kaishi.core.pipeline import Pipeline
@@ -11,7 +10,7 @@ import numpy as np
 class File:
     """Class that contains details about a file."""
 
-    def __init__(self, basedir, relpath, filename):
+    def __init__(self, basedir: str, relpath: str, filename: str):
         """Initialize basic file details."""
         self.relative_path = relpath
         self.children = {"duplicates": []}
@@ -24,13 +23,10 @@ class File:
             self.abspath = os.path.join(basedir, filename)
         self.hash = None  # Default to None, populate later
 
-        return
-
     def __repr__(self):
         if self.relative_path is None:
             return self.basename
-        else:
-            return os.path.join(self.relative_path, self.basename)
+        return os.path.join(self.relative_path, self.basename)
 
     def __str__(self):
         return self.__repr__()
@@ -67,12 +63,15 @@ class FileGroup:
         self.files = []
         self.filtered = dict()
         self.pipeline = Pipeline()
+        self.dir_name = None
+        self.dir_children = None
+        self.files = None
 
     # Externally defined classes and methods
     from kaishi.core.misc import CollapseChildren
     from kaishi.core.filters import FilterDuplicates
 
-    def load_dir(self, dir_name):
+    def load_dir(self, dir_name: str):
         """Read file names in a directory while ignoring subdirectories."""
         self.dir_name, self.dir_children, self.files = load_files_by_walk(
             dir_name, File
@@ -93,7 +92,7 @@ class FileGroup:
 
         return options
 
-    def configure(self, choice_inds=None):
+    def configure(self, choice_inds: list = None):
         """Configures the data processing pipeline."""
         options = self.pipeline_options()
         if choice_inds is None:  # Prompt for choices if not provided
@@ -136,18 +135,22 @@ class FileGroup:
             return
 
         print("Current file list:")
-        x = PrettyTable()
-        x.field_names = ["File Name", "Children", "Labels"]
-        for f in self.files:
-            x.add_row(
-                [repr(f), repr(f.children), repr([label.name for label in f.labels])]
+        table = PrettyTable()
+        table.field_names = ["File Name", "Children", "Labels"]
+        for fobj in self.files:
+            table.add_row(
+                [
+                    repr(fobj),
+                    repr(fobj.children),
+                    repr([label.name for label in fobj.labels]),
+                ]
             )
-        print(x)
+        print(table)
 
         print("Filtered files:")
-        x = PrettyTable()
-        x.field_names = ["File Name", "Filter Reason"]
+        table = PrettyTable()
+        table.field_names = ["File Name", "Filter Reason"]
         for k in self.filtered:
-            for f in self.filtered[k]:
-                x.add_row([repr(f), k])
-        print(x)
+            for fobj in self.filtered[k]:
+                table.add_row([repr(fobj), k])
+        print(table)

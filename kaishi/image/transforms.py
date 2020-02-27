@@ -1,3 +1,4 @@
+"""Transforms for image datasets."""
 from kaishi.core.labels import Labels
 from kaishi.image.labelers import LabelerMacro
 

@@ -1,3 +1,4 @@
+"""Labelers for image datasets."""
 import numpy as np
 from kaishi.core.labels import Labels
 from kaishi.image.model import Model
