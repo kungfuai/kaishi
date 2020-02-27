@@ -58,7 +58,11 @@ class File:
 class FileGroup:
     """Class for readind and performing general operations on files."""
 
-    def __init__(self):
+    # Externally defined classes and methods
+    from kaishi.core.misc import CollapseChildren
+    from kaishi.core.filters import FilterDuplicates
+
+    def __init__(self, recursive: bool):
         """Instantiate empty class."""
         self.files = []
         self.filtered = dict()
@@ -66,10 +70,7 @@ class FileGroup:
         self.dir_name = None
         self.dir_children = None
         self.files = None
-
-    # Externally defined classes and methods
-    from kaishi.core.misc import CollapseChildren
-    from kaishi.core.filters import FilterDuplicates
+        self.recursive = recursive
 
     def load_dir(self, dir_name: str):
         """Read file names in a directory while ignoring subdirectories."""

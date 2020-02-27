@@ -4,14 +4,16 @@ import os
 import numpy as np
 
 
-def load_files_by_walk(dir_name_raw: str, file_initializer):
+def load_files_by_walk(dir_name_raw: str, file_initializer, recursive: bool = False):
     """Read file names in a directory while ignoring subdirectories."""
     dir_name = os.path.abspath(dir_name_raw)
     dir_children = []
     files = []
     for root, _, filenames in os.walk(dir_name):
         relative_path = None  # Assume we're in the 'dir_name' directory before checking
-        if len(os.path.abspath(root)) > len(dir_name):
+        if os.path.abspath(root) != os.path.abspath(dir_name):
+            if recursive is False:
+                continue
             relative_path = os.path.abspath(root)[len(dir_name) + 1 :]
             if relative_path not in dir_children:
                 dir_children.append(relative_path)

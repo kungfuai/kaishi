@@ -37,7 +37,7 @@ class ImageFile(File):
 
     def __init__(self, basedir: str, relpath: str, filename: str):
         """Add members to supplement File class."""
-        File.__init__(self, basedir, relpath, filename)
+        super().__init__(basedir, relpath, filename)
         self.children["similar"] = []
         self.image = None
         self.small_image = None
@@ -92,9 +92,9 @@ class ImageFileGroup(FileGroup):
     from kaishi.image.labelers import LabelerMacro
     from kaishi.image.transforms import TransformFixRotation
 
-    def __init__(self):
+    def __init__(self, recursive: bool):
         """Initialize new image file group."""
-        FileGroup.__init__(self)
+        super().__init__(recursive=recursive)
         self.thumbnail_size = THUMBNAIL_SIZE
         self.max_dim_for_small = MAX_DIM_FOR_SMALL
         self.patch_size = PATCH_SIZE
@@ -105,7 +105,7 @@ class ImageFileGroup(FileGroup):
     def load_dir(self, dir_name: str):
         """Read file names in a directory while ignoring subdirectories."""
         self.dir_name, self.dir_children, self.files = load_files_by_walk(
-            dir_name, ImageFile
+            dir_name, ImageFile, recursive=self.recursive
         )
 
     def load_instance(self, fobj):

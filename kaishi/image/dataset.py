@@ -12,9 +12,9 @@ class Dataset(ImageFileGroup):
         3  # Empirically determined, can be overridden in DEFUALT_PIPELINE_ARGS
     )
 
-    def __init__(self, source: str = None):
+    def __init__(self, source: str = None, recursive: bool = False):
         """Initialize with the default pipeline defined."""
-        ImageFileGroup.__init__(self)
+        super().__init__(recursive=recursive)
         if source is not None:
             if os.path.exists(source):
                 self.load_dir(source)
