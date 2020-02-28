@@ -1,5 +1,6 @@
 """Class definition for reading/writing files of various types."""
 import os
+import warnings
 from kaishi.core.misc import md5sum
 from kaishi.core.misc import load_files_by_walk
 from kaishi.core.pipeline import Pipeline
@@ -78,7 +79,7 @@ class FileGroup:
             dir_name, File
         )
 
-    def pipeline_options(self):
+    def get_pipeline_options(self):
         """Returns available pipeline options."""
         options = []
         for method in dir(self):
@@ -93,10 +94,10 @@ class FileGroup:
 
         return options
 
-    def configure(self, choice_inds: list = None):
+    def configure_pipeline(self, choices: list = None):
         """Configures the data processing pipeline."""
-        options = self.pipeline_options()
-        if choice_inds is None:  # Prompt for choices if not provided
+        options = self.get_pipeline_options()
+        if choices is None:  # Prompt for choices if not provided
             print("Pipeline options: ")
             for i, option in enumerate(options):
                 print(repr(i) + ": " + option.__name__)
@@ -105,26 +106,29 @@ class FileGroup:
             choice_string = input(
                 "To configure, enter a comma separated list of integers: "
             )
-            choice_inds = None
-            while choice_inds is None:  # Keep trying until a valid string is entered
+            choices = None
+            while choices is None:  # Keep trying until a valid string is entered
                 try:
-                    choice_inds = np.array(choice_string.split(",")).astype("int")
-                    if (
-                        np.any(choice_inds < 0)
-                        or np.max(choice_inds) > len(options) - 1
-                    ):
-                        choice_inds = None
+                    choices = np.array(choice_string.split(",")).astype("int")
+                    if np.any(choices < 0) or np.max(choices) > len(options) - 1:
+                        choices = None
                 except ValueError:
-                    choice_inds = None
-                if choice_inds is None:
-                    choice_string = input(
+                    choices = None
+                if choices is None:
+                    choices = input(
                         "Error parsing string, please re-enter a list of the above options: "
                     )
         self.pipeline.reset()
-        for (
-            choice_ind
-        ) in choice_inds:  # Use the configuration specified to construct pipeline
-            self.pipeline.add_component(options[choice_ind](self))
+        for choice in choices:  # Use the configuration specified to construct pipeline
+            if isinstance(choice, int):
+                self.pipeline.add_component(options[choice](self))
+            elif isinstance(choice, str):
+                try:
+                    self.pipeline.add_component(self.__getattribute__(choice)(self))
+                except AttributeError:
+                    warnings.warn(
+                        choice + " is an invalid pipeline component, skipping..."
+                    )
         self.pipeline.add_component(
             self.CollapseChildren(self)
         )  # Always must end with this component

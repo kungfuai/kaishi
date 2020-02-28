@@ -1,13 +1,14 @@
 """Transforms for image datasets."""
 from kaishi.core.labels import Labels
+from kaishi.core.pipeline_component import PipelineComponent
 from kaishi.image.labelers import LabelerMacro
 
 
-class TransformFixRotation:
+class TransformFixRotation(PipelineComponent):
     """Fix rotations of each image given pre-determined labels."""
 
     def __init__(self, dataset):
-        self.dataset = dataset
+        super().__init__(dataset)
 
     def __call__(self):
         if not self.dataset.labeled:

@@ -41,7 +41,6 @@ class TabularDataset(TabularFileGroup):
             print("Pipeline completed")
 
     def report(self):
-        self.file_report()
         for i, fobj in enumerate(self.files):
             print(f"\nDataframe {i}")
             print(f"source: {fobj.abspath}")
@@ -49,7 +48,7 @@ class TabularDataset(TabularFileGroup):
             if fobj.df is None:
                 print(f"NO DATA OR NOT LOADED (try running 'dataset.load_all()')")
             else:
-                print(f"{len(fobj.df.columns)} columns: {fobj.df.columns}")
+                print(f"{len(fobj.df.columns)} columns: {list(fobj.df.columns)}")
                 for col in fobj.df.columns:
                     print(f"\n---  Column '{col}'")
                     print(fobj.df[col].describe())

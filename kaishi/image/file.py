@@ -14,22 +14,6 @@ THUMBNAIL_SIZE = (64, 64)
 MAX_DIM_FOR_SMALL = 224  # Max dimension for small sample
 PATCH_SIZE = (64, 64)  # Patch size for compression artifact detection
 RESAMPLE_METHOD = Image.NEAREST  # Resampling method for resizing images
-VALID_EXT = [
-    ".bmp",
-    ".dib",
-    ".jpeg",
-    ".jpg",
-    ".jpe",
-    ".jp2",
-    ".png",
-    ".pbm",  # Valid image extensions
-    ".pgm",
-    ".ppm",
-    ".sr",
-    ".ras",
-    ".tiff",
-    ".tif",
-]
 
 
 class ImageFile(File):
@@ -98,7 +82,6 @@ class ImageFileGroup(FileGroup):
         self.thumbnail_size = THUMBNAIL_SIZE
         self.max_dim_for_small = MAX_DIM_FOR_SMALL
         self.patch_size = PATCH_SIZE
-        self.valid_ext = VALID_EXT
         self.model = None  # Only load model if needed
         self.labeled = False
 
