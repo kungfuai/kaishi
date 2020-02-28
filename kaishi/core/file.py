@@ -109,7 +109,7 @@ class FileGroup:
             choices = None
             while choices is None:  # Keep trying until a valid string is entered
                 try:
-                    choices = np.array(choice_string.split(",")).astype("int")
+                    choices = np.array(choice_string.split(",")).astype(np.int64)
                     if np.any(choices < 0) or np.max(choices) > len(options) - 1:
                         choices = None
                 except ValueError:
@@ -120,7 +120,7 @@ class FileGroup:
                     )
         self.pipeline.reset()
         for choice in choices:  # Use the configuration specified to construct pipeline
-            if isinstance(choice, int):
+            if isinstance(choice, np.int64):
                 self.pipeline.add_component(options[choice](self))
             elif isinstance(choice, str):
                 try:

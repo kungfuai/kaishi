@@ -33,7 +33,7 @@ class TabularDataset(TabularFileGroup):
         for fobj in self.files:
             fobj.verify_loaded()
 
-    def run(self, verbose: bool = False):
+    def run_pipeline(self, verbose: bool = False):
         """Run the pipeline as configured."""
         self.load_all()
         self.pipeline(self, verbose=verbose)

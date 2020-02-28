@@ -21,7 +21,7 @@ class ImageDataset(ImageFileGroup):
         if torch.cuda.is_available() is False:
             warnings.warn("No GPU detected, ConvNet prediction tasks will be very slow")
 
-    def run(self, pool: bool = False, verbose: bool = False):
+    def run_pipeline(self, pool: bool = False, verbose: bool = False):
         """Run the pipeline as configured."""
         self.load_all(pool=pool)
         self.pipeline(self, verbose=verbose)
