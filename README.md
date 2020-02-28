@@ -23,7 +23,9 @@ pip install .
 ```
 
 # Quick Start
-To run a simple image analysis pipeline, try the below:
+The only requirement to use Kaishi is that your dataset is a directory of files. It is first and foremost a discovery tool, and thus is not optimized for huge data sets. Try working with a subset to start exploring.
+
+To run a simple image processing pipeline, try the below:
 ```
 from kaishi.image.dataset import ImageDataset
 imdata = ImageDataset('sample_images', recursive=True)
@@ -96,5 +98,12 @@ Look at how other pipeline components are implemented. Feel free to write your o
 * Has a single initialization argument (a dataset object)
 * Has a single `__call__` method with no arguments (this is where the dataset object is manipulated)
 
-If the component needs special parameters, there must always be defaults defined as named arguments to a `.configure()` method. When `__init__` is called, this configure method will be initialized with the default arguments. A call to `.configure(...)` in the script that instantiated the component sets the parameters for the pipeline run.
+You can then enable usage of the component with your instantiated dataset object, e.g.:
+```
+from your_definition import YourNewComponent
+imd.YourNewComponent = YourNewComponent
+imd.configure_pipeline(['YourNewComponent'])
+```
+
+Finally, if the component needs special parameters, there must always be defaults defined as named arguments to a `.configure()` method. When `__init__` is called, this configure method will be initialized with the default arguments. A call to `.configure(...)` in the script that instantiated the component sets the parameters for the pipeline run.
 _NOTE: `PipelineComponent` already has a `.configure()` method that warns that no arguments are configurable._
