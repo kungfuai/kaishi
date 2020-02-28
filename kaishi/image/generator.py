@@ -1,9 +1,9 @@
+"""Data generator for image datasets."""
 import itertools
-import numpy as np
 import random
-from PIL import Image
-from kaishi.core.image.util import swap_channel_dimension
-from kaishi.core.image import ops
+import numpy as np
+from kaishi.image.util import swap_channel_dimension
+from kaishi.image import ops
 
 
 def augment_and_label(imobj):
@@ -12,13 +12,13 @@ def augment_and_label(imobj):
     LABELS: [DOCUMENT, RECTIFIED, ROTATED_RIGHT, ROTATED_LEFT, UPSIDE_DOWN, STRETCHING]
     """
     label = np.zeros((6,))
-    im = imobj.small_image.convert('RGB')
+    im = imobj.small_image.convert("RGB")
 
-    if 'document' in imobj.relative_path:  # Document label
+    if "document" in imobj.relative_path:  # Document label
         label[0] = 1
 
     if np.random.random() < 0.5:  # Remove colors sometimes, no matter the source
-        im = im.convert('L').convert('RGB')
+        im = im.convert("L").convert("RGB")
     rot_param = np.random.random()  # Rotation (<0.25 does nothing)
     if rot_param <= 0.25:
         label[1] = 1
@@ -41,29 +41,36 @@ def augment_and_label(imobj):
             v_stretch = 100
         pre_stretch_size = im.size
         im = ops.add_stretching(im, h_stretch, v_stretch)
-        im = ops.extract_patch(im, pre_stretch_size)  # Crop back to original size if stretched
+        im = ops.extract_patch(
+            im, pre_stretch_size
+        )  # Crop back to original size if stretched
         label[5] = 1
 
     return im, label
 
-def train_generator(self, batch_size=32, string_to_match=None):
+
+def train_generator(self, batch_size: int = 32, string_to_match: str = None):
     """Generator for training the data labeler. Operates on a kaishi.image.Dataset object.
 
     'batch_size' - size of batches to create
-    'string_to_match' - ignores data without this string in the relative path (make 'None' to use all data)
+    'string_to_match' - ignores data without this string in the relative path (make
+                        'None' to use all data)
     """
-    indexes = [i for i in range(len(self.files))]
+    indexes = list(range(len(self.files)))
     random.seed(42)
     np.random.seed(42)
     random.shuffle(indexes)
 
     bi = 0  # Index within batch
     for imind in itertools.cycle(indexes):
-        if 'validate' in self.files[imind].relative_path:  # Don't use validation data
+        if "validate" in self.files[imind].relative_path:  # Don't use validation data
             continue
-        if 'high_res' in self.files[imind].relative_path:  # Use only low res photos
+        if "high_res" in self.files[imind].relative_path:  # Use only low res photos
             continue
-        if string_to_match is not None and string_to_match not in self.files[imind].relative_path:
+        if (
+            string_to_match is not None
+            and string_to_match not in self.files[imind].relative_path
+        ):
             continue
         self.files[imind].verify_loaded()
         if self.files[imind].image is None:
@@ -83,9 +90,10 @@ def train_generator(self, batch_size=32, string_to_match=None):
         else:
             bi += 1
 
-def generate_validation_data(self, n_examples=400, string_to_match=None):
+
+def generate_validation_data(self, n_examples: int = 400, string_to_match: str = None):
     """Generate a reproducibly random validation data set."""
-    indexes = [i for i in range(len(self.files))]
+    indexes = list(range(len(self.files)))
     random.seed(42)
     np.random.seed(42)
     random.shuffle(indexes)
@@ -96,11 +104,16 @@ def generate_validation_data(self, n_examples=400, string_to_match=None):
     for imind in itertools.cycle(indexes):
         if i == n_examples:
             break
-        if 'validate' not in self.files[imind].relative_path:  # Use only validation data
+        if (
+            "validate" not in self.files[imind].relative_path
+        ):  # Use only validation data
             continue
-        if 'high_res' in self.files[imind].relative_path:  # Disregard high res images
+        if "high_res" in self.files[imind].relative_path:  # Disregard high res images
             continue
-        if string_to_match is not None and string_to_match not in self.files[imind].relative_path:
+        if (
+            string_to_match is not None
+            and string_to_match not in self.files[imind].relative_path
+        ):
             continue
         self.files[imind].verify_loaded()
         if self.files[imind].image is None:

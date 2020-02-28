@@ -1,13 +1,15 @@
+"""Labelers for image datasets."""
 import numpy as np
-from kaishi.util.labels import Labels
-from kaishi.core.image.model import Model
+from kaishi.core.labels import Labels
+from kaishi.core.pipeline_component import PipelineComponent
+from kaishi.image.model import Model
 
 
-class LabelerMacro:
+class LabelerMacro(PipelineComponent):
     """Use pre-trained ConvNet to predict image labels (e.g. stretched, rotated, etc.)."""
 
     def __init__(self, dataset):
-        self.dataset = dataset
+        super().__init__(dataset)
 
     def __call__(self):
         if self.dataset.model is None:

@@ -1,14 +1,15 @@
-from kaishi.util.misc import find_duplicate_inds
-from kaishi.util.misc import trim_list_by_inds
+"""Core filters for multiple dataset types."""
+import warnings
+from kaishi.core.misc import find_duplicate_inds
+from kaishi.core.misc import trim_list_by_inds
+from kaishi.core.pipeline_component import PipelineComponent
 
 
-class FilterDuplicates:
+class FilterDuplicateFiles(PipelineComponent):
     """Filter duplicate files, detected via hashing."""
 
     def __init__(self, dataset):
-        self.dataset = dataset
-
-        return
+        super().__init__(dataset)
 
     def __call__(self):
         hashlist = [

@@ -1,27 +1,29 @@
 """Miscellaneous helper functions."""
 import hashlib
-import numpy as np
 import os
+import numpy as np
 
 
-def load_files_by_walk(dir_name_raw, FileInitializer):
+def load_files_by_walk(dir_name_raw: str, file_initializer, recursive: bool = False):
     """Read file names in a directory while ignoring subdirectories."""
     dir_name = os.path.abspath(dir_name_raw)
     dir_children = []
     files = []
-    for root, dirs, filenames in os.walk(dir_name):
+    for root, _, filenames in os.walk(dir_name):
         relative_path = None  # Assume we're in the 'dir_name' directory before checking
-        if len(os.path.abspath(root)) > len(dir_name):
+        if os.path.abspath(root) != os.path.abspath(dir_name):
+            if recursive is False:
+                continue
             relative_path = os.path.abspath(root)[len(dir_name) + 1 :]
             if relative_path not in dir_children:
                 dir_children.append(relative_path)
         for filename in filenames:
-            files.append(FileInitializer(dir_name, relative_path, filename))
+            files.append(file_initializer(dir_name, relative_path, filename))
 
     return dir_name, dir_children, files
 
 
-def trim_list_by_inds(list_to_trim, indices):
+def trim_list_by_inds(list_to_trim: list, indices: list):
     """Trim a list given an unordered list of indices."""
     new_list = list_to_trim.copy()
     trimmed = []
@@ -33,7 +35,7 @@ def trim_list_by_inds(list_to_trim, indices):
     return new_list, trimmed
 
 
-def find_duplicate_inds(list_with_duplicates):
+def find_duplicate_inds(list_with_duplicates: list):
     """Find indices of duplicates in a list."""
     found = []
     foundind = []
@@ -51,7 +53,7 @@ def find_duplicate_inds(list_with_duplicates):
     return badind, parentind
 
 
-def find_similar_by_value(list_of_values, difference_threshold):
+def find_similar_by_value(list_of_values: list, difference_threshold):
     """Find near duplicates based on similar reference value."""
     badind = []
     parentind = []
@@ -77,7 +79,7 @@ def find_similar_by_value(list_of_values, difference_threshold):
     return badind, parentind
 
 
-def md5sum(filename):
+def md5sum(filename: str):
     """Compute the md5sum of a file."""
     with open(filename, "rb") as fd:
         buf = fd.read()
@@ -97,25 +99,24 @@ class CollapseChildren:
         def recursive_collapse_children(
             parent, top_level_children, top_level_call=True, top_level_key=None
         ):
-            for k in parent.children.keys():
+            for k in parent.children:
                 if top_level_call:
                     top_level_key = k
                 if len(parent.children[k]) == 0:
                     continue
-                else:
-                    for child in parent.children[k]:
-                        recursive_collapse_children(
-                            child, top_level_children, False, top_level_key
-                        )
-                        if not top_level_call:
-                            top_level_children[top_level_key].append(child)
+                for child in parent.children[k]:
+                    recursive_collapse_children(
+                        child, top_level_children, False, top_level_key
+                    )
+                    if not top_level_call:
+                        top_level_children[top_level_key].append(child)
             if not top_level_call:
-                for k in parent.children.keys():
+                for k in parent.children:
                     parent.children[k] = []
 
         for (
-            f
+            fobj
         ) in (
             self.dataset.files
         ):  # Recursively collapse tree for all files in this group
-            recursive_collapse_children(f, f.children)
+            recursive_collapse_children(fobj, fobj.children)

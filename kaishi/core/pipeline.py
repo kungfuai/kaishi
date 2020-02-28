@@ -7,7 +7,7 @@ class Pipeline:
     def __init__(self):
         self.components = []
 
-    def __call__(self, dataset, verbose=False):
+    def __call__(self, dataset, verbose: bool = False):
         """Run the full pipeline as configured."""
         for component in self.components:
             if verbose:
@@ -18,21 +18,20 @@ class Pipeline:
         """Print pipeline overview."""
         if len(self.components) == 0:
             return "Empty Kaishi pipeline"
-        else:
-            ret_str = "Kaishi pipeline: "
-            for i, component in enumerate(self.components):
-                if component.__class__.__name__ == "CollapseChildren":
-                    ret_str += "CollapseChildren (required)"
-                else:
-                    ret_str += component.__class__.__name__ + " -> "
+        ret_str = "Kaishi pipeline: "
+        for component in self.components:
+            if component.__class__.__name__ == "CollapseChildren":
+                ret_str += "CollapseChildren (required)"
+            else:
+                ret_str += component.__class__.__name__ + " -> "
 
-            return ret_str
+        return ret_str
 
     def __str__(self):
         return self.__repr__()
 
     def add_component(self, component):
-        """Add a method to be called as a pipeline step, where the only argument to each will be the dataset object."""
+        """Add a method to be called as a pipeline step, where the only arg is a dataset object."""
         self.components.append(component)
 
     def reset(self):
