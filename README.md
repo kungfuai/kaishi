@@ -1,7 +1,10 @@
-# kaishi
-Tool kit to accelerate the initial phases of exploratory data analysis. Two data types (images and tabular data) are implemented, but more (e.g. signals, video, etc.) will be added in future releases. A lot of functionality for new data types exists out of the box, especially with file handling.
+# Kaishi
+Tool kit to accelerate the initial phases of exploratory data analysis.
 
-With the advent of deep learning
+## Brief Overview
+The advent of deep learning provides opportunities to detect issues present in data that would otherwise be extremely difficult to detect algorithmically (unnatural image aspect ratios, subjectively similar data, etc.). Kaishi attempts to take advantage of this to help you get to know your data subjectively and intimately on the front end, thus saving time that would have been spent debugging later on. There are, of course, many standard tools built in as well (deduplication, artifact detection, merge operations, etc.) that can all be chained to provide powerful automated data engineering.
+
+Two data types (images and tabular data) are currently implemented, but more (e.g. signals, video, etc.) will be added in future releases. A lot of functionality for new data types exists out of the box though, especially when it comes to file handling.
 
 # Requirements
 Python 3.6+
@@ -74,6 +77,12 @@ td.run_pipeline()
 td.save('output_directory_tabular')
 ```
 
+Some pipeline components are, of course, unique to a particular data type. To see which are available:
+```
+imd.get_pipeline_options()
+# or td.get_pipeline_options()
+```
+
 # A note on pipeline components
 Pipeline components are broken up into several distinct categories, and the classes that define them MUST begin with the correct keyword:
 * `Filter*` - removes elements of a dataset
@@ -86,5 +95,6 @@ Look at how other pipeline components are implemented. Feel free to write your o
 * Inherits from the `PipelineComponent` class
 * Has a single initialization argument (a dataset object)
 * Has a single `__call__` method with no arguments (this is where the dataset object is manipulated)
+
 If the component needs special parameters, there must always be defaults defined as named arguments to a `.configure()` method. When `__init__` is called, this configure method will be initialized with the default arguments. A call to `.configure(...)` in the script that instantiated the component sets the parameters for the pipeline run.
 _NOTE: `PipelineComponent` already has a `.configure()` method that warns that no arguments are configurable._
