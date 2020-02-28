@@ -1,18 +1,18 @@
 # kaishi
-Tool kit to accelerate the initial phases of exploratory data analysis.
+Tool kit to accelerate the initial phases of exploratory data analysis. Two data types (images and tabular data) are implemented, but more (e.g. signals, video, etc.) will be added in future releases. A lot of functionality for new data types exists out of the box, especially with file handling.
+
+With the advent of deep learning
 
 # Requirements
-Python 3
+Python 3.6+
 
 # Contributing
 Some general guidelines to keep in mind when contributing
 * Rely on convention as opposed to providing extensive configuration
-* Don't invent features that _might_ be needed. If you've seen an issue more than once in the past or are presented with it in the future, feel free to add functionality.
-* Try to follow a [factory approach](https://en.wikipedia.org/wiki/Software_factory) where possible
+* Don't invent features that _might_ be needed. If you've seen an issue more than once in the past or are presented with it in the future, feel free to add functionality and submit a PR.
+* Try to follow a factory approach where possible
 
 # Installation
-Before installation, weights files should be downloaded and placed in ./kaishi/weights/ ([link](https://drive.google.com/drive/folders/1MFYONkG83AmFqAxajT-iYM8H5Fr1W1gG?usp=sharing))
-
 To install (it will take a few secs to copy over the weights file(s)):
 ```
 pip install -r requirements.txt
@@ -20,35 +20,71 @@ pip install .
 ```
 
 # Quick Start
-To run the entire image analysis pipeline on the sample data directory, use the following commands in a python terminal:
+To run a simple image analysis pipeline, try the below:
 ```
-from kaishi.image import Dataset
-imdata = Dataset('sample_images')
-imdata.run_pipeline()
-imdata.report()
-```
-
-There's also a labeler and rotation fix method that can be used, although it's not part of the default pipeline. To run:
-
-```
-imdata.predict_and_label()  # Run without fixing the rotation
-imdata.report()
-# or
-imdata.transform_fix_rotation()  # Detect rotation and fix it
-imdata.report()
+from kaishi.image.dataset import ImageDataset
+imdata = ImageDataset('sample_images', recursive=True)
+imdata.configure_pipeline(["FilterInvalidFileExtensions", "FilterDuplicateFiles"])
+# You can also use imdata.configure_pipeline() without arguments to get guided input
+imdata.file_report()
 ```
 
-In addition, the `imdata` object contains various objects and methods to interact with the data.
-
-At any point in the pipeline, the `imdata.files` and `imdata.filtered` objects contain results.
-
-# A Note on Models
-If you want to use the baseline convnet labeler, run the following code:
+You will get command line output that looks like the below:
 ```
-from kaishi.core.image.nn import Model
-model = Model().model
-predictions = model(stuff_you_want_to_predict)
+Current file list:
++---------------------------------------------+---------------------------------------------------------------------+--------+
+|                  File Name                  |                               Children                              | Labels |
++---------------------------------------------+---------------------------------------------------------------------+--------+
+|                real_near2.jpg               | {'duplicates': [this_is_a_directory/real_near2.jpg], 'similar': []} |   []   |
+|                real_near1.jpg               | {'duplicates': [this_is_a_directory/real_near1.jpg], 'similar': []} |   []   |
+|                  empty.jpg                  |        {'duplicates': [empty.jpeg, empty.bmp], 'similar': []}       |   []   |
+|                real_same1.jpg               |           {'duplicates': [real_same2.jpg], 'similar': []}           |   []   |
+| this_is_a_directory/image_rotated_right.jpg |                  {'duplicates': [], 'similar': []}                  |   []   |
+|  this_is_a_directory/image_rotated_left.jpg |                  {'duplicates': [], 'similar': []}                  |   []   |
+|   this_is_a_directory/image_rectified.jpeg  |                  {'duplicates': [], 'similar': []}                  |   []   |
+|       documents/doc3_rotated_right.png      |                  {'duplicates': [], 'similar': []}                  |   []   |
+|         documents/doc2_rectified.jpg        |                  {'duplicates': [], 'similar': []}                  |   []   |
+|       documents/doc1_rotated_left.jpg       |                  {'duplicates': [], 'similar': []}                  |   []   |
++---------------------------------------------+---------------------------------------------------------------------+--------+
+Filtered files:
++------------------------------------+-----------------------+
+|             File Name              |     Filter Reason     |
++------------------------------------+-----------------------+
+|          unsupported.gif           | unsupported_extension |
+|               empty                | unsupported_extension |
+| this_is_a_directory/real_near1.jpg |       duplicates      |
+| this_is_a_directory/real_near2.jpg |       duplicates      |
+|             empty.bmp              |       duplicates      |
+|           real_same2.jpg           |       duplicates      |
+|             empty.jpeg             |       duplicates      |
++------------------------------------+-----------------------+
 ```
 
-# A Note on Pipelines
-`Dataset.pipeline.methods` and `Dataset.pipeline.args` are simply lists of functions and argument lists, respectively. You can edit this with your own custom objects simply by calling `dataset.pipeline.methods.append` and `Dataset.pipeline.args.append`, which will then be called when you run `Dataset.run_pipeline()`.
+Finally, you can save your modified datset in a new directory with the below command:
+```
+imd.save('output_directory')
+```
+
+This process is agnostic to the data type you have chosen. For instance:
+```
+from kaishi.tabular.dataset import TabularDataset
+td = TabularDataset('sample_data', recursive=True)
+td.configure_pipeline(['FilterDuplicateFiles'])
+td.run_pipeline()
+td.save('output_directory_tabular')
+```
+
+# A note on pipeline components
+Pipeline components are broken up into several distinct categories, and the classes that define them MUST begin with the correct keyword:
+* `Filter*` - removes elements of a dataset
+* `Transform*` - changes one or more data objects in some fundamental way
+* `Labeler*` - creates labels for data objects without modifying the underlying data
+* `Aggregator*` - combines data objects in some way (currently not implemented)
+* `Sorter*` - reorders data objects in somw way (currently not implemented)
+
+Look at how other pipeline components are implemented. Feel free to write your own, while following the below rules:
+* Inherits from the `PipelineComponent` class
+* Has a single initialization argument (a dataset object)
+* Has a single `__call__` method with no arguments (this is where the dataset object is manipulated)
+If the component needs special parameters, there must always be defaults defined as named arguments to a `.configure()` method. When `__init__` is called, this configure method will be initialized with the default arguments. A call to `.configure(...)` in the script that instantiated the component sets the parameters for the pipeline run.
+_NOTE: `PipelineComponent` already has a `.configure()` method that warns that no arguments are configurable._
