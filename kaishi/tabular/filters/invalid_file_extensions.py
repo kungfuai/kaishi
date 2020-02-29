@@ -34,5 +34,5 @@ class FilterInvalidFileExtensions(PipelineComponent):
 
         return trimmed
 
-    def configure(valid_extensions=VALID_EXT):
-        self.valid_extensions = valid_ext
+    def configure(self, valid_extensions=VALID_EXT):
+        self.valid_extensions = valid_extensions

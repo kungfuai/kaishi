@@ -3,6 +3,7 @@ import os
 import pandas as pd
 from kaishi.core.file_group import FileGroup
 from kaishi.core.misc import load_files_by_walk
+from kaishi.core.pipeline import Pipeline
 from kaishi.tabular.file import TabularFile
 
 
@@ -20,10 +21,12 @@ class TabularFileGroup(FileGroup):
         FilterInvalidFileExtensions,
     )
 
-    def __init__(self, recursive: bool):
+    def __init__(self, source: str, recursive: bool):
         """Initialize new image file group."""
         super().__init__(recursive)
+        self.pipeline = Pipeline()
         self.df_concatenated = None
+        self.load_dir(source)
 
     def get_valid_dataframes(self):
         """Get a list of valid dataframes."""
@@ -74,3 +77,28 @@ class TabularFileGroup(FileGroup):
                     fobj.df.to_csv(os.path.join(file_dir, fobj.basename))
                 else:
                     raise NotImplementedError
+
+    def load_all(self):
+        for fobj in self.files:
+            fobj.verify_loaded()
+
+    def run_pipeline(self, verbose: bool = False):
+        """Run the pipeline as configured."""
+        self.load_all()
+        self.pipeline(self, verbose=verbose)
+        if verbose:
+            print("Pipeline completed")
+
+    def report(self):
+        for i, fobj in enumerate(self.files):
+            print(f"\nDataframe {i}")
+            print(f"source: {fobj.abspath}")
+            print("====================================")
+            if fobj.df is None:
+                print(f"NO DATA OR NOT LOADED (try running 'dataset.load_all()')")
+            else:
+                print(f"{len(fobj.df.columns)} columns: {list(fobj.df.columns)}")
+                for col in fobj.df.columns:
+                    print(f"\n---  Column '{col}'")
+                    print(fobj.df[col].describe())
+            print()
