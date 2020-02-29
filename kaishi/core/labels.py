@@ -3,7 +3,7 @@ from enum import Enum
 
 
 class Labels(Enum):
-    """All fields."""
+    """Enumeration of possible data labels."""
 
     RECTIFIED = 0
     ROTATED_RIGHT = 1

@@ -34,6 +34,10 @@ class Pipeline:
         """Add a method to be called as a pipeline step, where the only arg is a dataset object."""
         self.components.append(component)
 
+    def remove_component(self, index):
+        """Remove a pipeline method by index."""
+        self.components.pop(index)
+
     def reset(self):
         """Reset the pipeline by removing all components."""
         self.components = []

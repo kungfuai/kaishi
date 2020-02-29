@@ -5,7 +5,17 @@ import numpy as np
 
 
 def load_files_by_walk(dir_name_raw: str, file_initializer, recursive: bool = False):
-    """Read file names in a directory while ignoring subdirectories."""
+    """Load files from a directory with an option to recurse.
+
+    :param dir_name_raw: Directory to load file structure from
+    :type dir_name_raw: str
+    :param file_initializer: Data file class to initialize each file with
+    :type file_initializer: kaishi file initializer class (e.g. :class:`kaishi.core.file.File`)
+    :param recursive: Option to load recursively, defaults to False
+    :type recursive: bool
+    :return: canonical directory name, list of subdirectories, and list of initialized files
+    :rtype: str, list, and list
+    """
     dir_name = os.path.abspath(dir_name_raw)
     dir_children = []
     files = []

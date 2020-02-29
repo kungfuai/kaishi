@@ -30,7 +30,7 @@ class ImageFileGroup(FileGroup):
     from kaishi.image.labelers.generic_convnet import LabelerGenericConvnet
     from kaishi.image.transforms.fix_rotation import TransformFixRotation
 
-    def __init__(self, recursive: bool):
+    def __init__(self, source: str, recursive: bool):
         """Initialize new image file group."""
         super().__init__(recursive=recursive)
         self.thumbnail_size = THUMBNAIL_SIZE
@@ -38,6 +38,7 @@ class ImageFileGroup(FileGroup):
         self.patch_size = PATCH_SIZE
         self.model = None  # Only load model if needed
         self.labeled = False
+        self.load_dir(source)
 
     def load_dir(self, dir_name: str):
         """Read file names in a directory while ignoring subdirectories."""
@@ -128,3 +129,14 @@ class ImageFileGroup(FileGroup):
             else:
                 file_dir = out_dir
             fobj.image.save(os.path.join(file_dir, fobj.basename))
+
+    def run_pipeline(self, pool: bool = False, verbose: bool = False):
+        """Run the pipeline as configured."""
+        self.load_all(pool=pool)
+        self.pipeline(self, verbose=verbose)
+        if verbose:
+            print("Pipeline completed")
+
+    def report(self):
+        """Run a descriptive report."""
+        self.file_report()
