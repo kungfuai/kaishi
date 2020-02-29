@@ -84,9 +84,15 @@ class TabularFileGroup(FileGroup):
     """Class to operate on an image file group."""
 
     # Externally defined classes and methods
-    from kaishi.tabular.filters import FilterDuplicateRowsEachDataframe
-    from kaishi.tabular.filters import FilterDuplicateRowsAfterConcatenation
-    from kaishi.tabular.filters import FilterInvalidFileExtensions
+    from kaishi.tabular.filters.duplicate_rows_each_dataframe import (
+        FilterDuplicateRowsEachDataframe,
+    )
+    from kaishi.tabular.filters.duplicate_rows_after_concatenation import (
+        FilterDuplicateRowsAfterConcatenation,
+    )
+    from kaishi.tabular.filters.invalid_file_extensions import (
+        FilterInvalidFileExtensions,
+    )
 
     def __init__(self, recursive: bool):
         """Initialize new image file group."""
