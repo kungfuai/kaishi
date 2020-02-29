@@ -12,7 +12,8 @@ class FileGroup:
 
     # Externally defined classes and methods
     from kaishi.core.misc import CollapseChildren
-    from kaishi.core.filters import FilterDuplicateFiles
+    from kaishi.core.filters.duplicate_files import FilterDuplicateFiles
+    from kaishi.core.filters.by_regex import FilterByRegex
 
     def __init__(self, recursive: bool):
         """Instantiate empty class."""
