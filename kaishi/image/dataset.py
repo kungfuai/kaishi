@@ -1,7 +1,7 @@
 """Primary interface to the image tool kit."""
 import os
 import warnings
-from kaishi.image.file import ImageFileGroup
+from kaishi.image.file_group import ImageFileGroup
 import torch
 
 
