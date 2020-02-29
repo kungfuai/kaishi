@@ -5,7 +5,7 @@ from kaishi.core.pipeline_component import PipelineComponent
 from kaishi.image.model import Model
 
 
-class LabelerMacro(PipelineComponent):
+class LabelerGenericConvnet(PipelineComponent):
     """Use pre-trained ConvNet to predict image labels (e.g. stretched, rotated, etc.)."""
 
     def __init__(self, dataset):

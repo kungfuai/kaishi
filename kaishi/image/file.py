@@ -70,11 +70,11 @@ class ImageFileGroup(FileGroup):
     from kaishi.image.generator import train_generator
     from kaishi.image.generator import generate_validation_data
     from kaishi.image.util import get_batch_dimensions
-    from kaishi.image.filters import FilterSimilar
-    from kaishi.image.filters import FilterInvalidFileExtensions
-    from kaishi.image.filters import FilterInvalidImageHeaders
-    from kaishi.image.labelers import LabelerMacro
-    from kaishi.image.transforms import TransformFixRotation
+    from kaishi.image.filters.similar import FilterSimilar
+    from kaishi.image.filters.invalid_file_extensions import FilterInvalidFileExtensions
+    from kaishi.image.filters.invalid_image_headers import FilterInvalidImageHeaders
+    from kaishi.image.labelers.generic_convnet import LabelerGenericConvnet
+    from kaishi.image.transforms.fix_rotation import TransformFixRotation
 
     def __init__(self, recursive: bool):
         """Initialize new image file group."""

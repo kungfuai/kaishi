@@ -1,7 +1,7 @@
 """Transforms for image datasets."""
 from kaishi.core.labels import Labels
 from kaishi.core.pipeline_component import PipelineComponent
-from kaishi.image.labelers import LabelerMacro
+from kaishi.image.labelers.generic_convnet import LabelerGenericConvnet
 
 
 class TransformFixRotation(PipelineComponent):
@@ -12,7 +12,7 @@ class TransformFixRotation(PipelineComponent):
 
     def __call__(self):
         if not self.dataset.labeled:
-            labeler = LabelerMacro(self.dataset)
+            labeler = LabelerGenericConvnet(self.dataset)
             labeler()
             self.dataset.labeled = True
 
