@@ -18,12 +18,12 @@ class Pipeline:
         """Print pipeline overview."""
         if len(self.components) == 0:
             return "Empty Kaishi pipeline"
-        ret_str = "Kaishi pipeline: "
-        for component in self.components:
+        ret_str = "Kaishi pipeline: \n"
+        for i, component in enumerate(self.components):
             if component.__class__.__name__ == "CollapseChildren":
-                ret_str += "CollapseChildren (required)"
+                ret_str += repr(i) + ": CollapseChildren (required)\n"
             else:
-                ret_str += component.__class__.__name__ + " -> "
+                ret_str += repr(i) + ": " + component.__class__.__name__ + "\n"
 
         return ret_str
 
