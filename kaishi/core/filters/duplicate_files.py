@@ -1,5 +1,4 @@
 """Core filters for multiple dataset types."""
-import warnings
 from kaishi.core.misc import find_duplicate_inds
 from kaishi.core.misc import trim_list_by_inds
 from kaishi.core.pipeline_component import PipelineComponent
