@@ -17,9 +17,9 @@ class TransformFixRotation(PipelineComponent):
             self.dataset.labeled = True
 
         for f in self.dataset.files:
-            if Labels.RECTIFIED in f.labels:
+            if f.image is None or Labels.RECTIFIED in f.labels:
                 continue
-            elif Labels.RECTIFIED in f.labels:
+            if Labels.ROTATED_RIGHT in f.labels:
                 f.rotate(90)
                 f.remove_label(Labels.ROTATED_RIGHT)
             elif Labels.ROTATED_LEFT in f.labels:

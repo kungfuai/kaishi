@@ -1,6 +1,5 @@
 """Definitions for image file objects and groups of them."""
 import os
-import multiprocessing
 import numpy as np
 from PIL import Image
 from kaishi.core.file import File
@@ -50,14 +49,10 @@ class ImageFileGroup(FileGroup):
         """Method to load an image object."""
         fobj.verify_loaded()
 
-    def load_all(self, pool: bool = True):
+    def load_all(self):
         """Load all files. If 'pool' is True, a multiprocessing pool is used."""
-        if pool:
-            pool = multiprocessing.Pool(multiprocessing.cpu_count())
-            pool.map(self.load_instance, self.files)
-        else:
-            for fobj in self.files:
-                self.load_instance(fobj)
+        for fobj in self.files:
+            self.load_instance(fobj)
 
     def build_numpy_batches(
         self,
@@ -132,7 +127,7 @@ class ImageFileGroup(FileGroup):
 
     def run_pipeline(self, pool: bool = False, verbose: bool = False):
         """Run the pipeline as configured."""
-        self.load_all(pool=pool)
+        self.load_all()
         self.pipeline(self, verbose=verbose)
         if verbose:
             print("Pipeline completed")
