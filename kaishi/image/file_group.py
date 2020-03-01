@@ -37,13 +37,7 @@ class ImageFileGroup(FileGroup):
         self.patch_size = PATCH_SIZE
         self.model = None  # Only load model if needed
         self.labeled = False
-        self.load_dir(source)
-
-    def load_dir(self, dir_name: str):
-        """Read file names in a directory while ignoring subdirectories."""
-        self.dir_name, self.dir_children, self.files = load_files_by_walk(
-            dir_name, ImageFile, recursive=self.recursive
-        )
+        self.load_dir(source, ImageFile, recursive)
 
     def load_instance(self, fobj):
         """Method to load an image object."""

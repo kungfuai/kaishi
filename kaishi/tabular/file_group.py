@@ -26,7 +26,7 @@ class TabularFileGroup(FileGroup):
         super().__init__(recursive)
         self.pipeline = Pipeline()
         self.df_concatenated = None
-        self.load_dir(source)
+        self.load_dir(source, TabularFile, recursive)
 
     def get_valid_dataframes(self):
         """Get a list of valid dataframes."""
@@ -44,12 +44,6 @@ class TabularFileGroup(FileGroup):
             self.df_concatenated = pd.concat(self.get_valid_dataframes()).reset_index(
                 drop=True
             )
-
-    def load_dir(self, dir_name: str):
-        """Read file names in a directory while ignoring subdirectories."""
-        self.dir_name, self.dir_children, self.files = load_files_by_walk(
-            dir_name, TabularFile, recursive=self.recursive
-        )
 
     def save(self, out_dir: str, file_format: str = "csv"):
         """Save the dataset as-is."""

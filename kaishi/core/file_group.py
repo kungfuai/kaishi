@@ -25,10 +25,10 @@ class FileGroup:
         self.files = None
         self.recursive = recursive
 
-    def load_dir(self, dir_name: str):
+    def load_dir(self, source: str, file_initializer, recursive: bool):
         """Read file names in a directory while ignoring subdirectories."""
         self.dir_name, self.dir_children, self.files = load_files_by_walk(
-            dir_name, File
+            source, file_initializer, recursive
         )
 
     def get_pipeline_options(self):
