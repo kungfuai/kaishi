@@ -112,3 +112,9 @@ class FileGroup:
             for fobj in self.filtered[k]:
                 table.add_row([repr(fobj), k])
         print(table)
+
+    def run_pipeline(self, pool: bool = False, verbose: bool = False):
+        """Run the pipeline as configured."""
+        self.pipeline(self, verbose=verbose)
+        if verbose:
+            print("Pipeline completed")
