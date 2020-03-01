@@ -9,12 +9,17 @@ class PipelineComponent:
 
     def __init__(self, dataset):
         self.dataset = dataset
+        self.applies_to_available = False
         self.target_criteria = [".*"]
 
     def configure(self):
         warnings.warn("No options to configure for " + self.__class__.__name__)
 
     def applies_to(self, target_criteria):
+        if not self.applies_to_available:
+            raise NotImplementedError(
+                "applies_to() method not implemented for " + self.__class__.__name__
+            )
         if not isinstance(target_criteria, list):
             self.target_criteria = [target_criteria]
         else:

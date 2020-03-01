@@ -91,8 +91,9 @@ class TabularFileGroup(FileGroup):
             if fobj.df is None:
                 print(f"NO DATA OR NOT LOADED (try running 'dataset.load_all()')")
             else:
-                print(f"{len(fobj.df.columns)} columns: {list(fobj.df.columns)}")
-                for col in fobj.df.columns:
-                    print(f"\n---  Column '{col}'")
-                    print(fobj.df[col].describe())
+                print(fobj.get_summary())
+                # print(f"{len(fobj.df.columns)} columns: {list(fobj.df.columns)}")
+                # for col in fobj.df.columns:
+                #    print(f"\n---  Column '{col}'")
+                #    print(fobj.df[col].describe())
             print()

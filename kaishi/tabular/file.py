@@ -46,7 +46,7 @@ class TabularFile(File):
             )
             self.load_error = True
 
-    def load_summary(self):
+    def get_summary(self):
         """Load summary for this data frame."""
         if self.df is None and self.load_error is False:
             self.verify_loaded()  # Try loading if it's None

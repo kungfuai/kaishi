@@ -10,6 +10,7 @@ class FilterInvalidImageHeaders(PipelineComponent):
 
     def __init__(self, dataset):
         super().__init__(dataset)
+        self.applies_to_available = True
 
     def __call__(self):
         badind = []
