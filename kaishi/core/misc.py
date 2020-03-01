@@ -74,12 +74,19 @@ def find_similar_by_value(list_of_values: list, difference_threshold):
     else:
         array_of_values = list_of_values
 
-    for i in range(
-        len(array_of_values) - 1, -1, -1
-    ):  # Loop backwards so we can remove values as we go
-        found_locs = np.nonzero(
-            (array_of_values[:-1] - array_of_values[-1]) <= difference_threshold
-        )[0]
+    for i in range(len(array_of_values) - 1, -1, -1):
+        if array_of_values[i] is None:
+            array_of_values = array_of_values[:-1]
+            continue
+        differences = np.array(
+            [
+                difference_threshold + 1
+                if value is None
+                else np.abs(value - array_of_values[-1])
+                for value in array_of_values[:-1]
+            ]
+        )
+        found_locs = np.nonzero(differences <= difference_threshold)[0]
 
         if len(found_locs) > 0:
             badind.append(i)
