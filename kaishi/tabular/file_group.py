@@ -21,12 +21,16 @@ class TabularFileGroup(FileGroup):
         FilterInvalidFileExtensions,
     )
 
-    def __init__(self, source: str, recursive: bool):
+    def __init__(
+        self, source: str, recursive: bool, use_predefined_pipeline: bool = False
+    ):
         """Initialize new image file group."""
         super().__init__(recursive)
         self.pipeline = Pipeline()
         self.df_concatenated = None
         self.load_dir(source, TabularFile, recursive)
+        if use_predefined_pipeline:
+            self.pipeline.configure(["FilterDuplicates"])
 
     def get_valid_dataframes(self):
         """Get a list of valid dataframes."""

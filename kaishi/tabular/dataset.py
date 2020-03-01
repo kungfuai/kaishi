@@ -8,8 +8,17 @@ from kaishi.tabular.file_group import TabularFileGroup
 
 
 class TabularDataset:
-    def __new__(self, source: str = None, recursive: bool = False):
+    def __new__(
+        self,
+        source: str = None,
+        recursive: bool = False,
+        use_predefined_pipeline: bool = False,
+    ):
         if os.path.exists(source):
-            return TabularFileGroup(source=source, recursive=recursive)
+            return TabularFileGroup(
+                source=source,
+                recursive=recursive,
+                use_predefined_pipeline=use_predefined_pipeline,
+            )
         else:
             raise NotImplementedError("Currently only supports a valid path as input")
