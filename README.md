@@ -21,13 +21,13 @@ pip install .
 ```
 
 # Quick Start
-The only requirement to use Kaishi is that your dataset is a directory of files. It is first and foremost a discovery tool, and thus is not optimized for huge data sets. Try working with a subset to start exploring.
+The only requirement to use Kaishi is that your dataset is a directory of files (support for other dataset types to come). It is first and foremost a discovery tool, and thus is not optimized for huge data sets. Try working with a subset to start exploring.
 
 To run a simple image processing pipeline, try the below:
 ```
 from kaishi.image.dataset import ImageDataset
 imdata = ImageDataset('tests/data/image', recursive=True)
-imdata.configure_pipeline(["FilterInvalidFileExtensions", "FilterDuplicateFiles"])
+imdata.configure_pipeline(["FilterInvalidFileExtensions", "FilterDuplicateFiles", "FilterSimilar"])
 # You can also use imdata.configure_pipeline() without arguments to get guided input
 imdata.run_pipeline()
 imdata.file_report()
@@ -36,32 +36,20 @@ imdata.file_report()
 You will get command line output that looks like the below:
 ```
 Current file list:
-+---------------------------------------------+---------------------------------------------------------------------+--------+
-|                  File Name                  |                               Children                              | Labels |
-+---------------------------------------------+---------------------------------------------------------------------+--------+
-|                real_near2.jpg               | {'duplicates': [this_is_a_directory/real_near2.jpg], 'similar': []} |   []   |
-|                real_near1.jpg               | {'duplicates': [this_is_a_directory/real_near1.jpg], 'similar': []} |   []   |
-|                  empty.jpg                  |        {'duplicates': [empty.jpeg, empty.bmp], 'similar': []}       |   []   |
-|                real_same1.jpg               |           {'duplicates': [real_same2.jpg], 'similar': []}           |   []   |
-| this_is_a_directory/image_rotated_right.jpg |                  {'duplicates': [], 'similar': []}                  |   []   |
-|  this_is_a_directory/image_rotated_left.jpg |                  {'duplicates': [], 'similar': []}                  |   []   |
-|   this_is_a_directory/image_rectified.jpeg  |                  {'duplicates': [], 'similar': []}                  |   []   |
-|       documents/doc3_rotated_right.png      |                  {'duplicates': [], 'similar': []}                  |   []   |
-|         documents/doc2_rectified.jpg        |                  {'duplicates': [], 'similar': []}                  |   []   |
-|       documents/doc1_rotated_left.jpg       |                  {'duplicates': [], 'similar': []}                  |   []   |
-+---------------------------------------------+---------------------------------------------------------------------+--------+
++-------+----------------------+-------------------------------------------------+--------+
+| Index |      File Name       |                     Children                    | Labels |
++-------+----------------------+-------------------------------------------------+--------+
+|   0   |    real_near2.jpg    | {'duplicates': [], 'similar': [real_near1.jpg]} |   []   |
+|   1   | sample_duplicate.jpg |   {'duplicates': [sample.jpg], 'similar': []}   |   []   |
++-------+----------------------+-------------------------------------------------+--------+
 Filtered files:
-+------------------------------------+-----------------------+
-|             File Name              |     Filter Reason     |
-+------------------------------------+-----------------------+
-|          unsupported.gif           | unsupported_extension |
-|               empty                | unsupported_extension |
-| this_is_a_directory/real_near1.jpg |       duplicates      |
-| this_is_a_directory/real_near2.jpg |       duplicates      |
-|             empty.bmp              |       duplicates      |
-|           real_same2.jpg           |       duplicates      |
-|             empty.jpeg             |       duplicates      |
-+------------------------------------+-----------------------+
++---------------------------------+-----------------------+
+|            File Name            |     Filter Reason     |
++---------------------------------+-----------------------+
+| empty_unsupported_extension.gif | unsupported_extension |
+|            sample.jpg           |       duplicates      |
+|          real_near1.jpg         |        similar        |
++---------------------------------+-----------------------+
 ```
 
 Finally, you can save your modified datset in a new directory with the below command:
@@ -112,6 +100,3 @@ from your_definition import YourNewComponent
 imd.YourNewComponent = YourNewComponent
 imd.configure_pipeline(['YourNewComponent'])
 ```
-
-Finally, if the component needs special parameters, there must always be defaults defined as named arguments to a `.configure()` method. When `__init__` is called, this configure method will be initialized with the default arguments. A call to `.configure(...)` in the script that instantiated the component sets the parameters for the pipeline run.
-_NOTE: `PipelineComponent` already has a `.configure()` method that warns that no arguments are configurable._
