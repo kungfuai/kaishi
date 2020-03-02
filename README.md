@@ -29,6 +29,7 @@ from kaishi.image.dataset import ImageDataset
 imdata = ImageDataset('tests/data/image', recursive=True)
 imdata.configure_pipeline(["FilterInvalidFileExtensions", "FilterDuplicateFiles"])
 # You can also use imdata.configure_pipeline() without arguments to get guided input
+imdata.run_pipeline()
 imdata.file_report()
 ```
 
