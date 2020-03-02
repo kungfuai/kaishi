@@ -103,7 +103,7 @@ Look at how other pipeline components are implemented. Feel free to write your o
 * Has a single initialization argument (a dataset object)
 * Has a single `__call__` method with no arguments (this is where the dataset object is manipulated)
 * If specific configuration is needed, a method named `self.configure(...)` must be written with named arguments with defaults. `self.configure()` must be called as part of the `__init__(...)` call for configuration to work.
-* `self.applies_to_available = True` must be in the `__init__(...)` call if the component takes advantage of the `self.applies_to()` and `self.get_target_indexes()` methods are used
+* `self.applies_to_available = True` must be in the `__init__(...)` call if the component takes advantage of the `self.applies_to()` and `self.get_target_indexes()` methods from `kaishi.core.pipeline_component.PipelineComponent` method
 
 You can then enable usage of the component with your instantiated dataset object, e.g.:
 ```
