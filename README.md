@@ -1,6 +1,10 @@
 # Kaishi
 Tool kit to accelerate the initial phases of exploratory data analysis.
 
+![](https://github.com/kungfuai/kaishi/workflows/build/badge.svg)
+[![License](https://img.shields.io/github/license/kungfuai/kaishi)](https://github.com/kungfuai/kaishi/blob/master/LICENSE)
+<!--[![PyPI Latest Release](https://img.shields.io/pypi/v/pandas.svg)](https://pypi.org/project/kaishi/)-->
+
 ## Brief Overview
 The advent of deep learning provides opportunities to detect issues present in data that would otherwise be extremely difficult to detect algorithmically (unnatural image aspect ratios, subjectively similar data, etc.). Kaishi attempts to take advantage of this to help you get to know your data subjectively and intimately on the front end, thus saving time that would have been spent debugging later on. There are, of course, many standard tools built in as well (deduplication, artifact detection, merge operations, etc.) that can all be chained to provide powerful automated data engineering.
 
