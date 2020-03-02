@@ -1,5 +1,5 @@
 # Kaishi
-Tool kit to accelerate the initial phases of exploratory data analysis.
+Tool kit to accelerate the initial phases of exploratory data analysis, as well as to enable rapid dataset preparation for downstream tasks.
 
 ![](https://github.com/kungfuai/kaishi/workflows/build/badge.svg)
 [![License](https://img.shields.io/github/license/kungfuai/kaishi)](https://github.com/kungfuai/kaishi/blob/master/LICENSE)
@@ -12,12 +12,6 @@ Two data types (images and tabular data) are currently implemented, but more (e.
 
 # Requirements
 Python 3.6+
-
-# Contributing
-Some general guidelines to keep in mind when contributing
-* Rely on convention as opposed to providing extensive configuration
-* Don't invent features that _might_ be needed. If you've seen an issue more than once in the past or are presented with it in the future, feel free to add functionality and submit a PR.
-* Try to follow a factory approach where possible
 
 # Installation
 To install (it will take a few secs to copy over the weights file(s)):
@@ -108,6 +102,8 @@ Look at how other pipeline components are implemented. Feel free to write your o
 * Inherits from the `PipelineComponent` class
 * Has a single initialization argument (a dataset object)
 * Has a single `__call__` method with no arguments (this is where the dataset object is manipulated)
+* If specific configuration is needed, a method named `self.configure(...)` must be written with named arguments with defaults. `self.configure()` must be called as part of the `__init__(...)` call for configuration to work.
+* `self.applies_to_available = True` must be in the `__init__(...)` call if the component takes advantage of the `self.applies_to()` and `self.get_target_indexes()` methods are used
 
 You can then enable usage of the component with your instantiated dataset object, e.g.:
 ```
