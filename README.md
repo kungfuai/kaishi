@@ -32,7 +32,7 @@ The only requirement to use Kaishi is that your dataset is a directory of files.
 To run a simple image processing pipeline, try the below:
 ```
 from kaishi.image.dataset import ImageDataset
-imdata = ImageDataset('sample_images', recursive=True)
+imdata = ImageDataset('tests/data/image', recursive=True)
 imdata.configure_pipeline(["FilterInvalidFileExtensions", "FilterDuplicateFiles"])
 # You can also use imdata.configure_pipeline() without arguments to get guided input
 imdata.file_report()
@@ -77,7 +77,7 @@ imd.save('output_directory')
 This process is agnostic to the data type you have chosen. For instance:
 ```
 from kaishi.tabular.dataset import TabularDataset
-td = TabularDataset('sample_data', recursive=True)
+td = TabularDataset('tests/data/tabular', recursive=True)
 td.configure_pipeline(['FilterDuplicateFiles'])
 td.run_pipeline()
 td.save('output_directory_tabular')
@@ -87,6 +87,13 @@ Some pipeline components are, of course, unique to a particular data type. To se
 ```
 imd.get_pipeline_options()
 # or td.get_pipeline_options()
+```
+
+Finally, if you want operations that apply to files in general, you can use the below:
+```
+from kaishi.core.dataset import FileDataset
+fd = FileDataset('your_directory')
+...
 ```
 
 # A note on pipeline components
