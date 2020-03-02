@@ -30,17 +30,22 @@ class TabularFileGroup(FileGroup):
         self.df_concatenated = None
         self.load_dir(source, TabularFile, recursive)
         if use_predefined_pipeline:
-            self.pipeline.configure(["FilterDuplicates"])
+            self.configure_pipeline(["FilterDuplicateFiles"])
+
+    def get_indexes_with_valid_dataframe(self):
+        """Get a list of file objects valid dataframes."""
+        valid_indexes = []
+        for i, fobj in enumerate(self.files):
+            fobj.verify_loaded()
+            if fobj.df is not None:
+                valid_indexes.append(i)
+
+        return valid_indexes
 
     def get_valid_dataframes(self):
         """Get a list of valid dataframes."""
-        valid_dataframes = []
-        for fobj in self.files:
-            fobj.verify_loaded()
-            if fobj.df is not None:
-                valid_dataframes.append(fobj.df)
-
-        return valid_dataframes
+        valid_indexes = self.get_indexes_with_valid_dataframe()
+        return [self.files[i].df for i in valid_indexes]
 
     def concatenate_all(self):
         """Concatenate all tables."""

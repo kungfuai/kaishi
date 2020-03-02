@@ -21,6 +21,7 @@ def test_configure():
 def test_applies_to_when_not_list():
     test = ImageFileGroup("tests/data/image", recursive=True)
     pc = PipelineComponent(test)
+    pc.applies_to_available = True
     pc.applies_to(0)
     assert len(pc.target_criteria) == 1 and pc.target_criteria[0] == 0
 
@@ -28,6 +29,7 @@ def test_applies_to_when_not_list():
 def test_applies_to_when_list():
     test = ImageFileGroup("tests/data/image", recursive=True)
     pc = PipelineComponent(test)
+    pc.applies_to_available = True
     pc.applies_to([0])
     assert len(pc.target_criteria) == 1 and pc.target_criteria[0] == 0
 
@@ -35,6 +37,7 @@ def test_applies_to_when_list():
 def test_get_target_indexes_when_int():
     test = ImageFileGroup("tests/data/image", recursive=True)
     pc = PipelineComponent(test)
+    pc.applies_to_available = True
     pc.applies_to([0])
     targets = pc.get_target_indexes()
     assert len(targets) == 1 and targets[0] == 0
@@ -43,6 +46,7 @@ def test_get_target_indexes_when_int():
 def test_get_target_indexes_when_regex():
     test = ImageFileGroup("tests/data/image", recursive=True)
     pc = PipelineComponent(test)
+    pc.applies_to_available = True
     pc.applies_to(["real_near.*"])
     assert len(pc.get_target_indexes()) == 2
 
