@@ -4,6 +4,7 @@ import warnings
 from kaishi.core.misc import load_files_by_walk
 from kaishi.core.pipeline import Pipeline
 from prettytable import PrettyTable
+import pprint
 import numpy as np
 
 
@@ -85,32 +86,67 @@ class FileGroup:
             self.CollapseChildren(self)
         )  # Always must end with this component
 
-    def file_report(self):
+    def should_print_row(self, i, max_entries, num_entries):
+        """Make decision to print row or not based on max_rows."""
+        if num_entries <= max_entries:
+            return 1
+        else:
+            gap_i_lower = max_entries // 2
+            gap_i_upper = num_entries - (max_entries - gap_i_lower)
+            if i == gap_i_lower:
+                # Ellipsis line
+                return 2
+            elif i <= gap_i_lower or i >= gap_i_upper:
+                # Print data
+                return 1
+            else:
+                # Do not print
+                return 0
+
+    def file_report(self, max_file_entries=30, max_filter_entries=10):
         """Show a report of valid and invalid data."""
         if self.files == [] and self.filtered == {}:
             print("No data loaded to report on.")
             return
 
+        pp = pprint.PrettyPrinter()
         print("Current file list:")
         table = PrettyTable()
         table.field_names = ["Index", "File Name", "Children", "Labels"]
+        table.align["Children"] = "l"
         for i, fobj in enumerate(self.files):
-            table.add_row(
-                [
-                    i,
-                    repr(fobj),
-                    repr(fobj.children),
-                    repr([label.name for label in fobj.labels]),
-                ]
-            )
+            if self.should_print_row(i, max_file_entries, len(self.files)) == 1:
+                children_text = pp.pformat(fobj.children).split("\n")
+                table.add_row(
+                    [
+                        i,
+                        repr(fobj),
+                        "    " + children_text[0],
+                        repr([label.name for label in fobj.labels]),
+                    ]
+                )
+                if len(children_text) > 1:
+                    for child_line in children_text[1:]:
+                        table.add_row([" ", " ", "\t" + child_line, " "])
+            elif self.should_print_row(i, max_file_entries, len(self.files)) == 2:
+                table.add_row(["...", " ", " ", " "])
         print(table)
 
         print("Filtered files:")
         table = PrettyTable()
         table.field_names = ["File Name", "Filter Reason"]
         for k in self.filtered:
-            for fobj in self.filtered[k]:
-                table.add_row([repr(fobj), k])
+            for i, fobj in enumerate(self.filtered[k]):
+                if (
+                    self.should_print_row(i, max_filter_entries, len(self.filtered[k]))
+                    == 1
+                ):
+                    table.add_row([repr(fobj), k])
+                elif (
+                    self.should_print_row(i, max_filter_entries, len(self.filtered[k]))
+                    == 2
+                ):
+                    table.add_row(["...", " "])
         print(table)
 
     def run_pipeline(self, pool: bool = False, verbose: bool = False):
