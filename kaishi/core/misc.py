@@ -1,5 +1,6 @@
 """Miscellaneous helper functions."""
 import hashlib
+import inspect
 import os
 import numpy as np
 
@@ -137,3 +138,8 @@ class CollapseChildren:
             self.dataset.files
         ):  # Recursively collapse tree for all files in this group
             recursive_collapse_children(fobj, fobj.children)
+
+
+def is_valid_label(label_str: str, label_enum):
+    """Check if a label is contained in an  enum."""
+    return bool(label_str in [label.name for label in label_enum])
