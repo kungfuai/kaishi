@@ -15,6 +15,9 @@ class FileGroup:
     from kaishi.core.misc import CollapseChildren
     from kaishi.core.filters.duplicate_files import FilterDuplicateFiles
     from kaishi.core.filters.by_regex import FilterByRegex
+    from kaishi.core.filters.subsample import FilterSubsample
+    from kaishi.core.filters.by_label import FilterByLabel
+    from kaishi.core.labelers.validation_and_test import LabelerValidationAndTest
 
     def __init__(self, recursive: bool):
         """Instantiate empty class."""
