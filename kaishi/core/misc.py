@@ -3,6 +3,7 @@ import hashlib
 import inspect
 import os
 import numpy as np
+from kaishi.core.pipeline_component import PipelineComponent
 
 
 def load_files_by_walk(dir_name_raw: str, file_initializer, recursive: bool = False):
@@ -107,7 +108,7 @@ def md5sum(filename: str):
         return hasher.hexdigest()
 
 
-class CollapseChildren:
+class CollapseChildren(PipelineComponent):
     """Restructure potentially multi-layer file tree into a single parent/child layer."""
 
     def __init__(self, dataset):
