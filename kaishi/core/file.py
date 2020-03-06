@@ -53,7 +53,7 @@ class File:
             raise ValueError(
                 "Cannot add label " + str(label_to_add) + " as it is not valid"
             )
-        if label_to_add not in self.labels:
+        if not self.has_label(label_to_add):
             self.labels.append(Labels[label_to_add])
 
         # Ensure the list is always sorted
