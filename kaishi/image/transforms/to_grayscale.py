@@ -8,7 +8,6 @@ class TransformToGrayscale(PipelineComponent):
     def __init__(self, dataset):
         super().__init__(dataset)
         self.applies_to_available = True
-        self.configure()
 
     def __call__(self):
         # Trim any files without image extensions
