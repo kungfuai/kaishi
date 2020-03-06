@@ -50,10 +50,11 @@ class FileGroup:
 
         return options
 
-    def configure_pipeline(self, choices: list = None):
+    def configure_pipeline(self, choices: list = None, verbose: bool = False):
         """Configures the data processing pipeline."""
         options = self.get_pipeline_options()
         if choices is None:  # Prompt for choices if not provided
+            verbose = True
             print("Pipeline options: ")
             for i, option in enumerate(options):
                 print(repr(i) + ": " + option.__name__)
@@ -88,6 +89,8 @@ class FileGroup:
         self.pipeline.add_component(
             self.CollapseChildren(self)
         )  # Always must end with this component
+        if verbose:
+            print(repr(self.pipeline))
 
     def should_print_row(self, i, max_entries, num_entries):
         """Make decision to print row or not based on max_rows."""
