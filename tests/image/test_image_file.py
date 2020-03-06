@@ -1,5 +1,4 @@
 import os
-from kaishi.core.labels import Labels
 from kaishi.image.file import ImageFile
 
 
