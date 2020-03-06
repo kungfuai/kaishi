@@ -9,12 +9,12 @@ def test_fix_rotation():
     found_rectified = False
     found_rotated = False
     for fobj in test.files:
-        if Labels.RECTIFIED in fobj.labels:
+        if fobj.has_label("RECTIFIED"):
             found_rectified = True
-        if Labels.ROTATED_LEFT in fobj.labels:
+        if fobj.has_label("ROTATED_LEFT"):
             found_rotated = True
-        if Labels.ROTATED_RIGHT in fobj.labels:
+        if fobj.has_label("ROTATED_RIGHT"):
             found_rotated = True
-        if Labels.UPSIDE_DOWN in fobj.labels:
+        if fobj.has_label("UPSIDE_DOWN"):
             found_rotated = True
     assert found_rectified is True and found_rotated is False
