@@ -20,16 +20,16 @@ class LabelerGenericConvnet(PipelineComponent):
             pred = self.dataset.model.predict(batch)
             for i in range(len(fobjs)):
                 if pred[i, 0] > 0.5:
-                    fobjs[i].add_label(Labels.DOCUMENT)
+                    fobjs[i].add_label("DOCUMENT")
                 rot = np.argmax(pred[i, 1:5])
                 if rot == 0:
-                    fobjs[i].add_label(Labels.RECTIFIED)
+                    fobjs[i].add_label("RECTIFIED")
                 elif rot == 1:
-                    fobjs[i].add_label(Labels.ROTATED_RIGHT)
+                    fobjs[i].add_label("ROTATED_RIGHT")
                 elif rot == 2:
-                    fobjs[i].add_label(Labels.ROTATED_LEFT)
+                    fobjs[i].add_label("ROTATED_LEFT")
                 else:
-                    fobjs[i].add_label(Labels.UPSIDE_DOWN)
+                    fobjs[i].add_label("UPSIDE_DOWN")
                 if pred[i, 5] > 0.5:
-                    fobjs[i].add_label(Labels.STRETCHED)
+                    fobjs[i].add_label("STRETCHED")
         self.dataset.labeled = True
