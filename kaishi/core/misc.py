@@ -111,10 +111,10 @@ def md5sum(filename: str):
 class CollapseChildren(PipelineComponent):
     """Restructure potentially multi-layer file tree into a single parent/child layer."""
 
-    def __init__(self, dataset):
-        self.dataset = dataset
+    def __init__(self):
+        super().__init__()
 
-    def __call__(self):
+    def __call__(self, dataset):
         def recursive_collapse_children(
             parent, top_level_children, top_level_call=True, top_level_key=None
         ):
@@ -135,9 +135,7 @@ class CollapseChildren(PipelineComponent):
 
         for (
             fobj
-        ) in (
-            self.dataset.files
-        ):  # Recursively collapse tree for all files in this group
+        ) in dataset.files:  # Recursively collapse tree for all files in this group
             recursive_collapse_children(fobj, fobj.children)
 
 

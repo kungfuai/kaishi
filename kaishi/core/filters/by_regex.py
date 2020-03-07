@@ -7,19 +7,19 @@ from kaishi.core.pipeline_component import PipelineComponent
 class FilterByRegex(PipelineComponent):
     """Filter duplicate files, detected via hashing."""
 
-    def __init__(self, dataset):
-        super().__init__(dataset)
+    def __init__(self):
+        super().__init__()
         self.applies_to_available = True
         self.configure()
 
-    def __call__(self):
+    def __call__(self, dataset):
 
         to_trim = []
-        for i in self.get_target_indexes():
-            if re.match(self.pattern, str(self.dataset.files[i])):
+        for i in self.get_target_indexes(dataset):
+            if re.match(self.pattern, str(dataset.files[i])):
                 to_trim.append(i)
-        self.dataset.files, trimmed = trim_list_by_inds(self.dataset.files, to_trim)
-        self.dataset.filtered["regex"] = trimmed
+        dataset.files, trimmed = trim_list_by_inds(dataset.files, to_trim)
+        dataset.filtered["regex"] = trimmed
 
         return trimmed
 

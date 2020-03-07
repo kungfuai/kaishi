@@ -14,8 +14,7 @@ def test_constructor_with_predefined_pipeline():
     test = TabularFileGroup(
         "tests/data/tabular", recursive=True, use_predefined_pipeline=True
     )
-    print(test.pipeline.components)
-    assert len(test.pipeline.components) == 2
+    assert len(test.pipeline.components) == 1
     assert test.pipeline.components[0].__class__.__name__ == "FilterDuplicateFiles"
 
 

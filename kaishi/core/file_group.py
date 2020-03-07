@@ -78,10 +78,10 @@ class FileGroup:
         self.pipeline.reset()
         for choice in choices:  # Use the configuration specified to construct pipeline
             if isinstance(choice, np.int64):
-                self.pipeline.add_component(options[choice](self))
+                self.pipeline.add_component(options[choice]())
             elif isinstance(choice, str):
                 try:
-                    self.pipeline.add_component(self.__getattribute__(choice)(self))
+                    self.pipeline.add_component(self.__getattribute__(choice)())
                 except AttributeError:
                     warnings.warn(
                         choice + " is an invalid pipeline component, skipping..."

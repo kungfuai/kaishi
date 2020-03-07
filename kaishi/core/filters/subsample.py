@@ -8,20 +8,20 @@ from kaishi.core.pipeline_component import PipelineComponent
 class FilterSubsample(PipelineComponent):
     """Filter duplicate files, detected via hashing."""
 
-    def __init__(self, dataset):
-        super().__init__(dataset)
+    def __init__(self):
+        super().__init__()
         self.configure()
 
-    def __call__(self):
+    def __call__(self, dataset):
 
-        if self.N is None or len(self.dataset.files) <= self.N:
+        if self.N is None or len(dataset.files) <= self.N:
             return []
-        all_inds = list(range(len(self.dataset.files)))
+        all_inds = list(range(len(dataset.files)))
         if self.seed is not None:
             random.seed(self.seed)
-        to_trim = random.sample(all_inds, len(self.dataset.files) - self.N)
-        self.dataset.files, trimmed = trim_list_by_inds(self.dataset.files, to_trim)
-        self.dataset.filtered["subsample"] = trimmed
+        to_trim = random.sample(all_inds, len(dataset.files) - self.N)
+        dataset.files, trimmed = trim_list_by_inds(dataset.files, to_trim)
+        dataset.filtered["subsample"] = trimmed
 
         return trimmed
 

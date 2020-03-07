@@ -14,7 +14,7 @@ class Pipeline:
         for component in self.components:
             if verbose:
                 print("Running " + component.__class__.__name__)
-            component()
+            component(dataset)
             self.completed_steps.append(
                 {
                     "step": component.__class__.__name__,

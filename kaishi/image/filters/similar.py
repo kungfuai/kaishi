@@ -9,28 +9,26 @@ from kaishi.core.misc import CollapseChildren
 class FilterSimilar(PipelineComponent):
     """Filter near duplicate files, detected via perceptual hashing ('imagehash' library)."""
 
-    def __init__(self, dataset):
-        super().__init__(dataset)
+    def __init__(self):
+        super().__init__()
         self.configure()
 
-    def __call__(self):
+    def __call__(self, dataset):
         hashlist = [
             f.perceptual_hash
             if f.perceptual_hash is not None
             else f.compute_perceptual_hash()
-            for f in self.dataset.files
+            for f in dataset.files
         ]
 
         duplicate_ind, parent_ind = find_similar_by_value(
             hashlist, self.perceptual_hash_threshold
         )
         for di, pi in zip(duplicate_ind, parent_ind):
-            self.dataset.files[pi].children["similar"].append(self.dataset.files[di])
-        self.dataset.files, trimmed = trim_list_by_inds(
-            self.dataset.files, duplicate_ind
-        )
-        self.dataset.filtered["similar"] = trimmed
-        CollapseChildren(self.dataset)()
+            dataset.files[pi].children["similar"].append(dataset.files[di])
+        dataset.files, trimmed = trim_list_by_inds(dataset.files, duplicate_ind)
+        dataset.filtered["similar"] = trimmed
+        CollapseChildren()(dataset)
 
         return trimmed
 

@@ -5,12 +5,12 @@ from kaishi.core.pipeline_component import PipelineComponent
 class TransformLimitDimensions(PipelineComponent):
     """Transform to limit max dimension of each image in a dataset."""
 
-    def __init__(self, dataset):
-        super().__init__(dataset)
+    def __init__(self):
+        super().__init__()
         self.applies_to_available = True
         self.configure()
 
-    def __call__(self):
+    def __call__(self, dataset):
         if all(
             [
                 self.max_dimension is None,
@@ -19,8 +19,8 @@ class TransformLimitDimensions(PipelineComponent):
             ]
         ):
             return
-        for i in self.get_target_indexes():
-            self.dataset.files[i].limit_dimensions(
+        for i in self.get_target_indexes(dataset):
+            dataset.files[i].limit_dimensions(
                 max_dimension=self.max_dimension,
                 max_width=self.max_width,
                 max_height=self.max_height,

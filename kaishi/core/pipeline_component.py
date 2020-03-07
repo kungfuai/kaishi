@@ -7,8 +7,7 @@ import numpy as np
 class PipelineComponent:
     """Base class for pipeline components."""
 
-    def __init__(self, dataset):
-        self.dataset = dataset
+    def __init__(self):
         self.applies_to_available = False
         self.target_criteria = [".*"]
 
@@ -25,9 +24,9 @@ class PipelineComponent:
         else:
             self.target_criteria = target_criteria
 
-    def get_target_indexes(self):
+    def get_target_indexes(self, dataset):
         targets = []
-        for i, fobj in enumerate(self.dataset.files):
+        for i, fobj in enumerate(dataset.files):
             for criterion in self.target_criteria:
                 if self._is_valid_target_int(criterion):
                     if i == criterion:

@@ -7,16 +7,15 @@ from kaishi.image.labelers.generic_convnet import LabelerGenericConvnet
 class TransformFixRotation(PipelineComponent):
     """Fix rotations of each image given pre-determined labels."""
 
-    def __init__(self, dataset):
-        super().__init__(dataset)
+    def __init__(self):
+        super().__init__()
 
-    def __call__(self):
-        if not self.dataset.labeled:
-            labeler = LabelerGenericConvnet(self.dataset)
-            labeler()
-            self.dataset.labeled = True
+    def __call__(self, dataset):
+        if not dataset.labeled:
+            LabelerGenericConvnet()(dataset)
+            dataset.labeled = True
 
-        for fobj in self.dataset.files:
+        for fobj in dataset.files:
             if fobj.image is None or fobj.has_label("RECTIFIED"):
                 continue
             if fobj.has_label("ROTATED_RIGHT"):

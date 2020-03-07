@@ -6,21 +6,21 @@ from kaishi.core.pipeline_component import PipelineComponent
 class FilterByLabel(PipelineComponent):
     """Filter by a label string."""
 
-    def __init__(self, dataset):
-        super().__init__(dataset)
+    def __init__(self):
+        super().__init__()
         self.applies_to_available = True
         self.configure()
 
-    def __call__(self):
+    def __call__(self, dataset):
 
         if self.label_to_filter is None:
             return []
         to_trim = []
-        for i in self.get_target_indexes():
-            if self.dataset.files[i].has_label(self.label_to_filter):
+        for i in self.get_target_indexes(dataset):
+            if dataset.files[i].has_label(self.label_to_filter):
                 to_trim.append(i)
-        self.dataset.files, trimmed = trim_list_by_inds(self.dataset.files, to_trim)
-        self.dataset.filtered["label_match"] = trimmed
+        dataset.files, trimmed = trim_list_by_inds(dataset.files, to_trim)
+        dataset.filtered["label_match"] = trimmed
 
         return trimmed
 
