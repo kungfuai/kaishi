@@ -3,6 +3,7 @@ import os
 from kaishi.core.pipeline_component import PipelineComponent
 from kaishi.core.misc import trim_list_by_inds
 from kaishi.core.misc import find_similar_by_value
+from kaishi.core.misc import CollapseChildren
 
 
 class FilterSimilar(PipelineComponent):
@@ -29,6 +30,7 @@ class FilterSimilar(PipelineComponent):
             self.dataset.files, duplicate_ind
         )
         self.dataset.filtered["similar"] = trimmed
+        CollapseChildren(self.dataset)()
 
         return trimmed
 
