@@ -28,16 +28,13 @@ class Pipeline:
             return "Empty Kaishi pipeline"
         ret_str = "Kaishi pipeline: \n"
         for i, component in enumerate(self.components):
-            if component.__class__.__name__ == "CollapseChildren":
-                ret_str += repr(i) + ": CollapseChildren (required)\n"
+            ret_str += repr(i) + ": " + component.__class__.__name__ + "\n"
+            args = self._get_configs_for_component(component)
+            if len(args) == 0:
+                continue
             else:
-                ret_str += repr(i) + ": " + component.__class__.__name__ + "\n"
-                args = self._get_configs_for_component(component)
-                if len(args) == 0:
-                    continue
-                else:
-                    for arg in args:
-                        ret_str += "     " + arg + ": " + repr(args[arg]) + "\n"
+                for arg in args:
+                    ret_str += "     " + arg + ": " + repr(args[arg]) + "\n"
 
         return ret_str
 
