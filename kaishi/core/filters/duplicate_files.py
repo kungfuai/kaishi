@@ -1,6 +1,7 @@
 """Core filters for multiple dataset types."""
 from kaishi.core.misc import find_duplicate_inds
 from kaishi.core.misc import trim_list_by_inds
+from kaishi.core.misc import CollapseChildren
 from kaishi.core.pipeline_component import PipelineComponent
 
 
@@ -23,5 +24,6 @@ class FilterDuplicateFiles(PipelineComponent):
             self.dataset.files, duplicate_ind
         )
         self.dataset.filtered["duplicates"] = trimmed
+        CollapseChildren(self.dataset)()
 
         return trimmed
