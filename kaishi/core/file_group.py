@@ -54,6 +54,13 @@ class FileGroup:
         """Configures the data processing pipeline."""
         options = self.get_pipeline_options()
         if choices is None:  # Prompt for choices if not provided
+
+            def fix_choice_string(choice_string, options):
+                choices = np.array(choice_string.split(",")).astype(np.int64)
+                if np.any(choices < 0) or np.max(choices) > len(options) - 1:
+                    choices = None
+                return choices
+
             verbose = True
             print("Pipeline options: ")
             for i, option in enumerate(options):
@@ -66,15 +73,14 @@ class FileGroup:
             choices = None
             while choices is None:  # Keep trying until a valid string is entered
                 try:
-                    choices = np.array(choice_string.split(",")).astype(np.int64)
-                    if np.any(choices < 0) or np.max(choices) > len(options) - 1:
-                        choices = None
+                    choices = fix_choice_string(choice_string, options)
                 except ValueError:
                     choices = None
                 if choices is None:
-                    choices = input(
+                    choice_string = input(
                         "Error parsing string, please re-enter a list of the above options: "
                     )
+                    choices = fix_choice_string(choice_string, options)
         self.pipeline.reset()
         for choice in choices:  # Use the configuration specified to construct pipeline
             if isinstance(choice, np.int64):
