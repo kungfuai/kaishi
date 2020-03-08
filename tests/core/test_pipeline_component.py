@@ -57,7 +57,7 @@ def test_is_valid_target_int():
     assert pc._is_valid_target_int(str(0)) == False
 
 
-def test_is_valid_target_int():
+def test_is_valid_target_str():
     pc = PipelineComponent()
     assert pc._is_valid_target_str(0) == False
     assert pc._is_valid_target_str(np.int8(0)) == False
