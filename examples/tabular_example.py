@@ -7,5 +7,7 @@ from kaishi.tabular import TabularDataset
 
 
 if __name__ == "__main__":
-    tds = TabularDataset("tests/data/tabular", use_predefined_pipeline=True, out_dir="tmp")
+    tds = TabularDataset(
+        "tests/data/tabular", use_predefined_pipeline=True, out_dir="tmp"
+    )
     tds.run_pipeline(verbose=True)

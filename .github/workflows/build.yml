@@ -28,3 +28,6 @@ jobs:
       run: |
         pip install pytest
         python -m pytest tests -p no:warnings
+
+# TODO: add document generation?
+# requires: sphinx recommonmark==0.6.0 sphinx-rtd-theme==0.4.3

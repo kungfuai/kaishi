@@ -11,11 +11,23 @@ class TabularFileGroup(FileGroup):
     """Class to operate on a tabular file group."""
 
     # Externally defined classes and methods
-    from kaishi.tabular.filters.duplicate_rows_each_dataframe import FilterDuplicateRowsEachDataframe
-    from kaishi.tabular.filters.duplicate_rows_after_concatenation import FilterDuplicateRowsAfterConcatenation
-    from kaishi.tabular.filters.invalid_file_extensions import FilterInvalidFileExtensions
+    from kaishi.tabular.filters.duplicate_rows_each_dataframe import (
+        FilterDuplicateRowsEachDataframe,
+    )
+    from kaishi.tabular.filters.duplicate_rows_after_concatenation import (
+        FilterDuplicateRowsAfterConcatenation,
+    )
+    from kaishi.tabular.filters.invalid_file_extensions import (
+        FilterInvalidFileExtensions,
+    )
 
-    def __init__(self, source: str, recursive: bool, use_predefined_pipeline: bool = False, out_dir: str = None):
+    def __init__(
+        self,
+        source: str,
+        recursive: bool,
+        use_predefined_pipeline: bool = False,
+        out_dir: str = None,
+    ):
         """Initialize new tabular file group and a data processing pipeline.
         
         Args:
@@ -30,6 +42,7 @@ class TabularFileGroup(FileGroup):
         self.load_dir(source, TabularFile, recursive)
         if use_predefined_pipeline:
             if out_dir is not None:
+
                 def save():
                     self.save(out_dir=out_dir)
 
@@ -58,7 +71,9 @@ class TabularFileGroup(FileGroup):
     def concatenate_all(self):
         """Concatenate all tables into one."""
         if self.df_concatenated is None:
-            self.df_concatenated = pd.concat(self._get_valid_dataframes()).reset_index(drop=True)
+            self.df_concatenated = pd.concat(self._get_valid_dataframes()).reset_index(
+                drop=True
+            )
 
     def save(self, out_dir: str, file_format: str = "csv"):
         """Save the processed dataset as individual files or as one file with all the data.
@@ -74,7 +89,9 @@ class TabularFileGroup(FileGroup):
             os.makedirs(out_dir)
         if self.df_concatenated is not None:
             if file_format == "csv":
-                self.df_concatenated.to_csv(os.path.join(out_dir, "all.csv"), index=False)
+                self.df_concatenated.to_csv(
+                    os.path.join(out_dir, "all.csv"), index=False
+                )
             else:
                 raise NotImplementedError
         else:
