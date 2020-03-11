@@ -81,6 +81,8 @@ class FileGroup:
                     warnings.warn(
                         choice + " is an invalid pipeline component, skipping..."
                     )
+            elif callable(choice):
+                self.pipeline.add_component(choice)
         self.pipeline.add_component(
             self.CollapseChildren(self)
         )  # Always must end with this component

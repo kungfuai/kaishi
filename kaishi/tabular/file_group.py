@@ -8,31 +8,39 @@ from kaishi.tabular.file import TabularFile
 
 
 class TabularFileGroup(FileGroup):
-    """Class to operate on an image file group."""
+    """Class to operate on a tabular file group."""
 
     # Externally defined classes and methods
-    from kaishi.tabular.filters.duplicate_rows_each_dataframe import (
-        FilterDuplicateRowsEachDataframe,
-    )
-    from kaishi.tabular.filters.duplicate_rows_after_concatenation import (
-        FilterDuplicateRowsAfterConcatenation,
-    )
-    from kaishi.tabular.filters.invalid_file_extensions import (
-        FilterInvalidFileExtensions,
-    )
+    from kaishi.tabular.filters.duplicate_rows_each_dataframe import FilterDuplicateRowsEachDataframe
+    from kaishi.tabular.filters.duplicate_rows_after_concatenation import FilterDuplicateRowsAfterConcatenation
+    from kaishi.tabular.filters.invalid_file_extensions import FilterInvalidFileExtensions
 
-    def __init__(
-        self, source: str, recursive: bool, use_predefined_pipeline: bool = False
-    ):
-        """Initialize new image file group."""
+    def __init__(self, source: str, recursive: bool, use_predefined_pipeline: bool = False, out_dir: str = None):
+        """Initialize new tabular file group and a data processing pipeline.
+        
+        Args:
+            source: The path to the folder where the tabular data (csv or json files) are stored.
+            recursive: If True, Traverse the folder recursively to find files.
+            use_predefined_pipeline: If True, use a predefined pipeline: load -> concat -> dedup -> export.
+            out_dir: The output directory.
+        """
         super().__init__(recursive)
         self.pipeline = Pipeline()
         self.df_concatenated = None
         self.load_dir(source, TabularFile, recursive)
         if use_predefined_pipeline:
-            self.configure_pipeline(["FilterDuplicateFiles"])
+            if out_dir is not None:
+                def save():
+                    self.save(out_dir=out_dir)
 
-    def get_indexes_with_valid_dataframe(self):
+                self.configure_pipeline(
+                    ["FilterDuplicateFiles", "FilterDuplicateRowsEachDataframe", save]
+                )
+            self.configure_pipeline(
+                ["FilterDuplicateFiles", "FilterDuplicateRowsEachDataframe"]
+            )
+
+    def _get_indexes_with_valid_dataframe(self):
         """Get a list of file objects valid dataframes."""
         valid_indexes = []
         for i, fobj in enumerate(self.files):
@@ -42,27 +50,31 @@ class TabularFileGroup(FileGroup):
 
         return valid_indexes
 
-    def get_valid_dataframes(self):
+    def _get_valid_dataframes(self):
         """Get a list of valid dataframes."""
-        valid_indexes = self.get_indexes_with_valid_dataframe()
+        valid_indexes = self._get_indexes_with_valid_dataframe()
         return [self.files[i].df for i in valid_indexes]
 
     def concatenate_all(self):
-        """Concatenate all tables."""
+        """Concatenate all tables into one."""
         if self.df_concatenated is None:
-            self.df_concatenated = pd.concat(self.get_valid_dataframes()).reset_index(
-                drop=True
-            )
+            self.df_concatenated = pd.concat(self._get_valid_dataframes()).reset_index(drop=True)
 
     def save(self, out_dir: str, file_format: str = "csv"):
-        """Save the dataset as-is."""
+        """Save the processed dataset as individual files or as one file with all the data.
+
+        Args:
+            out_dir: The path of the output directory. If the directory does not exist,
+                it will be created.
+            file_format: The format of output files. Currently only support "csv".
+            
+        """
+        print(f"Saving the results to {out_dir}")
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
         if self.df_concatenated is not None:
             if file_format == "csv":
-                self.df_concatenated.to_csv(
-                    os.path.join(out_dir, "all.csv"), index=False
-                )
+                self.df_concatenated.to_csv(os.path.join(out_dir, "all.csv"), index=False)
             else:
                 raise NotImplementedError
         else:
@@ -82,6 +94,8 @@ class TabularFileGroup(FileGroup):
                     raise NotImplementedError
 
     def load_all(self):
+        """Load all files from the source directory.
+        """
         for fobj in self.files:
             fobj.verify_loaded()
 

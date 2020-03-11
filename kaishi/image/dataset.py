@@ -9,7 +9,12 @@ class ImageDataset:
     """Factory for image dataset objects."""
 
     def __new__(self, source: str = None, recursive: bool = False):
-        """Initialize with the default pipeline defined."""
+        """Initialize with the default pipeline defined.
+
+        Args:
+            source: Path to the folder where images are stored.
+            recursive: If `True`, Traverse the folder recursively to find images.
+        """
         if torch.cuda.is_available() is False:
             warnings.warn("No GPU detected, ConvNet prediction tasks will be very slow")
 

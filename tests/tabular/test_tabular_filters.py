@@ -1,3 +1,5 @@
+import pytest
+import warnings
 from kaishi.tabular.file_group import TabularFileGroup
 
 
@@ -19,10 +21,12 @@ def test_duplicate_rows_each_file():
     test = TabularFileGroup("tests/data/tabular", recursive=True)
     test.configure_pipeline(["FilterDuplicateRowsEachDataframe"])
     test.pipeline.components[0].applies_to("simple.csv")
-    test.load_all()
+    with pytest.warns(UserWarning):
+        test.load_all()
     for i in range(len(test.files)):
         if str(test.files[i]) == "simple.csv":
             break
     assert len(test.files[i].df) == 4
-    test.run_pipeline()
+    with pytest.warns(UserWarning):
+        test.run_pipeline()
     assert len(test.files[i].df) == 3
