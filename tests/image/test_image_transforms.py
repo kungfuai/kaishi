@@ -2,6 +2,18 @@ from kaishi.core.labels import Labels
 from kaishi.image.file_group import ImageFileGroup
 
 
+def test_to_grayscale():
+    test = ImageFileGroup("tests/data/image", recursive=True)
+    test.configure_pipeline(["TransformToGrayscale"])
+    test.load_all()
+    test_ind = 0
+    while repr(test.files[test_ind]) != "sample.jpg":
+        test_ind += 1
+    assert test.files[test_ind].image.mode != "L"
+    test.run_pipeline()
+    assert test.files[test_ind].image.mode == "L"
+
+
 def test_fix_rotation():
     test = ImageFileGroup("tests/data/image", recursive=True)
     test.configure_pipeline(["TransformFixRotation"])

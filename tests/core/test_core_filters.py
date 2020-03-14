@@ -31,3 +31,11 @@ def test_subsample():
     test.pipeline.components[0].configure(N=2)
     test.run_pipeline()
     assert len(test.files) == 2
+
+
+def test_duplicates():
+    test = FileGroup(recursive=True)
+    test.load_dir("tests/data/image", File, recursive=True)
+    test.configure_pipeline(["FilterDuplicateFiles"])
+    test.run_pipeline()
+    assert len(test.filtered["duplicates"]) > 0
