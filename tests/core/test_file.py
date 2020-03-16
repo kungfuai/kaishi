@@ -1,5 +1,4 @@
 import os
-from kaishi.core.labels import Labels
 from kaishi.core.file import File
 
 
@@ -21,8 +20,8 @@ def test_compute_hash():
 def test_labels():
     test = File("tests/data", "image", "sample.jpg")
     assert len(test.labels) == 0
-    test.add_label(Labels.RECTIFIED)
+    test.add_label("RECTIFIED")
     assert len(test.labels) == 1
-    assert Labels.RECTIFIED in test.labels
-    test.remove_label(Labels.RECTIFIED)
+    assert test.has_label("RECTIFIED")
+    test.remove_label("RECTIFIED")
     assert len(test.labels) == 0

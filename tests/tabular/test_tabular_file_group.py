@@ -3,6 +3,8 @@ import tempfile
 import pandas as pd
 from kaishi.tabular.file import TabularFile
 from kaishi.tabular.file_group import TabularFileGroup
+import pytest
+import warnings
 
 
 def test_init_and_load_dir():
@@ -15,7 +17,7 @@ def test_constructor_with_predefined_pipeline():
         "tests/data/tabular", recursive=True, use_predefined_pipeline=True
     )
     print(test.pipeline.components)
-    assert len(test.pipeline.components) == 3
+    assert len(test.pipeline.components) == 2
     assert test.pipeline.components[0].__class__.__name__ == "FilterDuplicateFiles"
 
 
@@ -28,7 +30,8 @@ def test_load_all():
     test = TabularFileGroup(
         "tests/data/tabular", recursive=True, use_predefined_pipeline=True
     )
-    test.load_all()
+    with pytest.warns(UserWarning):
+        test.load_all()
     found_valid_dataframe = False
     for i in range(len(test.files)):
         if isinstance(test.files[i].df, pd.DataFrame):
@@ -40,7 +43,8 @@ def test_save():
     test = TabularFileGroup(
         "tests/data/tabular", recursive=True, use_predefined_pipeline=True
     )
-    test.load_all()
-    tempdir = tempfile.TemporaryDirectory()
-    test.save(tempdir.name)
+    with pytest.warns(UserWarning):
+        test.load_all()
+        tempdir = tempfile.TemporaryDirectory()
+        test.save(tempdir.name)
     assert len(os.listdir(tempdir.name)) > 0

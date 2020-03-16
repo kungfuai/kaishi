@@ -17,21 +17,21 @@ VALID_EXT = [
 class FilterInvalidFileExtensions(PipelineComponent):
     """Filter file list if non-image extensions exist."""
 
-    def __init__(self, dataset):
-        super().__init__(dataset)
+    def __init__(self):
+        super().__init__()
         self.applies_to_available = True
         self.configure()
 
-    def __call__(self):
+    def __call__(self, dataset):
         badind = []
-        for i in self.get_target_indexes():
-            fobj = self.dataset.files[i]
+        for i in self.get_target_indexes(dataset):
+            fobj = dataset.files[i]
             _, ext = os.path.splitext(fobj.basename)
             if len(ext) == 0 or ext not in self.valid_extensions:
                 badind.append(i)
 
-        self.dataset.files, trimmed = trim_list_by_inds(self.dataset.files, badind)
-        self.dataset.filtered["unsupported_extension"] = trimmed
+        dataset.files, trimmed = trim_list_by_inds(dataset.files, badind)
+        dataset.filtered["unsupported_extension"] = trimmed
 
         return trimmed
 

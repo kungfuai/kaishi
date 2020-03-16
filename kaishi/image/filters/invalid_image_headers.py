@@ -8,18 +8,18 @@ from kaishi.image.util import validate_image_header
 class FilterInvalidImageHeaders(PipelineComponent):
     """Filter file list if image files have invalid or nonexistent header."""
 
-    def __init__(self, dataset):
-        super().__init__(dataset)
+    def __init__(self):
+        super().__init__()
         self.applies_to_available = True
 
-    def __call__(self):
+    def __call__(self, dataset):
         badind = []
-        for i in self.get_target_indexes():
-            fobj = self.dataset.files[i]
+        for i in self.get_target_indexes(dataset):
+            fobj = dataset.files[i]
             if not validate_image_header(fobj.abspath):
                 badind.append(i)
 
-        self.dataset.files, trimmed = trim_list_by_inds(self.dataset.files, badind)
-        self.dataset.filtered["invalid_header"] = trimmed
+        dataset.files, trimmed = trim_list_by_inds(dataset.files, badind)
+        dataset.filtered["invalid_header"] = trimmed
 
         return trimmed

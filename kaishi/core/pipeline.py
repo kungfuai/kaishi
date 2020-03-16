@@ -1,4 +1,5 @@
 """Basic class definition for a pipeline object."""
+import inspect
 
 
 class Pipeline:
@@ -6,13 +7,20 @@ class Pipeline:
 
     def __init__(self):
         self.components = []
+        self.completed_steps = []
 
     def __call__(self, dataset, verbose: bool = False):
         """Run the full pipeline as configured."""
         for component in self.components:
             if verbose:
                 print("Running " + component.__class__.__name__)
-            component()
+            component(dataset)
+            self.completed_steps.append(
+                {
+                    "step": component.__class__.__name__,
+                    "config": self._get_configs_for_component(component),
+                }
+            )
 
     def __repr__(self):
         """Print pipeline overview."""
@@ -20,15 +28,28 @@ class Pipeline:
             return "Empty Kaishi pipeline"
         ret_str = "Kaishi pipeline: \n"
         for i, component in enumerate(self.components):
-            if component.__class__.__name__ == "CollapseChildren":
-                ret_str += repr(i) + ": CollapseChildren (required)\n"
+            ret_str += repr(i) + ": " + component.__class__.__name__ + "\n"
+            args = self._get_configs_for_component(component)
+            if len(args) == 0:
+                continue
             else:
-                ret_str += repr(i) + ": " + component.__class__.__name__ + "\n"
+                for arg in args:
+                    ret_str += "     " + arg + ": " + repr(args[arg]) + "\n"
 
         return ret_str
 
     def __str__(self):
         return self.__repr__()
+
+    def _get_configs_for_component(self, initialized_component):
+        """Get args and values of them from an initialized component."""
+        args = dict()
+        for arg in inspect.getfullargspec(initialized_component.configure).args:
+            if arg == "self":
+                continue
+            args[arg] = getattr(initialized_component, arg)
+
+        return args
 
     def add_component(self, component):
         """Add a method to be called as a pipeline step, where the only arg is a dataset object."""

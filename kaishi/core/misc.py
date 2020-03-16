@@ -1,7 +1,9 @@
 """Miscellaneous helper functions."""
 import hashlib
+import inspect
 import os
 import numpy as np
+from kaishi.core.pipeline_component import PipelineComponent
 
 
 def load_files_by_walk(dir_name_raw: str, file_initializer, recursive: bool = False):
@@ -106,13 +108,13 @@ def md5sum(filename: str):
         return hasher.hexdigest()
 
 
-class CollapseChildren:
+class CollapseChildren(PipelineComponent):
     """Restructure potentially multi-layer file tree into a single parent/child layer."""
 
-    def __init__(self, dataset):
-        self.dataset = dataset
+    def __init__(self):
+        super().__init__()
 
-    def __call__(self):
+    def __call__(self, dataset):
         def recursive_collapse_children(
             parent, top_level_children, top_level_call=True, top_level_key=None
         ):
@@ -133,7 +135,10 @@ class CollapseChildren:
 
         for (
             fobj
-        ) in (
-            self.dataset.files
-        ):  # Recursively collapse tree for all files in this group
+        ) in dataset.files:  # Recursively collapse tree for all files in this group
             recursive_collapse_children(fobj, fobj.children)
+
+
+def is_valid_label(label_str: str, label_enum):
+    """Check if a label is contained in an  enum."""
+    return bool(label_str in [label.name for label in label_enum])

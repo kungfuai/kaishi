@@ -3,6 +3,7 @@ import os
 from PIL import Image
 import imagehash
 from kaishi.core.file import File
+from kaishi.core.labels import Labels
 from kaishi.image import ops
 
 
@@ -31,22 +32,52 @@ class ImageFile(File):
             try:
                 self.image = Image.open(self.abspath)
                 self.image.load()  # https://github.com/python-pillow/Pillow/issues/1144
-                self.thumbnail = self.image.resize(THUMBNAIL_SIZE)
-                self.small_image = ops.make_small(
-                    self.image,
-                    max_dim=MAX_DIM_FOR_SMALL,
-                    resample_method=RESAMPLE_METHOD,
-                )
-                self.patch = ops.extract_patch(self.image, PATCH_SIZE)
+                self.update_derived_images()
+                if "L" in self.image.mode:
+                    self.add_label("GRAYSCALE")
             except OSError:  # Not an image file
                 self.image = None
+
+    def update_derived_images(self):
+        """Update images derived from the base image."""
+        if self.image is not None:
+            self.thumbnail = self.image.resize(THUMBNAIL_SIZE)
+            self.small_image = ops.make_small(
+                self.image, max_dim=MAX_DIM_FOR_SMALL, resample_method=RESAMPLE_METHOD
+            )
+            self.patch = ops.extract_patch(self.image, PATCH_SIZE)
 
     def rotate(self, ccw_rotation_degrees: int):
         """Rotate all instances of image by 'ccw_rotation_degrees'."""
         self.image = self.image.rotate(ccw_rotation_degrees, expand=True)
-        self.thumbnail = self.thumbnail.rotate(ccw_rotation_degrees, expand=True)
-        self.small_image = self.small_image.rotate(ccw_rotation_degrees, expand=True)
-        self.patch = self.patch.rotate(ccw_rotation_degrees, expand=True)
+        self.update_derived_images()
+
+    def limit_dimensions(self, max_width=None, max_height=None, max_dimension=None):
+        """Limit the max dimension of the image."""
+        if self.image is None:
+            return
+        if max_dimension is not None:
+            max_width = max_dimension
+            max_height = max_dimension
+        width_factor = 0 if max_width is None else float(self.image.size[0]) / max_width
+        height_factor = (
+            0 if max_height is None else float(self.image.size[1]) / max_height
+        )
+        if width_factor <= 1 and height_factor <= 1:
+            return  # Image already under limit(s)
+        factor = max((width_factor, height_factor))
+        self.image = self.image.resize(
+            (round(self.image.size[0] / factor), round(self.image.size[1] / factor))
+        )
+        self.update_derived_images()
+
+    def convert_to_grayscale(self):
+        """Convert image to grayscale."""
+        if self.image is not None:
+            self.image = self.image.convert("L")
+            self.add_label("GRAYSCALE")
+            self.update_derived_images()
+        return self.image
 
     def compute_perceptual_hash(self, hashfunc=imagehash.average_hash):
         """Calculate perceptual hash (close in value to similar images."""

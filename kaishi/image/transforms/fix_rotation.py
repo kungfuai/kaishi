@@ -7,25 +7,24 @@ from kaishi.image.labelers.generic_convnet import LabelerGenericConvnet
 class TransformFixRotation(PipelineComponent):
     """Fix rotations of each image given pre-determined labels."""
 
-    def __init__(self, dataset):
-        super().__init__(dataset)
+    def __init__(self):
+        super().__init__()
 
-    def __call__(self):
-        if not self.dataset.labeled:
-            labeler = LabelerGenericConvnet(self.dataset)
-            labeler()
-            self.dataset.labeled = True
+    def __call__(self, dataset):
+        if not dataset.labeled:
+            LabelerGenericConvnet()(dataset)
+            dataset.labeled = True
 
-        for f in self.dataset.files:
-            if f.image is None or Labels.RECTIFIED in f.labels:
+        for fobj in dataset.files:
+            if fobj.image is None or fobj.has_label("RECTIFIED"):
                 continue
-            if Labels.ROTATED_RIGHT in f.labels:
-                f.rotate(90)
-                f.remove_label(Labels.ROTATED_RIGHT)
-            elif Labels.ROTATED_LEFT in f.labels:
-                f.rotate(270)
-                f.remove_label(Labels.ROTATED_LEFT)
-            elif Labels.UPSIDE_DOWN in f.labels:
-                f.rotate(180)
-                f.remove_label(Labels.UPSIDE_DOWN)
-            f.add_label(Labels.RECTIFIED)
+            if fobj.has_label("ROTATED_RIGHT"):
+                fobj.rotate(90)
+                fobj.remove_label("ROTATED_RIGHT")
+            elif fobj.has_label("ROTATED_LEFT"):
+                fobj.rotate(270)
+                fobj.remove_label("ROTATED_LEFT")
+            elif fobj.has_label("UPSIDE_DOWN"):
+                fobj.rotate(180)
+                fobj.remove_label("UPSIDE_DOWN")
+            fobj.add_label("RECTIFIED")

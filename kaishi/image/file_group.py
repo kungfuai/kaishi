@@ -28,6 +28,8 @@ class ImageFileGroup(FileGroup):
     from kaishi.image.filters.invalid_image_headers import FilterInvalidImageHeaders
     from kaishi.image.labelers.generic_convnet import LabelerGenericConvnet
     from kaishi.image.transforms.fix_rotation import TransformFixRotation
+    from kaishi.image.transforms.to_grayscale import TransformToGrayscale
+    from kaishi.image.transforms.limit_dimensions import TransformLimitDimensions
 
     def __init__(self, source: str, recursive: bool):
         """Initialize new image file group."""

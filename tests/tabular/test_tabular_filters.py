@@ -6,14 +6,16 @@ from kaishi.tabular.file_group import TabularFileGroup
 def test_invalid_file_extensions():
     test = TabularFileGroup("tests/data/tabular", recursive=True)
     test.configure_pipeline(["FilterInvalidFileExtensions"])
-    test.run_pipeline()
+    with pytest.warns(UserWarning):
+        test.run_pipeline()
     assert len(test.filtered["unsupported_extension"]) > 0
 
 
 def test_duplicate_rows_after_concatenation():
     test = TabularFileGroup("tests/data/tabular", recursive=True)
     test.configure_pipeline(["FilterDuplicateRowsAfterConcatenation"])
-    test.run_pipeline()
+    with pytest.warns(UserWarning):
+        test.run_pipeline()
     assert len(test.df_concatenated) == 7
 
 
