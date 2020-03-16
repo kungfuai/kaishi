@@ -94,7 +94,7 @@ class FileGroup:
                     )
             elif callable(choice):
                 self.pipeline.add_component(choice)
-        
+
         if verbose:
             print(repr(self.pipeline))
 
