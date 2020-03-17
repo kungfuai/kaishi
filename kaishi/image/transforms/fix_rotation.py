@@ -1,5 +1,4 @@
 """Transforms for image datasets."""
-from kaishi.core.labels import Labels
 from kaishi.core.pipeline_component import PipelineComponent
 from kaishi.image.labelers.generic_convnet import LabelerGenericConvnet
 

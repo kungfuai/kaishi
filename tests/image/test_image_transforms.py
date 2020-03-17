@@ -1,4 +1,3 @@
-from kaishi.core.labels import Labels
 from kaishi.image.file_group import ImageFileGroup
 
 

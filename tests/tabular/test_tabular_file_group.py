@@ -1,10 +1,8 @@
 import os
 import tempfile
 import pandas as pd
-from kaishi.tabular.file import TabularFile
 from kaishi.tabular.file_group import TabularFileGroup
 import pytest
-import warnings
 
 
 def test_init_and_load_dir():

@@ -1,9 +1,6 @@
 """Data exploration utilities for tabular data (csv files, database tables).
 """
-from glob import glob
 import os
-import pandas as pd
-from kaishi.core.pipeline import Pipeline
 from kaishi.tabular.file_group import TabularFileGroup
 
 

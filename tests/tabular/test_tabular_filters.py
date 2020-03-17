@@ -1,5 +1,4 @@
 import pytest
-import warnings
 from kaishi.tabular.file_group import TabularFileGroup
 
 

@@ -49,19 +49,19 @@ def test_get_target_indexes_when_regex():
 
 def test_is_valid_target_int():
     pc = PipelineComponent()
-    assert pc._is_valid_target_int(0) == True
-    assert pc._is_valid_target_int(np.int8(0)) == True
-    assert pc._is_valid_target_int(np.int16(0)) == True
-    assert pc._is_valid_target_int(np.int32(0)) == True
-    assert pc._is_valid_target_int(np.int64(0)) == True
-    assert pc._is_valid_target_int(str(0)) == False
+    assert pc._is_valid_target_int(0)
+    assert pc._is_valid_target_int(np.int8(0))
+    assert pc._is_valid_target_int(np.int16(0))
+    assert pc._is_valid_target_int(np.int32(0))
+    assert pc._is_valid_target_int(np.int64(0))
+    assert pc._is_valid_target_int(str(0)) is False
 
 
 def test_is_valid_target_str():
     pc = PipelineComponent()
-    assert pc._is_valid_target_str(0) == False
-    assert pc._is_valid_target_str(np.int8(0)) == False
-    assert pc._is_valid_target_str(np.int16(0)) == False
-    assert pc._is_valid_target_str(np.int32(0)) == False
-    assert pc._is_valid_target_str(np.int64(0)) == False
-    assert pc._is_valid_target_str(str(0)) == True
+    assert pc._is_valid_target_str(0) is False
+    assert pc._is_valid_target_str(np.int8(0)) is False
+    assert pc._is_valid_target_str(np.int16(0)) is False
+    assert pc._is_valid_target_str(np.int32(0)) is False
+    assert pc._is_valid_target_str(np.int64(0)) is False
+    assert pc._is_valid_target_str(str(0))

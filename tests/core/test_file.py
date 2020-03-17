@@ -1,4 +1,3 @@
-import os
 from kaishi.core.file import File
 
 

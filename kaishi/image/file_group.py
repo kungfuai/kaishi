@@ -2,11 +2,8 @@
 import os
 import numpy as np
 from PIL import Image
-from kaishi.core.file import File
 from kaishi.core.file_group import FileGroup
-from kaishi.core.misc import load_files_by_walk
 from kaishi.image.util import swap_channel_dimension
-from kaishi.image import ops
 from kaishi.image.file import ImageFile
 
 

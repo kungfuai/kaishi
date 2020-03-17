@@ -1,11 +1,8 @@
 """Abstraction for PyTorch models."""
 from torchvision import models
-from torchvision import transforms
-from tqdm import tqdm
 import pkg_resources
 import torch
 import torch.nn as nn
-import numpy as np
 
 
 class Model:

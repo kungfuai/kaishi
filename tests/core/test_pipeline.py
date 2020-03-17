@@ -1,5 +1,3 @@
-import pytest
-import numpy as np
 from kaishi.core.pipeline import Pipeline
 from kaishi.core.pipeline_component import PipelineComponent
 

@@ -1,5 +1,4 @@
 """Filters for image datasets."""
-import os
 from kaishi.core.pipeline_component import PipelineComponent
 from kaishi.core.misc import trim_list_by_inds
 from kaishi.image.util import validate_image_header

@@ -1,5 +1,4 @@
 """Class definition for reading/writing files of various types."""
-import os
 import warnings
 from kaishi.core.misc import load_files_by_walk
 from kaishi.core.pipeline import Pipeline

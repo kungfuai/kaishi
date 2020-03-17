@@ -2,7 +2,6 @@
 import os
 import pandas as pd
 from kaishi.core.file_group import FileGroup
-from kaishi.core.misc import load_files_by_walk
 from kaishi.core.pipeline import Pipeline
 from kaishi.tabular.file import TabularFile
 
@@ -29,7 +28,7 @@ class TabularFileGroup(FileGroup):
         out_dir: str = None,
     ):
         """Initialize new tabular file group and a data processing pipeline.
-        
+
         Args:
             source: The path to the folder where the tabular data (csv or json files) are stored.
             recursive: If True, Traverse the folder recursively to find files.
@@ -82,7 +81,7 @@ class TabularFileGroup(FileGroup):
             out_dir: The path of the output directory. If the directory does not exist,
                 it will be created.
             file_format: The format of output files. Currently only support "csv".
-            
+
         """
         print(f"Saving the results to {out_dir}")
         if not os.path.exists(out_dir):
