@@ -1,5 +1,4 @@
 """Definitions for image file objects and groups of them."""
-import os
 import warnings
 import pandas as pd
 from kaishi.core.file import File

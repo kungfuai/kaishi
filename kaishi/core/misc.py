@@ -1,6 +1,5 @@
 """Miscellaneous helper functions."""
 import hashlib
-import inspect
 import os
 import numpy as np
 from kaishi.core.pipeline_component import PipelineComponent

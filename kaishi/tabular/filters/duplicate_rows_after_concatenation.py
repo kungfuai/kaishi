@@ -1,5 +1,4 @@
 """Filters for image datasets."""
-import os
 from kaishi.core.pipeline_component import PipelineComponent
 
 

@@ -1,5 +1,4 @@
 """Class definition for reading/writing files of various types."""
-import os
 import warnings
 from kaishi.core.misc import load_files_by_walk
 from kaishi.core.pipeline import Pipeline
@@ -92,6 +91,9 @@ class FileGroup:
                     warnings.warn(
                         choice + " is an invalid pipeline component, skipping..."
                     )
+            elif callable(choice):
+                self.pipeline.add_component(choice)
+
         if verbose:
             print(repr(self.pipeline))
 

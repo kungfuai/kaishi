@@ -10,7 +10,7 @@ class FilterDuplicateRowsEachDataframe(PipelineComponent):
         self.applies_to_available = True
 
     def __call__(self, dataset):
-        valid_indexes = dataset.get_indexes_with_valid_dataframe()
+        valid_indexes = dataset._get_indexes_with_valid_dataframe()
         targets = list(set(valid_indexes) & set(self.get_target_indexes(dataset)))
         for i in targets:
             dataset.files[i].df.drop_duplicates(inplace=True)

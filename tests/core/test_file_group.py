@@ -1,6 +1,4 @@
 from io import StringIO
-import os
-import tempfile
 import sys
 from kaishi.core.file import File
 from kaishi.core.file_group import FileGroup

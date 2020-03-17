@@ -1,4 +1,3 @@
-import os
 from kaishi.image.file import ImageFile
 
 

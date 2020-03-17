@@ -3,9 +3,11 @@ Usage:
     In the project root directory,
     `python -m examples.tabular_example`
 """
-from kaishi.tabular import TabularDataInspector
+from kaishi.tabular import TabularDataset
 
 
 if __name__ == "__main__":
-    ins = TabularDataInspector("sample_data/simple_csv", use_predefined_pipeline=True)
-    ins.run_pipeline(verbose=True)
+    tds = TabularDataset(
+        "tests/data/tabular", use_predefined_pipeline=True, out_dir="tmp"
+    )
+    tds.run_pipeline(verbose=True)

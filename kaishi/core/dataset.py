@@ -1,6 +1,5 @@
 """Primary interface to the image tool kit."""
 import os
-import warnings
 from kaishi.core.file import File
 from kaishi.core.file_group import FileGroup
 

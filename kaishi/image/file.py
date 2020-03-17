@@ -1,9 +1,7 @@
 """Definitions for image file objects and groups of them."""
-import os
 from PIL import Image
 import imagehash
 from kaishi.core.file import File
-from kaishi.core.labels import Labels
 from kaishi.image import ops
 
 
