@@ -89,8 +89,8 @@ Pipeline components are broken up into several distinct categories, and the clas
 
 Look at how other pipeline components are implemented. Feel free to write your own, while following the below rules:
 * Inherits from the `PipelineComponent` class
-* Has a single initialization argument (a dataset object)
-* Has a single `__call__` method with no arguments (this is where the dataset object is manipulated)
+* Has no initialization arguments
+* Has a single `__call__` method with a single argument (a dataset object)
 * If specific configuration is needed, a method named `self.configure(...)` must be written with named arguments with defaults. `self.configure()` must be called as part of the `__init__(...)` call for configuration to work.
 * `self.applies_to_available = True` must be in the `__init__(...)` call if the component takes advantage of the `self.applies_to()` and `self.get_target_indexes()` methods from `kaishi.core.pipeline_component.PipelineComponent` method
 
