@@ -41,6 +41,8 @@ extensions = [
 # autoapi settings
 autoapi_type = "python"
 autoapi_dirs = ["../kaishi"]
+autoapi_generate_api_docs = True
+# autoapi_options = ["members", "private-members", "special-members"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
