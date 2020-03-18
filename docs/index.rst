@@ -7,7 +7,7 @@ Kaishi
 ==================================
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    autoapi/index
    notes/index
