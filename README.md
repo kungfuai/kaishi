@@ -3,6 +3,7 @@ Tool kit to accelerate the initial phases of exploratory data analysis, as well 
 
 ![](https://github.com/kungfuai/kaishi/workflows/build/badge.svg)
 [![License](https://img.shields.io/github/license/kungfuai/kaishi)](https://github.com/kungfuai/kaishi/blob/master/LICENSE)
+[![Documentation Status](https://readthedocs.org/projects/kaishi/badge/?version=latest)](https://kaishi.readthedocs.io/en/latest/?badge=latest)
 <!--[![PyPI Latest Release](https://img.shields.io/pypi/v/pandas.svg)](https://pypi.org/project/kaishi/)-->
 
 ## Brief Overview
@@ -100,3 +101,6 @@ from your_definition import YourNewComponent
 imd.YourNewComponent = YourNewComponent
 imd.configure_pipeline(['YourNewComponent'])
 ```
+
+# Documentation
+For more info, see our [documentation on ReadTheDocs](https://kaishi.readthedocs.io/en/latest/)
