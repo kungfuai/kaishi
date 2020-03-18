@@ -1,10 +1,10 @@
-"""Core filters for multiple dataset types."""
+"""Class definition for filter by label."""
 from kaishi.core.misc import trim_list_by_inds
 from kaishi.core.pipeline_component import PipelineComponent
 
 
 class FilterByLabel(PipelineComponent):
-    """Filter by a label string."""
+    """Filter each element of a dataset by a specified label."""
 
     def __init__(self):
         super().__init__()
@@ -12,7 +12,6 @@ class FilterByLabel(PipelineComponent):
         self.configure()
 
     def __call__(self, dataset):
-
         if self.label_to_filter is None:
             return []
         to_trim = []
@@ -25,5 +24,9 @@ class FilterByLabel(PipelineComponent):
         return trimmed
 
     def configure(self, label_to_filter=None):
-        """Default configuration returns false always."""
+        """Specify the label to filter.
+
+        :param label_to_filter: data elements with this label will be filtered
+        :type label_to_filter: str
+        """
         self.label_to_filter = label_to_filter

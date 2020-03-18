@@ -1,4 +1,4 @@
-"""Core filters for multiple dataset types."""
+"""Class definition for filtering duplicate files."""
 from kaishi.core.misc import find_duplicate_inds
 from kaishi.core.misc import trim_list_by_inds
 from kaishi.core.misc import CollapseChildren

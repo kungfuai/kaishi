@@ -1,4 +1,4 @@
-"""Enumerations for labels."""
+"""Enumeration definition for labels."""
 from enum import Enum
 
 

@@ -1,11 +1,11 @@
-"""Core filters for multiple dataset types."""
+"""Class definition for subsampling filter."""
 import random
 from kaishi.core.misc import trim_list_by_inds
 from kaishi.core.pipeline_component import PipelineComponent
 
 
 class FilterSubsample(PipelineComponent):
-    """Filter duplicate files, detected via hashing."""
+    """Filter by subsampling."""
 
     def __init__(self):
         super().__init__()
@@ -25,6 +25,12 @@ class FilterSubsample(PipelineComponent):
         return trimmed
 
     def configure(self, N=None, seed=None):
-        """Default configuration returns false always."""
+        """Configuration options for subsample filter.
+
+        :param N: number of data points to keep
+        :type N: int
+        :param seed: random seed for reproducibility
+        :type seed: int
+        """
         self.N = N
         self.seed = seed

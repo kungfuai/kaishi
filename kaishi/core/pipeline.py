@@ -1,4 +1,4 @@
-"""Basic class definition for a pipeline object."""
+"""Class definition for a pipeline object."""
 import inspect
 
 
@@ -10,7 +10,13 @@ class Pipeline:
         self.completed_steps = []
 
     def __call__(self, dataset, verbose: bool = False):
-        """Run the full pipeline as configured."""
+        """Run the full pipeline as configured.
+
+        :param dataset: dataset to perform pipeline operations on
+        :type dataset: initiailized kaishi dataset class (e.g. :class `kaishi.image.dataset.Dataset`)
+        :param verbose: flag to indicate verbosity
+        :type verbose: bool
+        """
         for component in self.components:
             if verbose:
                 print("Running " + component.__class__.__name__)
@@ -42,7 +48,13 @@ class Pipeline:
         return self.__repr__()
 
     def _get_configs_for_component(self, initialized_component):
-        """Get args and values of them from an initialized component."""
+        """Get args and values of them from an initialized component.
+
+        :param initialized_component: pipeline to get configurable arguments for
+        :type initialized_component: initialized pipeline component (has to inherit from :class:`kaishi.core.pipeline_component.PipelineComponent`)
+        :return: dictionary with argument name keys and their values as contents
+        :rtype: dict
+        """
         args = dict()
         for arg in inspect.getfullargspec(initialized_component.configure).args:
             if arg == "self":
@@ -52,11 +64,19 @@ class Pipeline:
         return args
 
     def add_component(self, component):
-        """Add a method to be called as a pipeline step, where the only arg is a dataset object."""
+        """Add a method to be called as a pipeline step.
+
+        :param component: component to add to the pipeline
+        :type initialized_component: initialized pipeline component (has to inherit from :class:`kaishi.core.pipeline_component.PipelineComponent`)
+        """
         self.components.append(component)
 
     def remove_component(self, index):
-        """Remove a pipeline method by index."""
+        """Remove a pipeline method by index.
+
+        :param index: index to remove
+        :type index: int
+        """
         self.components.pop(index)
 
     def reset(self):

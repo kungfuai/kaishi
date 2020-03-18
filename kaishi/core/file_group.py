@@ -8,7 +8,7 @@ import numpy as np
 
 
 class FileGroup:
-    """Class for readind and performing general operations on files."""
+    """Class for reading and performing general operations on groups of files."""
 
     # Externally defined classes and methods
     from kaishi.core.misc import CollapseChildren
@@ -19,7 +19,11 @@ class FileGroup:
     from kaishi.core.labelers.validation_and_test import LabelerValidationAndTest
 
     def __init__(self, recursive: bool):
-        """Instantiate empty class."""
+        """Instantiate empty class.
+
+        :param recursive: flag to indicate recursion
+        :type recursive: bool
+        """
         self.files = []
         self.filtered = dict()
         self.pipeline = Pipeline()
@@ -29,13 +33,23 @@ class FileGroup:
         self.recursive = recursive
 
     def load_dir(self, source: str, file_initializer, recursive: bool):
-        """Read file names in a directory while ignoring subdirectories."""
+        """Read file names in a directory
+
+        :param source: Directory to load from
+        :type source: str
+        :param file_initializer: Data file calss to initialize each file with
+        :type file_initializer: kaishi file initializer class (e.g. :class:`kaishi.core.file.File`)
+        """
         self.dir_name, self.dir_children, self.files = load_files_by_walk(
             source, file_initializer, recursive
         )
 
     def get_pipeline_options(self):
-        """Returns available pipeline options."""
+        """Returns available pipeline options for this dataset.
+
+        :return: list of uninitialized pipeline component objects
+        :rtype: list
+        """
         options = []
         for method in dir(self):
             if method.startswith("Filter"):
@@ -50,7 +64,13 @@ class FileGroup:
         return options
 
     def configure_pipeline(self, choices: list = None, verbose: bool = False):
-        """Configures the data processing pipeline."""
+        """Configures the sequence of components in the data processing pipeline.
+
+        :param choices: list of pipeline choices
+        :type choices: list
+        :param verbose: flag to indicate verbosity
+        :type verbose: bool
+        """
         options = self.get_pipeline_options()
         if choices is None:  # Prompt for choices if not provided
 
@@ -97,8 +117,18 @@ class FileGroup:
         if verbose:
             print(repr(self.pipeline))
 
-    def should_print_row(self, i, max_entries, num_entries):
-        """Make decision to print row or not based on max_rows."""
+    def should_print_row(self, i: int, max_entries: int, num_entries: int):
+        """Make decision to print row or not based on max_rows.
+
+        :param i: index of row
+        :type i: int
+        :param max_entries: max number of entries for the table
+        :type max_entries: int
+        :param num_entries: number of possible entries (the full list)
+        :type num_entries: int
+        :return: 0 if should not print, 1 if should print, 2 if should print ellipsis ("...")
+        :rtype: int
+        """
         if num_entries <= max_entries:
             return 1
         else:
@@ -115,7 +145,13 @@ class FileGroup:
                 return 0
 
     def file_report(self, max_file_entries=30, max_filter_entries=10):
-        """Show a report of valid and invalid data."""
+        """Show a report of valid and invalid data.
+
+        :param max_file_entries: max number of entries to print of file list
+        :type max_file_entries: int
+        :param max_filter_entries: max number of entries to print per filter category (e.g. duplicates, similar, etc.)
+        :type max_filter_entries: int
+        """
         if self.files == [] and self.filtered == {}:
             print("No data loaded to report on.")
             return
@@ -160,8 +196,12 @@ class FileGroup:
                     table.add_row(["...", " "])
         print(table)
 
-    def run_pipeline(self, pool: bool = False, verbose: bool = False):
-        """Run the pipeline as configured."""
+    def run_pipeline(self, verbose: bool = False):
+        """Run the pipeline as configured.
+
+        :param verbose: flag to indicate verbosity
+        :type verbose: bool
+        """
         self.pipeline(self, verbose=verbose)
         if verbose:
             print("Pipeline completed")

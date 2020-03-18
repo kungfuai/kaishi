@@ -1,11 +1,11 @@
-"""Core filters for multiple dataset types."""
+"""Class definition for filter by regex."""
 import re
 from kaishi.core.misc import trim_list_by_inds
 from kaishi.core.pipeline_component import PipelineComponent
 
 
 class FilterByRegex(PipelineComponent):
-    """Filter duplicate files, detected via hashing."""
+    """Filter data elements with a filename matching a specified regex."""
 
     def __init__(self):
         super().__init__()
@@ -24,5 +24,9 @@ class FilterByRegex(PipelineComponent):
         return trimmed
 
     def configure(self, pattern="/(?=a)b/"):
-        """Default configuration returns false always."""
+        """Configure the regex pattern to match (default does not filter).
+
+        :param pattern: pattern to filter by
+        :type pattern: str
+        """
         self.pattern = pattern
