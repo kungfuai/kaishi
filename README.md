@@ -2,7 +2,7 @@
 Tool kit to accelerate the initial phases of exploratory data analysis, as well as to enable rapid dataset preparation for downstream tasks.
 
 ![](https://github.com/kungfuai/kaishi/workflows/build/badge.svg)
-[![License](https://img.shields.io/github/license/kungfuai/kaishi)](https://github.com/kungfuai/kaishi/blob/master/LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Documentation Status](https://readthedocs.org/projects/kaishi/badge/?version=latest)](https://kaishi.readthedocs.io/en/latest/?badge=latest)
 <!--[![PyPI Latest Release](https://img.shields.io/pypi/v/pandas.svg)](https://pypi.org/project/kaishi/)-->
 
