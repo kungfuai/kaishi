@@ -6,8 +6,10 @@
 Kaishi
 ==================================
 
+Kaishi is a toolkit to accelerate the initial phases of exploratory data analysis, as well as to enable rapid dataset preparation for downstream tasks.
+
 .. toctree::
    :maxdepth: 2
 
    autoapi/index
-   notes/index
+   pages/index
