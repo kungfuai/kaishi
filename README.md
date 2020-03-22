@@ -1,4 +1,5 @@
 # Kaishi
+# 開始
 Tool kit to accelerate the initial phases of exploratory data analysis, as well as to enable rapid dataset preparation for downstream tasks.
 
 ![](https://github.com/kungfuai/kaishi/workflows/build/badge.svg)

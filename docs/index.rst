@@ -3,13 +3,20 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Kaishi
+Kaishi (開始)
 ==================================
 
-Kaishi is a toolkit to accelerate the initial phases of exploratory data analysis, as well as to enable rapid dataset preparation for downstream tasks.
+Kaishi is a toolkit used to accelerate the initial phases of exploratory data analysis, as well as to enable rapid dataset preparation for downstream tasks.
 
 More simply, Kaishi helps you automate steps to get from a raw dataset (in the form of a directory of files) to something that's usable for machine
-learning, or any other task you may need a clean dataset for.
+learning (or any other task you may need a clean dataset for).
+
+Examples of common operations include:
+- Filtering duplicate files
+- Standardizing image sizes
+- Detecting similar data that may not add value to machine learning tasks
+- Deduplication of table rows
+- Many more...
 
 .. toctree::
    :maxdepth: 2
