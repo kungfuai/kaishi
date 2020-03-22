@@ -1,4 +1,4 @@
-"""Abstraction for PyTorch models."""
+"""Definition for PyTorch model abstraction."""
 from torchvision import models
 import pkg_resources
 import torch
@@ -6,8 +6,16 @@ import torch.nn as nn
 
 
 class Model:
+    """Abstraction for working with PyTorch models."""
+
     def __init__(self, n_classes: int = 6, model_arch: str = "resnet18"):
-        """Initialize generic computer vision model class."""
+        """Initialize generic computer vision model class.
+
+        :param n_classes: number of classes at output layer
+        :type n_classes: int
+        :param model_arch: one of "resnet18", "vgg16_bn", or "resnet50"
+        :type model_arch: str
+        """
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.batch_size = 16
         if model_arch == "vgg16_bn":
@@ -29,7 +37,13 @@ class Model:
         self.model.load_state_dict(state_dict)
 
     def vgg16_bn(self, n_classes: int):
-        """Basic VGG16 model with specified number of output classes."""
+        """Basic VGG16 model with variable number of output classes.
+
+        :param n_classes: number of classes at output layer
+        :type n_classes: int
+        :return: PyTorch VGG16 model object with batch normalization
+        :rtype: :any:`torchvision.models.vgg16_bn`
+        """
         model = models.vgg16_bn(pretrained=False)  # PyTorch VGG16
 
         # Terminate with a custom number of classes
@@ -45,14 +59,26 @@ class Model:
         return model
 
     def resnet18(self, n_classes: int):
-        """Basic ResNet18 model with specified number of output classes."""
+        """Basic ResNet18 model with specified number of output classes.
+
+        :param n_classes: number of classes at the output layer
+        :type n_classes: int
+        :return: PyTorch ResNet18 model object
+        :rtype: :any:`torchvision.models.resnet18`
+        """
         model = torch.hub.load("pytorch/vision:v0.4.2", "resnet18", pretrained=False)
         model.fc = nn.Sequential(nn.Linear(512, n_classes), nn.Sigmoid())
 
         return model
 
     def resnet50(self, n_classes: int):
-        """Basic ResNet50 with specified number of output classes."""
+        """Basic ResNet50 model with specified number of output classes.
+
+        :param n_classes: number of classes at the output layer
+        :type n_classes: int
+        :return: PyTorch ResNet50 model object
+        :rtype: :any:`torchvision.models.resnet50`
+        """
         model = torch.hub.load("pytorch/vision:v0.4.2", "resnet50", pretrained=False)
         model.fc = torch.nn.Sequential(
             torch.nn.Linear(in_features=2048, out_features=n_classes),
@@ -62,7 +88,13 @@ class Model:
         return model
 
     def predict(self, numpy_array):
-        """Make predictions from a numpy array."""
+        """Make predictions from a numpy array, where dimensions are (batch, channel, x, y).
+
+        :param numpy_array: input array to predict
+        :type numpy_array: :any:`numpy.array`
+        :return: predictions, where the dimensions are (batch, output)
+        :rtype: :any:`numpy.array`
+        """
         in_tensor = torch.from_numpy(numpy_array).to(torch.float32).to(self.device)
 
         return self.model(in_tensor).detach().cpu().numpy()

@@ -45,7 +45,7 @@ class ImageFileGroup(FileGroup):
         self.load_dir(source, ImageFile, recursive)
 
     def load_all(self):
-        """Load all files in the directory that this class was initialized."""
+        """Load all files in the directory that this class was initialized with."""
         for fobj in self.files:
             fobj.verify_loaded()
 

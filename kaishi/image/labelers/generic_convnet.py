@@ -1,16 +1,27 @@
-"""Labelers for image datasets."""
+"""Class definition for generic convnet labeler."""
 import numpy as np
 from kaishi.core.pipeline_component import PipelineComponent
 from kaishi.image.model import Model
 
 
 class LabelerGenericConvnet(PipelineComponent):
-    """Use pre-trained ConvNet to predict image labels (e.g. stretched, rotated, etc.)."""
+    """Use pre-trained ConvNet to predict image labels (e.g. stretched, rotated, etc.).
+
+    This labeler uses a default configured :class:`kaishi.image.model.Model` object where the output layer is assumed
+    to have 6 values ranging 0 to 1, where the labels are [DOCUMENT, RECTIFIED, ROTATED_RIGHT, ROTATED_LEFT,
+    UPSIDE_DOWN, STRETCHED].
+    """
 
     def __init__(self):
+        """Initialize a new generic convnet labeler component."""
         super().__init__()
 
     def __call__(self, dataset):
+        """Perform the labeling operation on an image dataset.
+
+        :param dataset: kaishi image dataset
+        :type dataset: :class:`kaishi.image.dataset.ImageDataset`
+        """
         if dataset.model is None:
             dataset.model = Model()
         for batch, fobjs in dataset.build_numpy_batches(

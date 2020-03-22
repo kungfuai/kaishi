@@ -1,4 +1,4 @@
-"""Primary interface to the image tool kit."""
+"""Definition for kaishi image datasets."""
 import os
 import warnings
 from kaishi.image.file_group import ImageFileGroup
@@ -9,11 +9,12 @@ class ImageDataset:
     """Factory for image dataset objects."""
 
     def __new__(self, source: str = None, recursive: bool = False):
-        """Initialize with the default pipeline defined.
+        """Initialize a kaishi image dataset (currently a directory of files is the only option).
 
-        Args:
-            source: Path to the folder where images are stored.
-            recursive: If `True`, Traverse the folder recursively to find images.
+        :param source: string pointing to the data source
+        :type source: str
+        :param recusive: flag indicating recursion
+        :type recursive: bool
         """
         if torch.cuda.is_available() is False:
             warnings.warn("No GPU detected, ConvNet prediction tasks will be very slow")

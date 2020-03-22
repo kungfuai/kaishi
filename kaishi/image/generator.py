@@ -9,7 +9,12 @@ from kaishi.image import ops
 def augment_and_label(imobj):
     """Augment an image with common issues and return the modified image + label vector.
 
-    LABELS: [DOCUMENT, RECTIFIED, ROTATED_RIGHT, ROTATED_LEFT, UPSIDE_DOWN, STRETCHING]
+    Labels at output layer (probabilities, no softmax): [DOCUMENT, RECTIFIED, ROTATED_RIGHT, ROTATED_LEFT, UPSIDE_DOWN, STRETCHING]
+
+    :param imobj: image object to randomly augment and label
+    :type imobj: :class:`kaishi.image.file.ImageFile`
+    :return: augmented image and label vector applied
+    :rtype: :class:`kaishi.image.file.ImageFile` and :any:`numpy.array`
     """
     label = np.zeros((6,))
     im = imobj.small_image.convert("RGB")
@@ -50,11 +55,16 @@ def augment_and_label(imobj):
 
 
 def train_generator(self, batch_size: int = 32, string_to_match: str = None):
-    """Generator for training the data labeler. Operates on a kaishi.image.Dataset object.
+    """Generator for training the data labeler. Operates on a :class:`kaishi.image.dataset.ImageDataset` object.
 
-    'batch_size' - size of batches to create
-    'string_to_match' - ignores data without this string in the relative path (make
-                        'None' to use all data)
+    :param self: image dataset
+    :type self: :class:`kaishi.image.dataset.ImageDatset`
+    :param batch_size: batch size for generated data
+    :type batch_size: int
+    :param string_to_match: string to match (ignores files without this string in the relative path)
+    :type string_to_match: str
+    :return: batch arrays and label vectors
+    :rtype: :class:`numpy.array` and list
     """
     indexes = list(range(len(self.files)))
     random.seed(42)
@@ -92,7 +102,15 @@ def train_generator(self, batch_size: int = 32, string_to_match: str = None):
 
 
 def generate_validation_data(self, n_examples: int = 400, string_to_match: str = None):
-    """Generate a reproducibly random validation data set."""
+    """Generate a reproducibly random validation data set.
+
+    :param n_examples: number of examples in the validation set
+    :type n_examples: int
+    :param string_to_match: string to match (ignores files without this string in the relative path)
+    :type string_to_match: str
+    :return: stacked training examples (first dimension is batch) and stacked labels
+    :rtype: :any:`numpy.array` and :any:`numpy.array`
+    """
     indexes = list(range(len(self.files)))
     random.seed(42)
     np.random.seed(42)

@@ -1,15 +1,21 @@
-"""Transforms for image datasets."""
+"""Class definition for fixing image rotation."""
 from kaishi.core.pipeline_component import PipelineComponent
 from kaishi.image.labelers.generic_convnet import LabelerGenericConvnet
 
 
 class TransformFixRotation(PipelineComponent):
-    """Fix rotations of each image given pre-determined labels."""
+    """Fix rotations of each image in a dataset given pre-determined labels (uses the default convnet for labels)."""
 
     def __init__(self):
+        """Initialize new transform component."""
         super().__init__()
 
     def __call__(self, dataset):
+        """Perform the transformation operation on an image dataset.
+
+        :param dataset: image dataset to perform operation on
+        :type dataset: :class:`kaishi.image.dataset.ImageDataset`
+        """
         if not dataset.labeled:
             LabelerGenericConvnet()(dataset)
             dataset.labeled = True
