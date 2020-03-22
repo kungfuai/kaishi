@@ -3,7 +3,7 @@ from kaishi.core.pipeline_component import PipelineComponent
 
 
 class FilterDuplicateRowsAfterConcatenation(PipelineComponent):
-    """Filter duplicate rows in the concatenated dataframe (dataset will be concatenated if it hasn't been already."""
+    """Filter duplicate rows in the concatenated dataframe (dataset will be concatenated if it hasn't been already)."""
 
     def __init__(self):
         """Initialize new filter object."""
