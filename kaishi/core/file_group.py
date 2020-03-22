@@ -26,6 +26,7 @@ class FileGroup:
         """
         self.files = []
         self.filtered = dict()
+        self.artifacts = dict()
         self.pipeline = Pipeline()
         self.dir_name = None
         self.dir_children = None
