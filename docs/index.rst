@@ -12,4 +12,5 @@ Kaishi is a toolkit to accelerate the initial phases of exploratory data analysi
    :maxdepth: 2
 
    autoapi/index
-   pages/index
+   Guide/index
+   Tutorials/index
