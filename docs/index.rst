@@ -8,6 +8,9 @@ Kaishi
 
 Kaishi is a toolkit to accelerate the initial phases of exploratory data analysis, as well as to enable rapid dataset preparation for downstream tasks.
 
+More simply, Kaishi helps you automate steps to get from a raw dataset (in the form of a directory of files) to something that's usable for machine
+learning, or any other task you may need a clean dataset for.
+
 .. toctree::
    :maxdepth: 2
 

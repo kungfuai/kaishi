@@ -3,8 +3,7 @@ Pipeline components are broken up into several distinct categories, and the clas
 * `Filter*` - removes elements of a dataset
 * `Transform*` - changes one or more data objects in some fundamental way
 * `Labeler*` - creates labels for data objects without modifying the underlying data
-* `Aggregator*` - combines data objects in some way (currently not implemented)
-* `Sorter*` - reorders data objects in some way (currently not implemented)
+* `Aggregator*` - combines data objects in some way
 
 Look at how other pipeline components are implemented. Feel free to write your own, while following the below rules:
 * Inherits from the `PipelineComponent` class
