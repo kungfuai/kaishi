@@ -67,7 +67,7 @@ class ImageFileGroup(FileGroup):
         :param image_type: choice of "small_image", "thumbnail", or "patch", indicating which version of each image to use
         :type image_type: str
         :return: batch of images (generator if batch size specified)
-        :rtype: :any:`numpy.array`
+        :rtype: `numpy.array`
         """
         final_batch_size = batch_size if batch_size is not None else len(self.files)
         shape = self.get_batch_dimensions(

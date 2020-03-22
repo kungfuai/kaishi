@@ -14,7 +14,7 @@ def augment_and_label(imobj):
     :param imobj: image object to randomly augment and label
     :type imobj: :class:`kaishi.image.file.ImageFile`
     :return: augmented image and label vector applied
-    :rtype: :class:`kaishi.image.file.ImageFile` and :any:`numpy.array`
+    :rtype: :class:`kaishi.image.file.ImageFile` and `numpy.array`
     """
     label = np.zeros((6,))
     im = imobj.small_image.convert("RGB")
@@ -109,7 +109,7 @@ def generate_validation_data(self, n_examples: int = 400, string_to_match: str =
     :param string_to_match: string to match (ignores files without this string in the relative path)
     :type string_to_match: str
     :return: stacked training examples (first dimension is batch) and stacked labels
-    :rtype: :any:`numpy.array` and :any:`numpy.array`
+    :rtype: `numpy.array` and `numpy.array`
     """
     indexes = list(range(len(self.files)))
     random.seed(42)

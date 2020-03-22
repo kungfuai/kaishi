@@ -66,7 +66,7 @@ def add_jpeg_compression(im, quality_level: int = 30):
 
 
 def add_rotation(im, ccw_rotation_degrees: int = 90):
-    """Rotate an image CCW by :any:`ccw_rotation_degrees` degrees.
+    """Rotate an image CCW by `ccw_rotation_degrees` degrees.
 
     :param im: input image
     :type im: PIL image object
@@ -99,10 +99,10 @@ def add_stretching(im, w_percent_additional, h_percent_additional):
 
 
 def add_poisson_noise(im, param: float = 1.0, rescale: bool = True):
-    """Add Poisson noise to image, where (poisson noise * :any:`param`) is the final noise function.
+    """Add Poisson noise to image, where (poisson noise * `param`) is the final noise function.
 
     See http://kmdouglass.github.io/posts/modeling-noise-for-image-simulations for more info.
-    If :any:`rescale` is set to True, the image will be rescaled after noise is added. Otherwise,
+    If `rescale` is set to True, the image will be rescaled after noise is added. Otherwise,
     the noise will saturate.
 
     :param im: input image

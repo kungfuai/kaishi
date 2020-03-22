@@ -10,9 +10,9 @@ def swap_channel_dimension(tensor):
     assumed that it's the actual tensor. Returns the edited shape vector or tensor.
 
     :param tensor: shape vector or tensor to have channel dimensions swapped
-    :type tensor: :any:`numpy.array`
+    :type tensor: `numpy.array`
     :return: altered input with the channel dimensions swapped
-    :rtype: :any:`numpy.array`
+    :rtype: `numpy.array`
     """
     if np.size(tensor) == 4:  # Shape vector
         if tensor[-1] == 3 or tensor[-1] == 1:
@@ -33,7 +33,7 @@ def validate_image_header(filename: str):
 
     :param filename: name of file to analyze
     :type filename: str
-    :return: flag indicating whether header is valid (by using :any:`imghdr.what()`)
+    :return: flag indicating whether header is valid (by using `imghdr.what()`)
     :rtype: bool
     """
 

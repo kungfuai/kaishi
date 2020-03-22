@@ -42,7 +42,7 @@ class Model:
         :param n_classes: number of classes at output layer
         :type n_classes: int
         :return: PyTorch VGG16 model object with batch normalization
-        :rtype: :any:`torchvision.models.vgg16_bn`
+        :rtype: `torchvision.models.vgg16_bn`
         """
         model = models.vgg16_bn(pretrained=False)  # PyTorch VGG16
 
@@ -64,7 +64,7 @@ class Model:
         :param n_classes: number of classes at the output layer
         :type n_classes: int
         :return: PyTorch ResNet18 model object
-        :rtype: :any:`torchvision.models.resnet18`
+        :rtype: `torchvision.models.resnet18`
         """
         model = torch.hub.load("pytorch/vision:v0.4.2", "resnet18", pretrained=False)
         model.fc = nn.Sequential(nn.Linear(512, n_classes), nn.Sigmoid())
@@ -77,7 +77,7 @@ class Model:
         :param n_classes: number of classes at the output layer
         :type n_classes: int
         :return: PyTorch ResNet50 model object
-        :rtype: :any:`torchvision.models.resnet50`
+        :rtype: `torchvision.models.resnet50`
         """
         model = torch.hub.load("pytorch/vision:v0.4.2", "resnet50", pretrained=False)
         model.fc = torch.nn.Sequential(
@@ -91,9 +91,9 @@ class Model:
         """Make predictions from a numpy array, where dimensions are (batch, channel, x, y).
 
         :param numpy_array: input array to predict
-        :type numpy_array: :any:`numpy.array`
+        :type numpy_array: `numpy.array`
         :return: predictions, where the dimensions are (batch, output)
-        :rtype: :any:`numpy.array`
+        :rtype: `numpy.array`
         """
         in_tensor = torch.from_numpy(numpy_array).to(torch.float32).to(self.device)
 

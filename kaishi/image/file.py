@@ -103,7 +103,7 @@ class ImageFile(File):
     def compute_perceptual_hash(self, hashfunc=imagehash.average_hash):
         """Calculate perceptual hash (close in value to similar images.
 
-        :param hashfunc: function object to be used to calculate the hash value (defualts to :any:`imagehash.average_hash`)
+        :param hashfunc: function object to be used to calculate the hash value (defualts to `imagehash.average_hash`)
         :type hashfunc: function
         :return: hash value (as computed by `hashfunc`)
         """
