@@ -2,7 +2,9 @@
 import warnings
 from kaishi.core.misc import load_files_by_walk
 from kaishi.core.pipeline import Pipeline
+from kaishi.core.printing import should_print_row
 from prettytable import PrettyTable
+import os
 import pprint
 import numpy as np
 
@@ -32,6 +34,13 @@ class FileGroup:
         self.dir_children = None
         self.files = None
         self.recursive = recursive
+
+    def __getitem__(self, key):
+        """Get a specific file object."""
+        for fobj in self.files:
+            if repr(fobj) == key:
+                return fobj
+        raise KeyError(key + " not a valid file")
 
     def load_dir(self, source: str, file_initializer, recursive: bool):
         """Read file names in a directory
@@ -116,34 +125,7 @@ class FileGroup:
         if verbose:
             print(repr(self.pipeline))
 
-    def should_print_row(self, i: int, max_entries: int, num_entries: int):
-        """Make decision to print row or not based on max_rows.
-
-        :param i: index of row
-        :type i: int
-        :param max_entries: max number of entries for the table
-        :type max_entries: int
-        :param num_entries: number of possible entries (the full list)
-        :type num_entries: int
-        :return: 0 if should not print, 1 if should print, 2 if should print ellipsis ("...")
-        :rtype: int
-        """
-        if num_entries <= max_entries:
-            return 1
-        else:
-            gap_i_lower = max_entries // 2
-            gap_i_upper = num_entries - (max_entries - gap_i_lower)
-            if i == gap_i_lower:
-                # Ellipsis line
-                return 2
-            elif i <= gap_i_lower or i >= gap_i_upper:
-                # Print data
-                return 1
-            else:
-                # Do not print
-                return 0
-
-    def file_report(self, max_file_entries=30, max_filter_entries=10):
+    def file_report(self, max_file_entries=16, max_filter_entries=10):
         """Show a report of valid and invalid data.
 
         :param max_file_entries: max number of entries to print of file list
@@ -161,7 +143,7 @@ class FileGroup:
         table.field_names = ["Index", "File Name", "Children", "Labels"]
         table.align["Children"] = "l"
         for i, fobj in enumerate(self.files):
-            if self.should_print_row(i, max_file_entries, len(self.files)) == 1:
+            if should_print_row(i, max_file_entries, len(self.files)) == 1:
                 children_text = pp.pformat(fobj.children).split("\n")
                 table.add_row(
                     [
@@ -174,7 +156,7 @@ class FileGroup:
                 if len(children_text) > 1:
                     for child_line in children_text[1:]:
                         table.add_row([" ", " ", "\t" + child_line, " "])
-            elif self.should_print_row(i, max_file_entries, len(self.files)) == 2:
+            elif should_print_row(i, max_file_entries, len(self.files)) == 2:
                 table.add_row(["...", " ", " ", " "])
         print(table)
 
@@ -183,14 +165,10 @@ class FileGroup:
         table.field_names = ["File Name", "Filter Reason"]
         for k in self.filtered:
             for i, fobj in enumerate(self.filtered[k]):
-                if (
-                    self.should_print_row(i, max_filter_entries, len(self.filtered[k]))
-                    == 1
-                ):
+                if should_print_row(i, max_filter_entries, len(self.filtered[k])) == 1:
                     table.add_row([repr(fobj), k])
                 elif (
-                    self.should_print_row(i, max_filter_entries, len(self.filtered[k]))
-                    == 2
+                    should_print_row(i, max_filter_entries, len(self.filtered[k])) == 2
                 ):
                     table.add_row(["...", " "])
         print(table)
