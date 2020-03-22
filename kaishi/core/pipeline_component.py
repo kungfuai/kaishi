@@ -11,6 +11,12 @@ class PipelineComponent:
         self.applies_to_available = False
         self.target_criteria = [".*"]
 
+    def __str__(self):
+        return self.__class__.__name__
+
+    def __repr__(self):
+        return self.__class__.__name__
+
     def configure(self):
         """Method to configure via named arguments. Defaults to no configurations, unless inherited and overridden."""
         warnings.warn("No options to configure for " + self.__class__.__name__)
