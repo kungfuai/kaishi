@@ -70,6 +70,9 @@ class FileGroup:
         for method in dir(self):
             if method.startswith("Transform"):
                 options.append(method)
+        for method in dir(self):
+            if method.startswith("Aggregator"):
+                options.append(method)
 
         return options
 

@@ -19,6 +19,9 @@ class TabularFileGroup(FileGroup):
     from kaishi.tabular.filters.invalid_file_extensions import (
         FilterInvalidFileExtensions,
     )
+    from kaishi.tabular.aggregators.concatenate_dataframes import (
+        AggregatorConcatenateDataframes,
+    )
 
     def __init__(
         self,
@@ -77,13 +80,6 @@ class TabularFileGroup(FileGroup):
         """
         valid_indexes = self._get_indexes_with_valid_dataframe()
         return [self.files[i].df for i in valid_indexes]
-
-    def concatenate_all(self):
-        """Concatenate all tables into one (stored in the artifacts dict as "df_concatenated"."""
-        if self.artifacts["df_concatenated"] is None:
-            self.artifacts["df_concatenated"] = pd.concat(
-                self._get_valid_dataframes()
-            ).reset_index(drop=True)
 
     def save(self, out_dir: str, file_format: str = "csv"):
         """Save the processed dataset as individual files or as one file with all the data.
