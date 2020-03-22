@@ -27,7 +27,7 @@ class FilterInvalidFileExtensions(PipelineComponent):
         """Perform operation on a tabular dataset.
 
         :param dataset: dataset to perform file extension filter on
-        :type dataset: :class:`kaishi.tabular.dataset.TabularDataset
+        :type dataset: :class:`kaishi.tabular.dataset.TabularDataset`
         """
         badind = []
         for i in self.get_target_indexes(dataset):
