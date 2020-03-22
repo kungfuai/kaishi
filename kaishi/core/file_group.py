@@ -54,13 +54,13 @@ class FileGroup:
         options = []
         for method in dir(self):
             if method.startswith("Filter"):
-                options.append(getattr(self, method))
+                options.append(method)
         for method in dir(self):
             if method.startswith("Labeler"):
-                options.append(getattr(self, method))
+                options.append(method)
         for method in dir(self):
             if method.startswith("Transform"):
-                options.append(getattr(self, method))
+                options.append(method)
 
         return options
 
@@ -84,7 +84,7 @@ class FileGroup:
             verbose = True
             print("Pipeline options: ")
             for i, option in enumerate(options):
-                print(repr(i) + ": " + option.__name__)
+                print(repr(i) + ": " + option)
             print("")
 
             choice_string = input(
@@ -103,9 +103,7 @@ class FileGroup:
                     choices = fix_choice_string(choice_string, options)
         self.pipeline.reset()
         for choice in choices:  # Use the configuration specified to construct pipeline
-            if isinstance(choice, np.int64):
-                self.pipeline.add_component(options[choice]())
-            elif isinstance(choice, str):
+            if isinstance(choice, str):
                 try:
                     self.pipeline.add_component(self.__getattribute__(choice)())
                 except AttributeError:
