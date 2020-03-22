@@ -1,4 +1,4 @@
-"""Definitions for image file objects and groups of them."""
+"""Class definition for group of tabular files."""
 import os
 import pandas as pd
 from kaishi.core.file_group import FileGroup
@@ -7,7 +7,7 @@ from kaishi.tabular.file import TabularFile
 
 
 class TabularFileGroup(FileGroup):
-    """Class to operate on a tabular file group."""
+    """Object containing groups of :class:`kaishi.tabular.file.File` objects with methods to perform common operations on them."""
 
     # Externally defined classes and methods
     from kaishi.tabular.filters.duplicate_rows_each_dataframe import (
@@ -29,15 +29,18 @@ class TabularFileGroup(FileGroup):
     ):
         """Initialize new tabular file group and a data processing pipeline.
 
-        Args:
-            source: The path to the folder where the tabular data (csv or json files) are stored.
-            recursive: If True, Traverse the folder recursively to find files.
-            use_predefined_pipeline: If True, use a predefined pipeline: load -> concat -> dedup -> export.
-            out_dir: The output directory.
+        :param source: The path to the folder where the tabular data (csv or json files) are stored.
+        :type source: str
+        :param recursive: If True, Traverse the folder recursively to find files.
+        :type recursive: bool
+        :param use_predefined_pipeline: If True, use a predefined pipeline: load -> concat -> dedup -> export.
+        :type use_predefined_pipeline: bool
+        :param out_dir: The output directory.
+        :type out_dir: str
         """
         super().__init__(recursive)
         self.pipeline = Pipeline()
-        self.df_concatenated = None
+        self.artifacts["df_concatenated"] = None
         self.load_dir(source, TabularFile, recursive)
         if use_predefined_pipeline:
             if out_dir is not None:
@@ -53,7 +56,11 @@ class TabularFileGroup(FileGroup):
             )
 
     def _get_indexes_with_valid_dataframe(self):
-        """Get a list of file objects valid dataframes."""
+        """Get a list of indexes with valid dataframes.
+
+        :return: indexes with valid dataframe
+        :rtype: list
+        """
         valid_indexes = []
         for i, fobj in enumerate(self.files):
             fobj.verify_loaded()
@@ -63,32 +70,35 @@ class TabularFileGroup(FileGroup):
         return valid_indexes
 
     def _get_valid_dataframes(self):
-        """Get a list of valid dataframes."""
+        """Get a list of valid dataframe objects.
+
+        :return: valid dataframes
+        :rtype: list[:class:`pandas.core.frame.DataFrame`]
+        """
         valid_indexes = self._get_indexes_with_valid_dataframe()
         return [self.files[i].df for i in valid_indexes]
 
     def concatenate_all(self):
-        """Concatenate all tables into one."""
-        if self.df_concatenated is None:
-            self.df_concatenated = pd.concat(self._get_valid_dataframes()).reset_index(
-                drop=True
-            )
+        """Concatenate all tables into one (stored in the artifacts dict as "df_concatenated"."""
+        if self.artifacts["df_concatenated"] is None:
+            self.artifacts["df_concatenated"] = pd.concat(
+                self._get_valid_dataframes()
+            ).reset_index(drop=True)
 
     def save(self, out_dir: str, file_format: str = "csv"):
         """Save the processed dataset as individual files or as one file with all the data.
 
-        Args:
-            out_dir: The path of the output directory. If the directory does not exist,
-                it will be created.
-            file_format: The format of output files. Currently only support "csv".
-
+        :param out_dir: The path of the output directory. If the directory does not exist, it will be created.
+        :type out_dir: str
+        :param file_format: The format of output files. Currently only supports "csv".
+        :type file_format: str
         """
         print(f"Saving the results to {out_dir}")
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
-        if self.df_concatenated is not None:
+        if self.artifacts["df_concatenated"] is not None:
             if file_format == "csv":
-                self.df_concatenated.to_csv(
+                self.artifacts["df_concatenated"].to_csv(
                     os.path.join(out_dir, "all.csv"), index=False
                 )
             else:
@@ -110,19 +120,23 @@ class TabularFileGroup(FileGroup):
                     raise NotImplementedError
 
     def load_all(self):
-        """Load all files from the source directory.
-        """
+        """Load all files from the source directory."""
         for fobj in self.files:
             fobj.verify_loaded()
 
     def run_pipeline(self, verbose: bool = False):
-        """Run the pipeline as configured."""
+        """Run the pipeline as configured.
+
+        :param verbose: flag indicating verbosity
+        :type verbose: bool
+        """
         self.load_all()
         self.pipeline(self, verbose=verbose)
         if verbose:
             print("Pipeline completed")
 
     def report(self):
+        """Print a report of the dataset in its current state."""
         for i, fobj in enumerate(self.files):
             print(f"\nDataframe {i}")
             print(f"source: {fobj.abspath}")

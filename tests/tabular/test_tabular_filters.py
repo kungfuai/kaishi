@@ -15,7 +15,7 @@ def test_duplicate_rows_after_concatenation():
     test.configure_pipeline(["FilterDuplicateRowsAfterConcatenation"])
     with pytest.warns(UserWarning):
         test.run_pipeline()
-    assert len(test.df_concatenated) == 7
+    assert len(test.artifacts["df_concatenated"]) == 7
 
 
 def test_duplicate_rows_each_file():

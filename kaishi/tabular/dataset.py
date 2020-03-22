@@ -1,10 +1,11 @@
-"""Data exploration utilities for tabular data (csv files, database tables).
-"""
+"""Class definition for data exploration utilities for tabular data (csv files, database tables)."""
 import os
 from kaishi.tabular.file_group import TabularFileGroup
 
 
 class TabularDataset:
+    """Object for analyzing and manipulating tabular datasets."""
+
     def __new__(
         self,
         source: str = None,
@@ -12,13 +13,16 @@ class TabularDataset:
         use_predefined_pipeline: bool = False,
         out_dir: str = None,
     ):
-        """Create a tabular data pipeline.
+        """Create a tabular data object given a directory of files.
 
-        Args:
-            source: The path to the folder where the tabular data (csv or json files) are stored.
-            recursive: If True, Traverse the folder recursively to find files.
-            use_predefined_pipeline: If True, use a predefined pipeline: load -> concat -> dedup -> export.
-            out_dir: The output directory.
+        :param source: The path to the folder where the tabular data (csv or json files) are stored.
+        :type source: str
+        :param recursive: If True, Traverse the folder recursively to find files.
+        :type recursive: bool
+        :param use_predefined_pipeline: If True, use a predefined pipeline: load -> concat -> dedup -> export.
+        :type use_predefined_pipeline: bool
+        :param out_dir: The output directory.
+        :type out_dir: str
         """
         if os.path.exists(source):
             return TabularFileGroup(

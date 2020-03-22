@@ -1,26 +1,42 @@
-"""Definitions for image file objects and groups of them."""
+"""Class definition for tabular data files."""
 import warnings
 import pandas as pd
 from kaishi.core.file import File
 
 
 class TabularFile(File):
-    """Class extension from 'File' for tabular data-specific attributes and methods."""
+    """Class for tabular data file-specific attributes and methods."""
 
     def __init__(self, basedir: str, relpath: str, filename: str):
-        """Add members to supplement File class."""
+        """Initialize a new tabular file object.
+
+        :param basedir: base directory with data
+        :type basedir: str
+        :param relpath: relative path within the base directory
+        :type relpath: str
+        :param filename: basename of file to initialize
+        :type filename: str
+        """
         super().__init__(basedir, relpath, filename)
         self.summary = None
         self.df = None
         self.load_error = False
 
     def _has_csv_file_ext(self):
-        """Check if file is variant of .csv"""
+        """Check if file is variant of .csv
+
+        :return: flag indicating if file is valid
+        :rtype: bool
+        """
         fstr = self.basename.lower()
         return fstr.endswith(".csv.gz") or fstr.endswith(".csv")
 
     def _has_json_file_ext(self):
-        """Check if file is variant of .json"""
+        """Check if file is variant of .json
+
+        :return: flag indicating if file is valid
+        :rtype: bool
+        """
         fstr = self.basename.lower()
         return (
             fstr.endswith(".json")
@@ -46,7 +62,11 @@ class TabularFile(File):
             self.load_error = True
 
     def get_summary(self):
-        """Load summary for this data frame."""
+        """Create summary for this data frame.
+
+        :return: summary dictionary containing common analyses
+        :rtype: dict
+        """
         if self.df is None and self.load_error is False:
             self.verify_loaded()  # Try loading if it's None
         if self.load_error:
