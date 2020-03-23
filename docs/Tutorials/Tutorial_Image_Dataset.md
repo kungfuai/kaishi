@@ -1,8 +1,6 @@
 # Image Datasets
 Image datasets in this context are directories of files. Kaishi has a lot of built in functionality for interacting with them. While kaishi has many built-in pipeline components that operate on image datasets, a lot of the standard ETL is handled for you in the event you want to add your own custom code (without the ETL hassle).
 
-The following pages are a single example meant to be run concurrently.
-
 ## Initializing datasets
 Let's start by downloading a sample dataset to work with. You will need wget installed unless using your own directory of files.
 

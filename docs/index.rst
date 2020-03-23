@@ -12,6 +12,7 @@ More simply, Kaishi helps you automate steps to get from a raw dataset (in the f
 learning (or any other task you may need a clean dataset for).
 
 Examples of common operations include:
+
 - Filtering duplicate files
 - Standardizing image sizes
 - Detecting similar data that may not add value to machine learning tasks
