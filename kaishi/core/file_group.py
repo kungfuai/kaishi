@@ -121,6 +121,8 @@ class FileGroup:
                     warnings.warn(
                         choice + " is an invalid pipeline component, skipping..."
                     )
+            elif isinstance(choice, np.int64):
+                self.pipeline.add_component(self.__getattribute__(options[choice])())
             elif callable(choice):
                 self.pipeline.add_component(choice)
 
