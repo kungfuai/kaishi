@@ -11,6 +11,7 @@ Look at how other pipeline components are implemented. Feel free to write your o
 * Has a single `__call__` method with a single argument (a dataset object)
 * If specific configuration is needed, a method named `self.configure(...)` must be written with named arguments with defaults. `self.configure()` must be called as part of the `__init__(...)` call for configuration to work.
 * `self.applies_to_available = True` must be in the `__init__(...)` call if the component takes advantage of the `self.applies_to()` and `self.get_target_indexes()` methods from `kaishi.core.pipeline_component.PipelineComponent` method
+* If an artifact (i.e. some result) is created from the operation, as in the case of Aggregators, the artifact should be added to the `dataset.artifacts` dictionary (automatically initialized with any new dataset)
 
 You can then enable usage of the component with your instantiated dataset object, e.g.:
 ```
