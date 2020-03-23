@@ -1,6 +1,5 @@
 """Class definition for group of tabular files."""
 import os
-import pandas as pd
 from kaishi.core.file_group import FileGroup
 from kaishi.core.pipeline import Pipeline
 from kaishi.tabular.file import TabularFile

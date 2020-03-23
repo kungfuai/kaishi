@@ -1,5 +1,4 @@
 """Definitions for print helper utilities."""
-import os
 
 
 def should_print_row(i: int, max_entries: int, num_entries: int):

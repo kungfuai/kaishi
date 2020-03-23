@@ -4,7 +4,6 @@ from kaishi.core.misc import load_files_by_walk
 from kaishi.core.pipeline import Pipeline
 from kaishi.core.printing import should_print_row
 from prettytable import PrettyTable
-import os
 import pprint
 import numpy as np
 
