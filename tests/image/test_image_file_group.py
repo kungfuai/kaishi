@@ -1,6 +1,5 @@
 import os
 import tempfile
-from kaishi.image.file import ImageFile
 from kaishi.image.file_group import ImageFileGroup
 
 
