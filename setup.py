@@ -14,6 +14,18 @@ classifiers = [
     "Programming Language :: Python :: 3.6",
 ]
 
+install_requires = [
+    "imagehash>=4.0,<5.0",
+    "numpy>=1.17.3",
+    "pillow>=6.2.2,<7.0",
+    "PTable>=0.9.2,<1.0",
+    "torch>=1.3.0,<2.0",
+    "torchvision>=0.4.1,<1.0",
+    "tqdm>=4.37.0",
+    "typing>=3.7",
+    "pandas",
+]
+
 setup(
     name="kaishi",
     version="0.11",
@@ -24,6 +36,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     download_url="https://github.com/kungfuai/kaishi/archive/0.11.tar.gz",
+    install_requires=install_requires,
     classifiers=classifiers,
     zip_safe=False,
 )
