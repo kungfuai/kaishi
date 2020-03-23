@@ -120,7 +120,10 @@ td.report()
     Dataframe 0
     source: /Users/mwharton/Code/kaishi/notebooks/toy_csv/1.csv
     ====================================
-    {'describe': {'Index': count    10.00000
+    4 columns: ['Index', ' "Living Space (sq ft)"', ' "Beds"', ' "Baths"']
+    
+    ---  Column 'Index'
+    count    10.00000
     mean      5.50000
     std       3.02765
     min       1.00000
@@ -128,7 +131,10 @@ td.report()
     50%       5.50000
     75%       7.75000
     max      10.00000
-    Name: Index, dtype: float64, ' "Living Space (sq ft)"': count      10.00000
+    Name: Index, dtype: float64
+    
+    ---  Column ' "Living Space (sq ft)"'
+    count      10.00000
     mean     2577.50000
     std       894.97725
     min      1137.00000
@@ -136,7 +142,10 @@ td.report()
     50%      2441.50000
     75%      3393.25000
     max      3824.00000
-    Name:  "Living Space (sq ft)", dtype: float64, ' "Beds"': count    10.000000
+    Name:  "Living Space (sq ft)", dtype: float64
+    
+    ---  Column ' "Beds"'
+    count    10.000000
     mean      3.900000
     std       0.994429
     min       3.000000
@@ -144,7 +153,10 @@ td.report()
     50%       4.000000
     75%       4.000000
     max       6.000000
-    Name:  "Beds", dtype: float64, ' "Baths"': count    10.000000
+    Name:  "Beds", dtype: float64
+    
+    ---  Column ' "Baths"'
+    count    10.000000
     mean      3.150000
     std       0.747217
     min       2.000000
@@ -152,13 +164,22 @@ td.report()
     50%       3.000000
     75%       3.875000
     max       4.000000
-    Name:  "Baths", dtype: float64}, 'fraction_missing': {'Index': 0.0, ' "Living Space (sq ft)"': 0.0, ' "Beds"': 0.0, ' "Baths"': 0.0}, 'shape': (10, 4), 'columns': ['Index', ' "Living Space (sq ft)"', ' "Beds"', ' "Baths"'], 'filepath': '/Users/mwharton/Code/kaishi/notebooks/toy_csv/1.csv'}
+    Name:  "Baths", dtype: float64
+    
+    ***** Fraction of missing data in each column *****
+    Index: 0.0
+     "Living Space (sq ft)": 0.0
+     "Beds": 0.0
+     "Baths": 0.0
     
     
     Dataframe 1
     source: /Users/mwharton/Code/kaishi/notebooks/toy_csv/3.csv
     ====================================
-    {'describe': {'Index': count    10.00000
+    4 columns: ['Index', ' "Living Space (sq ft)"', ' "Beds"', ' "Baths"']
+    
+    ---  Column 'Index'
+    count    10.00000
     mean     15.50000
     std       3.02765
     min      11.00000
@@ -166,7 +187,10 @@ td.report()
     50%      15.50000
     75%      17.75000
     max      20.00000
-    Name: Index, dtype: float64, ' "Living Space (sq ft)"': count      10.00000
+    Name: Index, dtype: float64
+    
+    ---  Column ' "Living Space (sq ft)"'
+    count      10.00000
     mean     2577.50000
     std       894.97725
     min      1137.00000
@@ -174,7 +198,10 @@ td.report()
     50%      2441.50000
     75%      3393.25000
     max      3824.00000
-    Name:  "Living Space (sq ft)", dtype: float64, ' "Beds"': count    10.000000
+    Name:  "Living Space (sq ft)", dtype: float64
+    
+    ---  Column ' "Beds"'
+    count    10.000000
     mean      3.900000
     std       0.994429
     min       3.000000
@@ -182,7 +209,10 @@ td.report()
     50%       4.000000
     75%       4.000000
     max       6.000000
-    Name:  "Beds", dtype: float64, ' "Baths"': count    10.000000
+    Name:  "Beds", dtype: float64
+    
+    ---  Column ' "Baths"'
+    count    10.000000
     mean      3.150000
     std       0.747217
     min       2.000000
@@ -190,13 +220,22 @@ td.report()
     50%       3.000000
     75%       3.875000
     max       4.000000
-    Name:  "Baths", dtype: float64}, 'fraction_missing': {'Index': 0.0, ' "Living Space (sq ft)"': 0.0, ' "Beds"': 0.0, ' "Baths"': 0.0}, 'shape': (10, 4), 'columns': ['Index', ' "Living Space (sq ft)"', ' "Beds"', ' "Baths"'], 'filepath': '/Users/mwharton/Code/kaishi/notebooks/toy_csv/3.csv'}
+    Name:  "Baths", dtype: float64
+    
+    ***** Fraction of missing data in each column *****
+    Index: 0.0
+     "Living Space (sq ft)": 0.0
+     "Beds": 0.0
+     "Baths": 0.0
     
     
     Dataframe 2
     source: /Users/mwharton/Code/kaishi/notebooks/toy_csv/2.csv
     ====================================
-    {'describe': {'Index': count    10.00000
+    4 columns: ['Index', ' "Living Space (sq ft)"', ' "Beds"', ' "Baths"']
+    
+    ---  Column 'Index'
+    count    10.00000
     mean      5.50000
     std       3.02765
     min       1.00000
@@ -204,7 +243,10 @@ td.report()
     50%       5.50000
     75%       7.75000
     max      10.00000
-    Name: Index, dtype: float64, ' "Living Space (sq ft)"': count      10.00000
+    Name: Index, dtype: float64
+    
+    ---  Column ' "Living Space (sq ft)"'
+    count      10.00000
     mean     2577.50000
     std       894.97725
     min      1137.00000
@@ -212,7 +254,10 @@ td.report()
     50%      2441.50000
     75%      3393.25000
     max      3824.00000
-    Name:  "Living Space (sq ft)", dtype: float64, ' "Beds"': count    10.000000
+    Name:  "Living Space (sq ft)", dtype: float64
+    
+    ---  Column ' "Beds"'
+    count    10.000000
     mean      3.900000
     std       0.994429
     min       3.000000
@@ -220,7 +265,10 @@ td.report()
     50%       4.000000
     75%       4.000000
     max       6.000000
-    Name:  "Beds", dtype: float64, ' "Baths"': count    10.000000
+    Name:  "Beds", dtype: float64
+    
+    ---  Column ' "Baths"'
+    count    10.000000
     mean      3.150000
     std       0.747217
     min       2.000000
@@ -228,7 +276,13 @@ td.report()
     50%       3.000000
     75%       3.875000
     max       4.000000
-    Name:  "Baths", dtype: float64}, 'fraction_missing': {'Index': 0.0, ' "Living Space (sq ft)"': 0.0, ' "Beds"': 0.0, ' "Baths"': 0.0}, 'shape': (10, 4), 'columns': ['Index', ' "Living Space (sq ft)"', ' "Beds"', ' "Baths"'], 'filepath': '/Users/mwharton/Code/kaishi/notebooks/toy_csv/2.csv'}
+    Name:  "Baths", dtype: float64
+    
+    ***** Fraction of missing data in each column *****
+    Index: 0.0
+     "Living Space (sq ft)": 0.0
+     "Beds": 0.0
+     "Baths": 0.0
     
 
 
