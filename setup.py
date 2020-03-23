@@ -24,7 +24,7 @@ classifiers = [
 
 setup(
     name="kaishi",
-    version="0.0.1",
+    version="0.1",
     author="KUNGFU.AI",
     author_email="michael@kungfu.ai",
     description=("Tool kit to accelerate the first steps of the data science process"),
