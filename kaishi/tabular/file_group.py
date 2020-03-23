@@ -131,6 +131,7 @@ class TabularFileGroup(FileGroup):
             print("Pipeline completed")
 
     def report(self):
+        # TODO: Also do missing fraction reporting on the file group level.
         """Print a report of the dataset in its current state."""
         for i, fobj in enumerate(self.files):
             print(f"\nDataframe {i}")
@@ -139,9 +140,13 @@ class TabularFileGroup(FileGroup):
             if fobj.df is None:
                 print(f"NO DATA OR NOT LOADED (try running 'dataset.load_all()')")
             else:
-                print(fobj.get_summary())
-                # print(f"{len(fobj.df.columns)} columns: {list(fobj.df.columns)}")
-                # for col in fobj.df.columns:
-                #    print(f"\n---  Column '{col}'")
-                #    print(fobj.df[col].describe())
+                # print(fobj.get_summary())
+                print(f"{len(fobj.df.columns)} columns: {list(fobj.df.columns)}")
+                for col in fobj.df.columns:
+                    print(f"\n---  Column '{col}'")
+                    print(fobj.df[col].describe())
+                print("\n***** Fraction of missing data in each column *****")
+                fraction_missing = fobj.get_summary()["fraction_missing"]
+                for col in fobj.df.columns:
+                    print(f"{col}: {fraction_missing[col]}")
             print()

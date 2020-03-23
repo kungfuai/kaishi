@@ -11,3 +11,4 @@ if __name__ == "__main__":
         "tests/data/tabular", use_predefined_pipeline=True, out_dir="tmp"
     )
     tds.run_pipeline(verbose=True)
+    tds.report()

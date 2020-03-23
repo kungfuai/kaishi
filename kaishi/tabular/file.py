@@ -1,5 +1,6 @@
 """Class definition for tabular data files."""
 import warnings
+import numpy as np
 import pandas as pd
 from kaishi.core.file import File
 
@@ -77,6 +78,8 @@ class TabularFile(File):
             for col in self.df.columns.tolist():
                 col_missing = pd.isnull(self.df[col])
                 fraction_missing[col] = col_missing.mean()
+                if np.isnan(fraction_missing[col]):
+                    fraction_missing[col] = 0
                 describe[col] = self.df[col].describe()
             self.summary = {
                 "describe": describe,
