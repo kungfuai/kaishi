@@ -3,4 +3,5 @@ User Guide
 .. toctree::
    :maxdepth: 2
 
-   pipeline_components
+   install.md
+   pipeline_components.md

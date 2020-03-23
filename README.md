@@ -16,10 +16,9 @@ Two data types (images and tabular data) are currently implemented, but more (e.
 Python 3.6+
 
 # Installation
-To install (it will take a few secs to copy over the weights file(s)):
+To install simply:
 ```
-pip install -r requirements.txt
-pip install .
+pip install kaishi
 ```
 
 # Quick Start
