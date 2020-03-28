@@ -35,6 +35,8 @@ class Model:
             )
         state_dict = torch.load(weights_filename, map_location=self.device)
         self.model.load_state_dict(state_dict)
+        if torch.cuda.is_available():
+            self.model = self.model.cuda()
 
     def vgg16_bn(self, n_classes: int):
         """Basic VGG16 model with variable number of output classes.
