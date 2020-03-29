@@ -69,7 +69,13 @@ class Model:
         :rtype: `torchvision.models.resnet18`
         """
         model = torch.hub.load("pytorch/vision:v0.4.2", "resnet18", pretrained=False)
-        model.fc = nn.Sequential(nn.Linear(512, n_classes), nn.Sigmoid())
+        model.fc = nn.Sequential(
+            nn.Linear(512, 64),
+            nn.ReLU(),
+            nn.Dropout(0.15),
+            nn.Linear(64, n_classes),
+            nn.Sigmoid(),
+        )
 
         return model
 
