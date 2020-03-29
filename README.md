@@ -80,5 +80,8 @@ fd = FileDataset('your_directory')
 ...
 ```
 
+# Training data
+The image labeler model was trained using the data located at [this link](https://drive.google.com/open?id=1lKk3bilmxY4YC7p5BkZd9nm8DjsGmgRf). There is a README located in this archive with sources listed.
+
 # Documentation
 For more info, see our [documentation on ReadTheDocs](https://kaishi.readthedocs.io/en/latest/)
